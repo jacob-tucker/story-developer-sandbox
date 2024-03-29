@@ -93,7 +93,7 @@ export default function RegisterIPA() {
         <h3>OR</h3>
         <Card className="w-[350px]">
           <CardHeader>
-            <CardTitle>Step 1b. Mint & register new asset</CardTitle>
+            <CardTitle>Step 1b. Mint & register new IP</CardTitle>
             <CardDescription>
               Mint a new NFT to represent your IP and register it as an IP
               Asset.

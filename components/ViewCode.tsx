@@ -55,8 +55,8 @@ const data: {
     ],
   },
   "mint-license": {
-    title: "Mint a License",
-    description: "Mint a license from an existing IP Asset.",
+    title: "Mint a License Token",
+    description: "Mint a License Token from an existing IP Asset.",
     code: [
       { filename: "index.ts", code: mintLicense },
       { filename: "config.ts", code: setupClient },

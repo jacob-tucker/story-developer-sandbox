@@ -44,9 +44,9 @@ export default function MintLicense() {
       <div className="flex justify-center items-center">
         <Card className="w-[350px]">
           <CardHeader>
-            <CardTitle>Step 3. Mint a License</CardTitle>
+            <CardTitle>Step 3. Mint a License Token</CardTitle>
             <CardDescription>
-              Mint a license from an existing IP Asset.
+              Mint a License Token from an existing IP Asset.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -90,7 +90,7 @@ export default function MintLicense() {
                 )
               }
             >
-              Attach
+              Mint
             </Button>
             <ViewCode type="mint-license" />
           </CardFooter>
