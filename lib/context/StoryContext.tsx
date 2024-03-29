@@ -2,9 +2,7 @@ import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
 import { PropsWithChildren, createContext } from "react";
 import { useContext, useState } from "react";
 import { useEffect } from "react";
-import { createPublicClient } from "viem";
-import { createWalletClient } from "viem";
-import { Address, custom } from "viem";
+import { createPublicClient, createWalletClient, Address, custom } from "viem";
 import { sepolia } from "viem/chains";
 
 const defaultValue: {
@@ -51,7 +49,7 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   const mintNFT: (to: Address) => Promise<string> = async (to: Address) => {
     console.log("Minting a new NFT...");
     const walletClient = createWalletClient({
-      account: walletAddress as `0x${string}`,
+      account: walletAddress as Address,
       chain: sepolia,
       transport: custom(window.ethereum!),
     });

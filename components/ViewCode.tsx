@@ -17,6 +17,9 @@ import { setupClient } from "@/lib/code-snippets/setupClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { attachTerms } from "@/lib/code-snippets/attachTerms";
 import { mintLicense } from "@/lib/code-snippets/mintLicense";
+import { registerNewNft } from "@/lib/code-snippets/registerNewNft";
+import { mintNft } from "@/lib/code-snippets/mintNft";
+import { setupClientForMint } from "@/lib/code-snippets/setupClientForMint";
 
 const data: {
   [type: string]: {
@@ -37,7 +40,11 @@ const data: {
     title: "Register IP Asset",
     description:
       "Mint a new NFT to represent your IP and register it as an IP Asset.",
-    code: [{ filename: "config.ts", code: setupClient }],
+    code: [
+      { filename: "index.ts", code: registerNewNft },
+      { filename: "mint.ts", code: mintNft },
+      { filename: "config.ts", code: setupClientForMint },
+    ],
   },
   "attach-terms": {
     title: "Attach terms to IP Asset",

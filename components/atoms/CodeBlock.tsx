@@ -4,12 +4,14 @@ import { CopyBlock, github } from "react-code-blocks";
 
 export function Code({ code }: { code: string }) {
   return (
-    <CopyBlock
-      text={code.trim()}
-      language={"javascript"}
-      showLineNumbers
-      theme={github}
-      wrapLongLines
-    />
+    <div className="text-xs">
+      <CopyBlock
+        text={code.trim()}
+        language={"javascript"}
+        showLineNumbers
+        theme={github}
+        wrapLongLines
+      />
+    </div>
   );
 }
