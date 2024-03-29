@@ -47,7 +47,7 @@ export default function AttachTerms() {
                 <Input
                   type="text"
                   id="ipId"
-                  placeholder="12"
+                  placeholder="0x6Bba939A4215b8705bCaFdD34B99876D4D36FcaC"
                   onChange={(e) => setIpId(e.target.value)}
                 />
               </div>

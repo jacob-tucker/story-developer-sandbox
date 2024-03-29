@@ -27,7 +27,7 @@ const data: {
 } = {
   "register-existing-nft": {
     title: "Register IP Asset",
-    description: "Register an existing NFT as an IP Asset.",
+    description: "Register an existing NFT in your wallet as an IP Asset.",
     code: [
       { filename: "index.ts", code: registerExistingNft },
       { filename: "config.ts", code: setupClient },
@@ -41,7 +41,7 @@ const data: {
   },
   "attach-terms": {
     title: "Attach terms to IP Asset",
-    description: "Attach terms to an existing IP Asset.",
+    description: "Attach existing pre-set terms to an IP Asset.",
     code: [
       { filename: "index.ts", code: attachTerms },
       { filename: "config.ts", code: setupClient },

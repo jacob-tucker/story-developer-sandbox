@@ -56,7 +56,7 @@ export default function MintLicense() {
                 <Input
                   type="text"
                   id="licensorIpId"
-                  placeholder="12"
+                  placeholder="0x6Bba939A4215b8705bCaFdD34B99876D4D36FcaC"
                   onChange={(e) => setLicensorIpId(e.target.value)}
                 />
               </div>
@@ -74,7 +74,7 @@ export default function MintLicense() {
                 <Input
                   type="text"
                   id="receiverAddress"
-                  placeholder="1"
+                  placeholder="0x6Bba939A4215b8705bCaFdD34B99876D4D36FcaC"
                   onChange={(e) => setReceiverAddress(e.target.value)}
                 />
               </div>
