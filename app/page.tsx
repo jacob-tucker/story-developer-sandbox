@@ -5,6 +5,7 @@ import Introduction from "@/components/sections/Introduction";
 import RegisterIPA from "@/components/sections/RegisterIPA";
 import { VerticalLine } from "@/components/atoms/VerticalLine";
 import AttachTerms from "@/components/sections/AttachTerms";
+import MintLicense from "@/components/sections/MintLicense";
 
 export default function Home() {
   return (
@@ -15,7 +16,7 @@ export default function Home() {
       <VerticalLine />
       <AttachTerms />
       <VerticalLine />
-      <RegisterIPA />
+      <MintLicense />
       <VerticalLine />
     </main>
   );

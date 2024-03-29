@@ -12,36 +12,48 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Code } from "./atoms/CodeBlock";
+import { registerExistingNft } from "@/lib/code-snippets/registerExistingNft";
+import { setupClient } from "@/lib/code-snippets/setupClient";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { attachTerms } from "@/lib/code-snippets/attachTerms";
+import { mintLicense } from "@/lib/code-snippets/mintLicense";
 
 const data: {
-  [type: string]: { title: string; description: string; code: string };
+  [type: string]: {
+    title: string;
+    description: string;
+    code: { filename: string; code: string }[];
+  };
 } = {
   "register-existing-nft": {
-    title: "View Code",
+    title: "Register IP Asset",
     description: "Register an existing NFT as an IP Asset.",
-    code: `
-import { useAccount } from "wagmi";
-import { Address, custom } from "viem";
-import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
-
-const config: StoryConfig = {
-  account: account,
-  transport: custom(window.ethereum!),
-};
-const client = StoryClient.newClient(config);
-const registeredIpAsset = await client.ipAsset.registerRootIp({
-  tokenContractAddress: "0x7ee32b8b515dee0ba2f25f612a04a731eec24f49" as Address,
-  tokenId: nftId,
-  txOptions: { waitForTransaction: true },
-});
-console.log(registeredIpAsset);
-`,
+    code: [
+      { filename: "index.ts", code: registerExistingNft },
+      { filename: "config.ts", code: setupClient },
+    ],
   },
   "register-new-nft": {
-    title: "View Code",
+    title: "Register IP Asset",
     description:
       "Mint a new NFT to represent your IP and register it as an IP Asset.",
-    code: `Unavailable.`,
+    code: [{ filename: "config.ts", code: setupClient }],
+  },
+  "attach-terms": {
+    title: "Attach terms to IP Asset",
+    description: "Attach terms to an existing IP Asset.",
+    code: [
+      { filename: "index.ts", code: attachTerms },
+      { filename: "config.ts", code: setupClient },
+    ],
+  },
+  "mint-license": {
+    title: "Mint a License",
+    description: "Mint a license from an existing IP Asset.",
+    code: [
+      { filename: "index.ts", code: mintLicense },
+      { filename: "config.ts", code: setupClient },
+    ],
   },
 };
 
@@ -57,8 +69,25 @@ export function ViewCode({ type }: { type: string }) {
             <DrawerTitle>{data[type].title}</DrawerTitle>
             <DrawerDescription>{data[type].description}</DrawerDescription>
           </DrawerHeader>
-          <div>
-            <Code code={data[type].code} />
+          <div className="pl-4">
+            <Tabs defaultValue={data[type].code[0].filename}>
+              <TabsList>
+                {data[type].code.map((file) => {
+                  return (
+                    <TabsTrigger value={file.filename}>
+                      {file.filename}
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+              {data[type].code.map((file) => {
+                return (
+                  <TabsContent value={file.filename}>
+                    <Code code={file.code} />
+                  </TabsContent>
+                );
+              })}
+            </Tabs>
           </div>
           {/* <DrawerFooter>
             <Button>Submit</Button>

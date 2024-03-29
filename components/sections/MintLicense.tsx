@@ -12,21 +12,30 @@ import { Label } from "../ui/label";
 import { useState } from "react";
 import { ViewCode } from "../ViewCode";
 import { useStory } from "@/lib/context/StoryContext";
+import { Address } from "viem";
 
-export default function AttachTerms() {
+export default function MintLicense() {
   const { client } = useStory();
-  const [ipId, setIpId] = useState("");
+  const [licensorIpId, setLicensorIpId] = useState("");
+  const [receiverAddress, setReceiverAddress] = useState("");
   const [termsId, setTermsId] = useState("");
 
-  async function attachTermsToIPA(policyId: string, ipId: `0x${string}`) {
+  async function mintLicense(
+    policyId: string,
+    licensorIpId: `0x${string}`,
+    receiverAddress: Address
+  ) {
     if (!client) return;
-    const response = await client.policy.addPolicyToIp({
+    const response = await client.license.mintLicense({
       policyId,
-      ipId,
+      licensorIpId,
+      receiverAddress,
+      mintAmount: 1,
       txOptions: { waitForTransaction: true },
     });
+
     console.log(
-      `Attached Policy to IP at transaction hash ${response.txHash}, index: ${response.index}`
+      `License minted at transaction hash ${response.txHash}, license id: ${response.licenseId}`
     );
   }
 
@@ -35,20 +44,20 @@ export default function AttachTerms() {
       <div className="flex justify-center items-center">
         <Card className="w-[350px]">
           <CardHeader>
-            <CardTitle>Step 2. Attach terms to IPA</CardTitle>
+            <CardTitle>Step 3. Mint a License</CardTitle>
             <CardDescription>
-              Attach existing pre-set terms to an IP Asset.
+              Mint a license from an existing IP Asset.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-3">
               <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="ipId">IP ID</Label>
+                <Label htmlFor="licensorIpId">Licensor IP ID</Label>
                 <Input
                   type="text"
-                  id="ipId"
+                  id="licensorIpId"
                   placeholder="12"
-                  onChange={(e) => setIpId(e.target.value)}
+                  onChange={(e) => setLicensorIpId(e.target.value)}
                 />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -60,15 +69,30 @@ export default function AttachTerms() {
                   onChange={(e) => setTermsId(e.target.value)}
                 />
               </div>
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="receiverAddress">Receiver Address</Label>
+                <Input
+                  type="text"
+                  id="receiverAddress"
+                  placeholder="1"
+                  onChange={(e) => setReceiverAddress(e.target.value)}
+                />
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex gap-3">
             <Button
-              onClick={() => attachTermsToIPA(termsId, ipId as `0x${string}`)}
+              onClick={() =>
+                mintLicense(
+                  termsId,
+                  licensorIpId as `0x${string}`,
+                  receiverAddress as Address
+                )
+              }
             >
               Attach
             </Button>
-            <ViewCode type="attach-terms" />
+            <ViewCode type="mint-license" />
           </CardFooter>
         </Card>
       </div>

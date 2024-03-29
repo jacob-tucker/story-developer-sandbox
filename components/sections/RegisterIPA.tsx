@@ -30,13 +30,13 @@ export default function RegisterIPA() {
     tokenContractAddress: `0x${string}`
   ) => {
     if (!client) return;
-    const registeredIpAssetResponse = await client.ipAsset.registerRootIp({
+    const response = await client.ipAsset.registerRootIp({
       tokenContractAddress,
       tokenId,
       txOptions: { waitForTransaction: true },
     });
     console.log(
-      `Root IPA created at transaction hash ${registeredIpAssetResponse.txHash}, IPA ID: ${registeredIpAssetResponse.ipId}`
+      `Root IPA created at transaction hash ${response.txHash}, IPA ID: ${response.ipId}`
     );
   };
 
