@@ -20,6 +20,8 @@ import { mintLicense } from "@/lib/code-snippets/mintLicense";
 import { registerNewNft } from "@/lib/code-snippets/registerNewNft";
 import { mintNft } from "@/lib/code-snippets/mintNft";
 import { setupClientForMint } from "@/lib/code-snippets/setupClientForMint";
+import { registerNewNftDerivative } from "@/lib/code-snippets/registerNewNftDerivative";
+import { registerExistingNftDerivative } from "@/lib/code-snippets/registerExistingNftDerivative";
 
 const data: {
   [type: string]: {
@@ -60,6 +62,25 @@ const data: {
     code: [
       { filename: "index.ts", code: mintLicense },
       { filename: "config.ts", code: setupClient },
+    ],
+  },
+  "register-existing-nft-derivative": {
+    title: "Register Derivative IP Asset",
+    description:
+      "Register an existing NFT in your wallet as a derivative of an existing IP Asset.",
+    code: [
+      { filename: "index.ts", code: registerExistingNftDerivative },
+      { filename: "config.ts", code: setupClient },
+    ],
+  },
+  "register-new-nft-derivative": {
+    title: "Register Derivative IP Asset",
+    description:
+      "Mint a new NFT to represent your IP and register it as a derivative of an existing IP Asset.",
+    code: [
+      { filename: "index.ts", code: registerNewNftDerivative },
+      { filename: "mint.ts", code: mintNft },
+      { filename: "config.ts", code: setupClientForMint },
     ],
   },
 };

@@ -6,6 +6,7 @@ import RegisterIPA from "@/components/sections/RegisterIPA";
 import { VerticalLine } from "@/components/atoms/VerticalLine";
 import AttachTerms from "@/components/sections/AttachTerms";
 import MintLicense from "@/components/sections/MintLicense";
+import RegisterDerivativeIPA from "@/components/sections/RegisterDerivativeIPA";
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <VerticalLine />
       <MintLicense />
       <VerticalLine />
+      <RegisterDerivativeIPA />
     </main>
   );
 }

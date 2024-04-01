@@ -1,0 +1,16 @@
+export const registerExistingNftDerivative = `
+import { client } from './config.ts';
+import { Address } from 'viem';
+
+const tokenContractAddress: Address = "0x7ee32b8b515dee0ba2f25f612a04a731eec24f49";
+const tokenId: string = ...
+const licenseId: string = ...
+
+const response = await client.ipAsset.registerDerivativeIp({
+  tokenContractAddress, // your remixed NFT contract address
+  tokenId, // your remixed NFT token ID
+  licenseIds: [licenseId], // array of licenses relevant to the creation of the remix, minted from the parent IPA
+  txOptions: { waitForTransaction: true }
+});
+console.log(\`Remixed IPA created at transaction hash \${response.txHash}, IPA ID: \${response.ipId}\`)
+`;
