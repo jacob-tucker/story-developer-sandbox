@@ -5,20 +5,20 @@ import { useEffect } from "react";
 import { createPublicClient, createWalletClient, Address, custom } from "viem";
 import { sepolia } from "viem/chains";
 
+const sepoliaChainId = "0xaa36a7";
+
 const defaultValue: {
   client: StoryClient | null;
   walletAddress: string;
-  initializeStoryClient: () => void;
-  logout: () => void;
-  mintNFT: (to: Address) => Promise<string>;
+  initializeStoryClient: any;
+  logout: any;
+  mintNFT: any;
 } = {
   client: null,
   walletAddress: "",
-  initializeStoryClient: () => {},
+  initializeStoryClient: async () => {},
   logout: () => {},
-  mintNFT: async () => {
-    return "";
-  },
+  mintNFT: async () => {},
 };
 export const StoryContext = createContext(defaultValue);
 
@@ -29,19 +29,28 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   const [walletAddress, setWalletAddress] = useState<string>("");
 
   const initializeStoryClient = async () => {
-    const [account]: [Address] = await window.ethereum!.request({
-      method: "eth_requestAccounts",
-    });
-    const config: StoryConfig = {
-      account: account,
-      transport: custom(window.ethereum!),
-    };
-    const client = StoryClient.newClient(config);
-    setWalletAddress(account);
-    setClient(client);
+    if (!client || !walletAddress) {
+      const [account]: [Address] = await window.ethereum!.request({
+        method: "eth_requestAccounts",
+      });
+      const config: StoryConfig = {
+        account: account,
+        transport: custom(window.ethereum!),
+      };
+      const client = StoryClient.newClient(config);
+      setWalletAddress(account);
+      setClient(client);
+    }
+    const chainId = await window.ethereum!.request({ method: "eth_chainId" });
+    if (chainId !== sepoliaChainId) {
+      await window.ethereum!.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: sepoliaChainId }],
+      });
+    }
   };
 
-  const logout = async () => {
+  const logout = () => {
     setWalletAddress("");
     setClient(null);
   };
@@ -87,7 +96,13 @@ export default function StoryProvider({ children }: PropsWithChildren) {
 
   return (
     <StoryContext.Provider
-      value={{ client, walletAddress, initializeStoryClient, logout, mintNFT }}
+      value={{
+        client,
+        walletAddress,
+        initializeStoryClient,
+        logout,
+        mintNFT,
+      }}
     >
       {children}
     </StoryContext.Provider>

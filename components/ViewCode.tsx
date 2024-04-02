@@ -100,17 +100,17 @@ export function ViewCode({ type }: { type: string }) {
           <div className="pl-4">
             <Tabs defaultValue={data[type].code[0].filename}>
               <TabsList>
-                {data[type].code.map((file) => {
+                {data[type].code.map((file, index) => {
                   return (
-                    <TabsTrigger value={file.filename}>
+                    <TabsTrigger value={file.filename} key={index}>
                       {file.filename}
                     </TabsTrigger>
                   );
                 })}
               </TabsList>
-              {data[type].code.map((file) => {
+              {data[type].code.map((file, index) => {
                 return (
-                  <TabsContent value={file.filename}>
+                  <TabsContent value={file.filename} key={index}>
                     <Code code={file.code} />
                   </TabsContent>
                 );
