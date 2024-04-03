@@ -3,18 +3,16 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Code } from "./atoms/CodeBlock";
+import { Code } from "./CodeBlock";
 import { registerExistingNft } from "@/lib/code-snippets/registerExistingNft";
 import { setupClient } from "@/lib/code-snippets/setupClient";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { attachTerms } from "@/lib/code-snippets/attachTerms";
 import { mintLicense } from "@/lib/code-snippets/mintLicense";
 import { registerNewNft } from "@/lib/code-snippets/registerNewNft";

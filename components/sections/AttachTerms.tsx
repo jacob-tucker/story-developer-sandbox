@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useState } from "react";
-import { ViewCode } from "../ViewCode";
+import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/StoryContext";
 
 export default function AttachTerms() {
@@ -23,7 +23,7 @@ export default function AttachTerms() {
     const response = await client.policy.addPolicyToIp({
       policyId,
       ipId,
-      txOptions: { waitForTransaction: true },
+      txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
     });
     console.log(
       `Attached Policy to IP at transaction hash ${response.txHash}, index: ${response.index}`

@@ -1,6 +1,6 @@
 "use client";
 import "viem/window";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/sections/Navbar";
 import Introduction from "@/components/sections/Introduction";
 import RegisterIPA from "@/components/sections/RegisterIPA";
 import { VerticalLine } from "@/components/atoms/VerticalLine";
@@ -25,8 +25,8 @@ export default function Home() {
             />
             <AlertTitle>Please connect your wallet!</AlertTitle>
             <AlertDescription>
-              In order to use the Story Playground, you must connect your wallet
-              in the top right.
+              In order to use the Developer Sandbox, you must connect your
+              wallet in the top right.
             </AlertDescription>
           </Alert>
         </div>

@@ -1,8 +1,8 @@
-# Story Playground
+# Story Protocol - Developer Sandbox
 
 This is a Next.js app built to help you learn the Story Protocol TypeScript SDK and see its integration with a wallet like Metamask.
 
-The playground will walk you through building with Story Protocol step-by-step. More specifically:
+The sandbox will walk you through building with Story Protocol step-by-step. More specifically:
 
 1. Registering an IP Asset
 2. Attaching terms to that IP Asset

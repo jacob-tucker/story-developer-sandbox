@@ -11,7 +11,7 @@ const response = await client.license.mintLicense({
     licensorIpId,
     receiverAddress,
     mintAmount: 1,
-    txOptions: { waitForTransaction: true },
+    txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
 });
 
 console.log(

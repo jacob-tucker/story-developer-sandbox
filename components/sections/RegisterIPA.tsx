@@ -11,7 +11,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Address } from "viem";
 import { useState } from "react";
-import { ViewCode } from "../ViewCode";
+import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/StoryContext";
 
 export default function RegisterIPA() {
@@ -33,7 +33,7 @@ export default function RegisterIPA() {
     const response = await client.ipAsset.registerRootIp({
       tokenContractAddress,
       tokenId,
-      txOptions: { waitForTransaction: true },
+      txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
     });
     console.log(
       `Root IPA created at transaction hash ${response.txHash}, IPA ID: ${response.ipId}`

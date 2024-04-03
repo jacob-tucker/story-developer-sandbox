@@ -1,3 +1,4 @@
+"use client";
 import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
 import { PropsWithChildren, createContext } from "react";
 import { useContext, useState } from "react";
