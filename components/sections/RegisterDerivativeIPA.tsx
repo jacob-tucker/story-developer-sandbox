@@ -13,39 +13,58 @@ import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/StoryContext";
 import { Address } from "viem";
+import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 
 export default function RegisterDerivativeIPA() {
-  const { client, mintNFT, walletAddress } = useStory();
+  const { client, mintNFT, walletAddress, setTxLoading, setTxName, setTxHash } =
+    useStory();
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState();
   const [licenseId, setLicenseId] = useState("");
   const [nftId, setNftId] = useState("");
   const [nftContractAddress, setNftContractAddress] = useState("");
 
   const mintAndRegisterNFT = async () => {
     if (!client) return;
-    const tokenId = await mintNFT(walletAddress as Address);
+    setTxLoading(true);
+    setTxName(
+      "Minting an NFT so it can be registered as a derivative of an IP Asset..."
+    );
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    //@ts-ignore
+    formData.append("file", image);
+    const ipfsUri = await uploadJSONToIPFS(formData);
+
+    const tokenId = await mintNFT(walletAddress as Address, ipfsUri);
     registerDerivativeIPA(
       tokenId,
-      "0x7ee32b8b515dee0ba2f25f612a04a731eec24f49",
-      licenseId
+      "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc"
     );
   };
 
   async function registerDerivativeIPA(
     tokenId: string,
-    tokenContractAddress: `0x${string}`,
-    licenseId: string
+    tokenContractAddress: `0x${string}`
   ) {
     if (!client) return;
+    setTxLoading(true);
+    setTxName("Registering an NFT as a derivative of an IP Asset...");
     const response = await client.ipAsset.registerDerivativeIp({
       tokenContractAddress,
       tokenId,
       licenseIds: [licenseId],
+      ipName: name,
       txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
     });
 
     console.log(
       `Remixed IPA created at transaction hash ${response.txHash}, IPA ID: ${response.ipId}`
     );
+    setTxLoading(false);
+    setTxHash(response.txHash);
   }
 
   return (
@@ -75,7 +94,7 @@ export default function RegisterDerivativeIPA() {
                 <Input
                   type="text"
                   id="nftContractAddress"
-                  placeholder="0x7ee32b8b515dee0ba2f25f612a04a731eec24f49"
+                  placeholder="0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc"
                   onChange={(e) => setNftContractAddress(e.target.value)}
                 />
               </div>
@@ -95,8 +114,7 @@ export default function RegisterDerivativeIPA() {
               onClick={() =>
                 registerDerivativeIPA(
                   nftId,
-                  nftContractAddress as `0x${string}`,
-                  licenseId
+                  nftContractAddress as `0x${string}`
                 )
               }
             >
@@ -118,7 +136,12 @@ export default function RegisterDerivativeIPA() {
             <div className="flex flex-col gap-3">
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="name">Name</Label>
-                <Input type="text" id="name" placeholder="Doge" />
+                <Input
+                  type="text"
+                  id="name"
+                  placeholder="Doge"
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="description">Description</Label>
@@ -126,11 +149,17 @@ export default function RegisterDerivativeIPA() {
                   type="text"
                   id="description"
                   placeholder="doge wif hat"
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="image">Image</Label>
-                <Input type="file" id="image" />
+                <Input
+                  type="file"
+                  id="image"
+                  //@ts-ignore
+                  onChange={(e) => setImage(e.target.files[0])}
+                />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="licenseId">License ID</Label>

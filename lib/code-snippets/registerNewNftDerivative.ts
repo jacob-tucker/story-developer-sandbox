@@ -6,7 +6,7 @@ import { mintNFT } from './mint.ts';
 const walletAddress: Address = ...
 
 const tokenId = await mintNFT(walletAddress);
-const tokenContractAddress: Address = "0x7ee32b8b515dee0ba2f25f612a04a731eec24f49";
+const tokenContractAddress: Address = "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc";
 const licenseId: string = ...
 
 const response = await client.ipAsset.registerDerivativeIp({

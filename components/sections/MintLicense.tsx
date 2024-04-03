@@ -15,21 +15,19 @@ import { useStory } from "@/lib/context/StoryContext";
 import { Address } from "viem";
 
 export default function MintLicense() {
-  const { client } = useStory();
+  const { client, setTxHash, setTxLoading, setTxName } = useStory();
   const [licensorIpId, setLicensorIpId] = useState("");
   const [receiverAddress, setReceiverAddress] = useState("");
   const [termsId, setTermsId] = useState("");
 
-  async function mintLicense(
-    policyId: string,
-    licensorIpId: `0x${string}`,
-    receiverAddress: Address
-  ) {
+  async function mintLicense() {
     if (!client) return;
+    setTxLoading(true);
+    setTxName("Minting a License Token from an IP Asset...");
     const response = await client.license.mintLicense({
-      policyId,
-      licensorIpId,
-      receiverAddress,
+      policyId: termsId,
+      licensorIpId: licensorIpId as `0x${string}`,
+      receiverAddress: receiverAddress as Address,
       mintAmount: 1,
       txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
     });
@@ -37,6 +35,8 @@ export default function MintLicense() {
     console.log(
       `License minted at transaction hash ${response.txHash}, license id: ${response.licenseId}`
     );
+    setTxLoading(false);
+    setTxHash(response.txHash);
   }
 
   return (
@@ -81,17 +81,7 @@ export default function MintLicense() {
             </div>
           </CardContent>
           <CardFooter className="flex gap-3">
-            <Button
-              onClick={() =>
-                mintLicense(
-                  termsId,
-                  licensorIpId as `0x${string}`,
-                  receiverAddress as Address
-                )
-              }
-            >
-              Mint
-            </Button>
+            <Button onClick={mintLicense}>Mint</Button>
             <ViewCode type="mint-license" />
           </CardFooter>
         </Card>

@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -13,16 +14,30 @@ import { Address } from "viem";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/StoryContext";
+import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 
 export default function RegisterIPA() {
-  const { client, walletAddress, mintNFT } = useStory();
+  const { client, walletAddress, mintNFT, setTxHash, setTxLoading, setTxName } =
+    useStory();
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState();
   const [nftId, setNftId] = useState("");
   const [nftContractAddress, setNftContractAddress] = useState("");
 
   const mintAndRegisterNFT = async () => {
     if (!client) return;
-    const tokenId = await mintNFT(walletAddress as Address);
-    registerExistingNFT(tokenId, "0x7ee32b8b515dee0ba2f25f612a04a731eec24f49");
+    setTxLoading(true);
+    setTxName("Minting an NFT so it can be registered as an IP Asset...");
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    //@ts-ignore
+    formData.append("file", image);
+    const ipfsUri = await uploadJSONToIPFS(formData);
+
+    const tokenId = await mintNFT(walletAddress as Address, ipfsUri);
+    registerExistingNFT(tokenId, "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc");
   };
 
   const registerExistingNFT = async (
@@ -30,25 +45,23 @@ export default function RegisterIPA() {
     tokenContractAddress: `0x${string}`
   ) => {
     if (!client) return;
+    setTxLoading(true);
+    setTxName("Registering an NFT as an IP Asset...");
     const response = await client.ipAsset.registerRootIp({
       tokenContractAddress,
       tokenId,
+      ipName: name,
       txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
     });
     console.log(
       `Root IPA created at transaction hash ${response.txHash}, IPA ID: ${response.ipId}`
     );
+    setTxLoading(false);
+    setTxHash(response.txHash);
   };
 
   return (
     <div>
-      {/* <div className="flex flex-col justify-center items-center mb-[15px]">
-        <h2 className="text-xl font-bold">Step 1: Register IP Asset</h2>
-        <p className="text-muted-foreground md:max-w-[600px] max-w-[400px] text-center">
-          Register an existing NFT as an IP Asset, or mint a new NFT to
-          represent a real-world asset.
-        </p>
-      </div> */}
       <div className="flex md:flex-row gap-3 justify-center items-center flex-col">
         <Card className="w-[350px]">
           <CardHeader>
@@ -73,7 +86,7 @@ export default function RegisterIPA() {
                 <Input
                   type="text"
                   id="nftContractAddress"
-                  placeholder="0x7ee32b8b515dee0ba2f25f612a04a731eec24f49"
+                  placeholder="0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc"
                   onChange={(e) => setNftContractAddress(e.target.value)}
                 />
               </div>
@@ -103,7 +116,12 @@ export default function RegisterIPA() {
             <div className="flex flex-col gap-3">
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="name">Name</Label>
-                <Input type="text" id="name" placeholder="Doge" />
+                <Input
+                  type="text"
+                  id="name"
+                  placeholder="Doge"
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="description">Description</Label>
@@ -111,11 +129,17 @@ export default function RegisterIPA() {
                   type="text"
                   id="description"
                   placeholder="doge wif hat"
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="image">Image</Label>
-                <Input type="file" id="image" />
+                <Input
+                  type="file"
+                  id="image"
+                  // @ts-ignore
+                  onChange={(e) => setImage(e.target.files[0])}
+                />
               </div>
             </div>
           </CardContent>

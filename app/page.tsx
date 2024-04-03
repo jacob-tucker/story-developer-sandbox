@@ -12,14 +12,48 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 export default function Home() {
-  const { client } = useStory();
+  const { client, txLoading, txHash, txName } = useStory();
   return (
     <main className="flex min-h-screen flex-col">
-      {!client ? (
+      {txLoading ? (
         <div className="fixed bottom-5 left-5">
           <Alert>
             <Icon
-              style={{ color: "#ff2825" }}
+              style={{ color: "#ff2825", marginTop: "-5px" }}
+              className="h-4 w-4"
+              icon="tabler:loader"
+            />
+            <AlertTitle>Transaction Loading</AlertTitle>
+            <AlertDescription>{txName}</AlertDescription>
+          </Alert>
+        </div>
+      ) : txHash ? (
+        <div className="fixed bottom-5 left-5">
+          <Alert>
+            <Icon
+              style={{ color: "#ff2825", marginTop: "-5px" }}
+              className="h-4 w-4"
+              icon="tabler:check"
+            />
+            <AlertTitle>Transaction Complete</AlertTitle>
+            <AlertDescription>
+              View your transaction on the{" "}
+              <a
+                href={`https://explorer.storyprotocol.xyz/transactions/${txHash}`}
+                target="_blank"
+                style={{ color: "rgb(255, 40, 37)" }}
+              >
+                Story Protocol explorer
+              </a>
+              .
+            </AlertDescription>
+          </Alert>
+        </div>
+      ) : !client ? (
+        <div className="fixed bottom-5 left-5">
+          <Alert>
+            <Icon
+              style={{ color: "#ff2825", marginTop: "-5px" }}
               className="h-4 w-4"
               icon="tabler:alert-triangle"
             />

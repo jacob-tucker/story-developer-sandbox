@@ -5,22 +5,36 @@ import { useContext, useState } from "react";
 import { useEffect } from "react";
 import { createPublicClient, createWalletClient, Address, custom } from "viem";
 import { sepolia } from "viem/chains";
+import { defaultNftContractAbi } from "../defaultNftContractAbi";
 
 const sepoliaChainId = "0xaa36a7";
 
 const defaultValue: {
+  txLoading: boolean;
+  txHash: string;
+  txName: string;
+  setTxLoading: any;
+  setTxHash: any;
+  setTxName: any;
   client: StoryClient | null;
   walletAddress: string;
   initializeStoryClient: any;
   logout: any;
   mintNFT: any;
 } = {
+  txLoading: false,
+  txHash: "",
   client: null,
   walletAddress: "",
+  txName: "",
+  setTxLoading: () => {},
+  setTxHash: () => {},
+  setTxName: () => {},
   initializeStoryClient: async () => {},
   logout: () => {},
   mintNFT: async () => {},
 };
+
 export const StoryContext = createContext(defaultValue);
 
 export const useStory = () => useContext(StoryContext);
@@ -28,6 +42,9 @@ export const useStory = () => useContext(StoryContext);
 export default function StoryProvider({ children }: PropsWithChildren) {
   const [client, setClient] = useState<StoryClient | null>(null);
   const [walletAddress, setWalletAddress] = useState<string>("");
+  const [txLoading, setTxLoading] = useState<boolean>(false);
+  const [txName, setTxName] = useState<string>("");
+  const [txHash, setTxHash] = useState<string>("");
 
   const initializeStoryClient = async () => {
     if (!client || !walletAddress) {
@@ -56,7 +73,7 @@ export default function StoryProvider({ children }: PropsWithChildren) {
     setClient(null);
   };
 
-  const mintNFT: (to: Address) => Promise<string> = async (to: Address) => {
+  const mintNFT = async (to: Address, uri: string) => {
     console.log("Minting a new NFT...");
     const walletClient = createWalletClient({
       account: walletAddress as Address,
@@ -68,19 +85,11 @@ export default function StoryProvider({ children }: PropsWithChildren) {
       chain: sepolia,
     });
 
-    // 3. Mint an NFT to your account
-    const mintContractAbi = {
-      inputs: [{ internalType: "address", name: "to", type: "address" }],
-      name: "mint",
-      outputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
-      stateMutability: "nonpayable",
-      type: "function",
-    };
     const { request } = await publicClient.simulateContract({
-      address: "0x7ee32b8b515dee0ba2f25f612a04a731eec24f49",
+      address: "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc",
       functionName: "mint",
-      args: [to],
-      abi: [mintContractAbi],
+      args: [to, uri],
+      abi: defaultNftContractAbi,
     });
     const hash = await walletClient.writeContract(request);
     console.log(`Minted NFT successful with hash: ${hash}`);
@@ -91,15 +100,23 @@ export default function StoryProvider({ children }: PropsWithChildren) {
     return tokenId;
   };
 
-  //   useEffect(() => {
-  //     initializeStoryClient();
-  //   }, []);
+  useEffect(() => {
+    if (!client || !walletAddress) {
+      initializeStoryClient();
+    }
+  }, []);
 
   return (
     <StoryContext.Provider
       value={{
         client,
         walletAddress,
+        txLoading,
+        txHash,
+        txName,
+        setTxLoading,
+        setTxName,
+        setTxHash,
         initializeStoryClient,
         logout,
         mintNFT,

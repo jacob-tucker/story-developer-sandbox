@@ -14,20 +14,24 @@ import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/StoryContext";
 
 export default function AttachTerms() {
-  const { client } = useStory();
+  const { client, setTxHash, setTxLoading, setTxName } = useStory();
   const [ipId, setIpId] = useState("");
   const [termsId, setTermsId] = useState("");
 
-  async function attachTermsToIPA(policyId: string, ipId: `0x${string}`) {
+  async function attachTermsToIPA() {
     if (!client) return;
+    setTxLoading(true);
+    setTxName("Attaching terms to an IP Asset...");
     const response = await client.policy.addPolicyToIp({
-      policyId,
-      ipId,
+      policyId: termsId,
+      ipId: ipId as `0x${string}`,
       txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
     });
     console.log(
       `Attached Policy to IP at transaction hash ${response.txHash}, index: ${response.index}`
     );
+    setTxLoading(false);
+    setTxHash(response.txHash);
   }
 
   return (
@@ -63,11 +67,7 @@ export default function AttachTerms() {
             </div>
           </CardContent>
           <CardFooter className="flex gap-3">
-            <Button
-              onClick={() => attachTermsToIPA(termsId, ipId as `0x${string}`)}
-            >
-              Attach
-            </Button>
+            <Button onClick={attachTermsToIPA}>Attach</Button>
             <ViewCode type="attach-terms" />
           </CardFooter>
         </Card>
