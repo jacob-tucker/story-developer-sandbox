@@ -10,13 +10,14 @@ import RegisterDerivativeIPA from "@/components/sections/RegisterDerivativeIPA";
 import { useStory } from "@/lib/context/StoryContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import Footer from "@/components/sections/Footer";
 
 export default function Home() {
   const { client, txLoading, txHash, txName } = useStory();
   return (
     <main className="flex min-h-screen flex-col">
       {txLoading ? (
-        <div className="fixed bottom-5 left-5">
+        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px]">
           <Alert>
             <Icon
               style={{ color: "#ff2825", marginTop: "-5px" }}
@@ -28,7 +29,7 @@ export default function Home() {
           </Alert>
         </div>
       ) : txHash ? (
-        <div className="fixed bottom-5 left-5">
+        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px]">
           <Alert>
             <Icon
               style={{ color: "#ff2825", marginTop: "-5px" }}
@@ -50,7 +51,7 @@ export default function Home() {
           </Alert>
         </div>
       ) : !client ? (
-        <div className="fixed bottom-5 left-5">
+        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px]">
           <Alert>
             <Icon
               style={{ color: "#ff2825", marginTop: "-5px" }}
@@ -74,6 +75,7 @@ export default function Home() {
       <MintLicense />
       <VerticalLine />
       <RegisterDerivativeIPA />
+      <Footer />
     </main>
   );
 }
