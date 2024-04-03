@@ -13,6 +13,13 @@ import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/StoryContext";
 import { Address } from "viem";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export default function MintLicense() {
   const { client, setTxHash, setTxLoading, setTxName } = useStory();
@@ -61,13 +68,17 @@ export default function MintLicense() {
                 />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="termsId">Terms ID</Label>
-                <Input
-                  type="text"
-                  id="termsId"
-                  placeholder="1"
-                  onChange={(e) => setTermsId(e.target.value)}
-                />
+                <Label htmlFor="termsId">Terms</Label>
+                <Select onValueChange={(value) => setTermsId(value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select pre-set terms" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">
+                      Non-Commercial Social Remixing
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="receiverAddress">Receiver Address</Label>
