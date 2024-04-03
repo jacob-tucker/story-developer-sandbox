@@ -18,7 +18,7 @@ export default function Navbar() {
             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-white/25">
               <Icon icon="tabler:flask-2" />
             </div>
-            Story Beta
+            SDK Version: Beta
           </div>
         </div>
         <div className="flex items-center gap-8">
