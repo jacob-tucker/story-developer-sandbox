@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">
       {txLoading ? (
-        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px]">
+        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px] z-10">
           <Alert>
             <Icon
               style={{ color: "#ff2825", marginTop: "-5px" }}
@@ -29,7 +29,7 @@ export default function Home() {
           </Alert>
         </div>
       ) : txHash ? (
-        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px]">
+        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px] z-10">
           <Alert>
             <Icon
               style={{ color: "#ff2825", marginTop: "-5px" }}
@@ -51,7 +51,7 @@ export default function Home() {
           </Alert>
         </div>
       ) : !client ? (
-        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px]">
+        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px] z-10">
           <Alert>
             <Icon
               style={{ color: "#ff2825", marginTop: "-5px" }}
