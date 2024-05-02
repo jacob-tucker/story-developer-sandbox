@@ -29,7 +29,7 @@ export default function Navbar() {
         <div className="flex items-center gap-8">
           <a
             className="text-sm/6 font-medium text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
-            href="https://docs.storyprotocol.xyz/docs/what-is-story-protocol"
+            href="https://docs.storyprotocol.xyz/v1/docs/what-is-story-protocol"
             target="_blank"
           >
             Docs
