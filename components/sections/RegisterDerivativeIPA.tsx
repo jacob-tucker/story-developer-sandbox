@@ -47,24 +47,33 @@ export default function RegisterDerivativeIPA() {
 
   async function registerDerivativeIPA(
     tokenId: string,
-    tokenContractAddress: `0x${string}`
+    tokenContract: `0x${string}`
   ) {
     if (!client) return;
     setTxLoading(true);
-    setTxName("Registering an NFT as a derivative of an IP Asset...");
-    const response = await client.ipAsset.registerDerivativeIp({
-      tokenContractAddress,
+    setTxName("Registering an NFT as an IP Asset...");
+    const registerResponse = await client.ipAsset.register({
+      tokenContract,
       tokenId,
-      licenseIds: [licenseId],
-      ipName: name,
-      txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
+      txOptions: { waitForTransaction: true },
     });
-
     console.log(
-      `Remixed IPA created at transaction hash ${response.txHash}, IPA ID: ${response.ipId}`
+      `IPA created at tx hash ${registerResponse.txHash}, IPA ID: ${registerResponse.ipId}`
+    );
+    setTxName(
+      "Registering the IP Asset as a derivative of another IP Asset..."
+    );
+    const registerDerivativeResponse =
+      await client.ipAsset.registerDerivativeWithLicenseTokens({
+        childIpId: registerResponse.ipId!,
+        licenseTokenIds: [licenseId],
+        txOptions: { waitForTransaction: true },
+      });
+    console.log(
+      `IPA registered as derivative at tx hash ${registerDerivativeResponse.txHash}`
     );
     setTxLoading(false);
-    setTxHash(response.txHash);
+    setTxHash(registerDerivativeResponse.txHash);
   }
 
   return (

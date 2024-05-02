@@ -6,11 +6,17 @@ const tokenContractAddress: Address = "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89ED
 const tokenId: string = ...
 const licenseId: string = ...
 
-const response = await client.ipAsset.registerDerivativeIp({
-  tokenContractAddress, // your remixed NFT contract address
-  tokenId, // your remixed NFT token ID
-  licenseIds: [licenseId], // array of licenses relevant to the creation of the remix, minted from the parent IPA
+const registerResponse = await client.ipAsset.register({
+  tokenContract,
+  tokenId,
   txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) }
 });
-console.log(\`Remixed IPA created at transaction hash \${response.txHash}, IPA ID: \${response.ipId}\`)
+console.log(\`IPA created at tx hash \${registerResponse.txHash}, IPA ID: \${registerResponse.ipId}\`);
+
+const registerDerivativeResponse = await client.ipAsset.registerDerivativeWithLicenseTokens({
+  childIpId: registerResponse.ipId!,
+  licenseTokenIds: [licenseId],
+  txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) }
+});
+console.log(\`IPA registered as derivative at tx hash \${registerDerivativeResponse.txHash}\`);
 `;

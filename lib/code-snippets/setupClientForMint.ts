@@ -9,6 +9,7 @@ const [account]: [Address] = await window.ethereum!.request({
 const config: StoryConfig = {
     account: account,
     transport: custom(window.ethereum!),
+    chainId: "sepolia"
 };
 export const client = StoryClient.newClient(config);
 

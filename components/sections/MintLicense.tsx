@@ -31,16 +31,16 @@ export default function MintLicense() {
     if (!client) return;
     setTxLoading(true);
     setTxName("Minting a License Token from an IP Asset...");
-    const response = await client.license.mintLicense({
-      policyId: termsId,
+    const response = await client.license.mintLicenseTokens({
+      licenseTermsId: termsId,
       licensorIpId: licensorIpId as `0x${string}`,
-      receiverAddress: receiverAddress as Address,
-      mintAmount: 1,
-      txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
+      receiver: receiverAddress as Address,
+      amount: 1,
+      txOptions: { waitForTransaction: true },
     });
 
     console.log(
-      `License minted at transaction hash ${response.txHash}, license id: ${response.licenseId}`
+      `License minted at tx hash ${response.txHash}, License ID: ${response.licenseTokenId}`
     );
     setTxLoading(false);
     setTxHash(response.txHash);

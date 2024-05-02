@@ -29,14 +29,12 @@ export default function AttachTerms() {
     if (!client) return;
     setTxLoading(true);
     setTxName("Attaching terms to an IP Asset...");
-    const response = await client.policy.addPolicyToIp({
-      policyId: termsId,
+    const response = await client.license.attachLicenseTerms({
+      licenseTermsId: termsId,
       ipId: ipId as `0x${string}`,
-      txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
+      txOptions: { waitForTransaction: true },
     });
-    console.log(
-      `Attached Policy to IP at transaction hash ${response.txHash}, index: ${response.index}`
-    );
+    console.log(`Attached License Terms to IP at tx hash ${response.txHash}`);
     setTxLoading(false);
     setTxHash(response.txHash);
   }

@@ -54,6 +54,7 @@ export default function StoryProvider({ children }: PropsWithChildren) {
       const config: StoryConfig = {
         account: account,
         transport: custom(window.ethereum!),
+        chainId: "sepolia",
       };
       const client = StoryClient.newClient(config);
       setWalletAddress(account);

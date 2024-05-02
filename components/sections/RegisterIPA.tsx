@@ -42,19 +42,18 @@ export default function RegisterIPA() {
 
   const registerExistingNFT = async (
     tokenId: string,
-    tokenContractAddress: `0x${string}`
+    tokenContract: `0x${string}`
   ) => {
     if (!client) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
-    const response = await client.ipAsset.registerRootIp({
-      tokenContractAddress,
+    const response = await client.ipAsset.register({
+      tokenContract,
       tokenId,
-      ipName: name,
-      txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
+      txOptions: { waitForTransaction: true },
     });
     console.log(
-      `Root IPA created at transaction hash ${response.txHash}, IPA ID: ${response.ipId}`
+      `Root IPA created at tx hash ${response.txHash}, IPA ID: ${response.ipId}`
     );
     setTxLoading(false);
     setTxHash(response.txHash);
