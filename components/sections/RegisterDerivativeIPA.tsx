@@ -47,7 +47,7 @@ export default function RegisterDerivativeIPA() {
 
   async function registerDerivativeIPA(
     tokenId: string,
-    tokenContract: `0x${string}`
+    tokenContract: Address
   ) {
     if (!client) return;
     setTxLoading(true);
@@ -121,10 +121,7 @@ export default function RegisterDerivativeIPA() {
           <CardFooter className="flex gap-3">
             <Button
               onClick={() =>
-                registerDerivativeIPA(
-                  nftId,
-                  nftContractAddress as `0x${string}`
-                )
+                registerDerivativeIPA(nftId, nftContractAddress as Address)
               }
             >
               Register

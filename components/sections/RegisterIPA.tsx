@@ -42,7 +42,7 @@ export default function RegisterIPA() {
 
   const registerExistingNFT = async (
     tokenId: string,
-    tokenContract: `0x${string}`
+    tokenContract: Address
   ) => {
     if (!client) return;
     setTxLoading(true);
@@ -94,7 +94,7 @@ export default function RegisterIPA() {
           <CardFooter className="flex gap-3">
             <Button
               onClick={() =>
-                registerExistingNFT(nftId, nftContractAddress as `0x${string}`)
+                registerExistingNFT(nftId, nftContractAddress as Address)
               }
             >
               Register

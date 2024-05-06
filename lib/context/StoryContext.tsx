@@ -47,22 +47,23 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   const [txHash, setTxHash] = useState<string>("");
 
   const initializeStoryClient = async () => {
+    if (!window.ethereum) return;
     if (!client || !walletAddress) {
-      const [account]: [Address] = await window.ethereum!.request({
+      const [account]: [Address] = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
       const config: StoryConfig = {
         account: account,
-        transport: custom(window.ethereum!),
+        transport: custom(window.ethereum),
         chainId: "sepolia",
       };
       const client = StoryClient.newClient(config);
       setWalletAddress(account);
       setClient(client);
     }
-    const chainId = await window.ethereum!.request({ method: "eth_chainId" });
+    const chainId = await window.ethereum.request({ method: "eth_chainId" });
     if (chainId !== sepoliaChainId) {
-      await window.ethereum!.request({
+      await window.ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: sepoliaChainId }],
       });
@@ -75,14 +76,15 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   };
 
   const mintNFT = async (to: Address, uri: string) => {
+    if (!window.ethereum) return;
     console.log("Minting a new NFT...");
     const walletClient = createWalletClient({
       account: walletAddress as Address,
       chain: sepolia,
-      transport: custom(window.ethereum!),
+      transport: custom(window.ethereum),
     });
     const publicClient = createPublicClient({
-      transport: custom(window.ethereum!),
+      transport: custom(window.ethereum),
       chain: sepolia,
     });
 

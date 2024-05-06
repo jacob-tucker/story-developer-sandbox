@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Address } from "viem";
 
 export default function AttachTerms() {
   const { client, setTxHash, setTxLoading, setTxName } = useStory();
@@ -31,7 +32,7 @@ export default function AttachTerms() {
     setTxName("Attaching terms to an IP Asset...");
     const response = await client.license.attachLicenseTerms({
       licenseTermsId: termsId,
-      ipId: ipId as `0x${string}`,
+      ipId: ipId as Address,
       txOptions: { waitForTransaction: true },
     });
     console.log(`Attached License Terms to IP at tx hash ${response.txHash}`);

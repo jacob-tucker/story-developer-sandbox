@@ -33,7 +33,7 @@ export default function MintLicense() {
     setTxName("Minting a License Token from an IP Asset...");
     const response = await client.license.mintLicenseTokens({
       licenseTermsId: termsId,
-      licensorIpId: licensorIpId as `0x${string}`,
+      licensorIpId: licensorIpId as Address,
       receiver: receiverAddress as Address,
       amount: 1,
       txOptions: { waitForTransaction: true },
