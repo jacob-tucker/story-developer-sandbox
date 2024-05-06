@@ -20,6 +20,7 @@ import { mintNft } from "@/lib/code-snippets/mintNft";
 import { setupClientForMint } from "@/lib/code-snippets/setupClientForMint";
 import { registerNewNftDerivative } from "@/lib/code-snippets/registerNewNftDerivative";
 import { registerExistingNftDerivative } from "@/lib/code-snippets/registerExistingNftDerivative";
+import { collectRoyalty } from "@/lib/code-snippets/collectRoyalty";
 
 const data: {
   [type: string]: {
@@ -79,6 +80,15 @@ const data: {
       { filename: "index.ts", code: registerNewNftDerivative },
       { filename: "mint.ts", code: mintNft },
       { filename: "config.ts", code: setupClientForMint },
+    ],
+  },
+  "collect-royalty": {
+    title: "Collect Royalty Tokens",
+    description:
+      "Claim the royalty tokens and any accrued revenue tokens from children.",
+    code: [
+      { filename: "index.ts", code: collectRoyalty },
+      { filename: "config.ts", code: setupClient },
     ],
   },
 };

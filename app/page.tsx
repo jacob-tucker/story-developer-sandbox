@@ -11,6 +11,7 @@ import { useStory } from "@/lib/context/StoryContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Footer from "@/components/sections/Footer";
+import CollectRoyalty from "@/components/sections/CollectRoyalty";
 
 export default function Home() {
   const { client, txLoading, txHash, txName } = useStory();
@@ -75,6 +76,8 @@ export default function Home() {
       <MintLicense />
       <VerticalLine />
       <RegisterDerivativeIPA />
+      <VerticalLine />
+      <CollectRoyalty />
       <Footer />
     </main>
   );
