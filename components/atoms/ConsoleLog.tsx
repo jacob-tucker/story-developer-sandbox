@@ -57,7 +57,13 @@ export function ConsoleLog() {
           </TableHeader>
           {txLoading ? (
             <TableRow>
-              <TableCell>Pending transaction...</TableCell>
+              <TableCell className="italic">Pending transaction...</TableCell>
+            </TableRow>
+          ) : transactions.length == 0 ? (
+            <TableRow>
+              <TableCell className="italic">
+                There are no transactions yet.
+              </TableCell>
             </TableRow>
           ) : null}
           <TableBody>
