@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Footer from "@/components/sections/Footer";
 import CollectRoyalty from "@/components/sections/CollectRoyalty";
+import { ConsoleLog } from "@/components/atoms/ConsoleLog";
 
 export default function Home() {
   const { client, txLoading, txHash, txName } = useStory();
@@ -68,6 +69,9 @@ export default function Home() {
         </div>
       ) : null}
       <Navbar />
+      <div className="relative">
+        <ConsoleLog />
+      </div>
       <Introduction />
       <RegisterIPA />
       <VerticalLine />

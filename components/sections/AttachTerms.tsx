@@ -22,7 +22,8 @@ import {
 import { Address } from "viem";
 
 export default function AttachTerms() {
-  const { client, setTxHash, setTxLoading, setTxName } = useStory();
+  const { client, setTxHash, setTxLoading, setTxName, addTransaction } =
+    useStory();
   const [ipId, setIpId] = useState("");
   const [termsId, setTermsId] = useState("");
 
@@ -38,6 +39,7 @@ export default function AttachTerms() {
     console.log(`Attached License Terms to IP at tx hash ${response.txHash}`);
     setTxLoading(false);
     setTxHash(response.txHash);
+    addTransaction(response.txHash, "Attach Terms", {});
   }
 
   return (

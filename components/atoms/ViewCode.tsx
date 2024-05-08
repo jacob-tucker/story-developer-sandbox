@@ -2,13 +2,15 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Code } from "./CodeBlock";
 import { registerExistingNft } from "@/lib/code-snippets/registerExistingNft";
 import { setupClient } from "@/lib/code-snippets/setupClient";
@@ -95,17 +97,17 @@ const data: {
 
 export function ViewCode({ type }: { type: string }) {
   return (
-    <Drawer>
-      <DrawerTrigger asChild>
+    <Sheet>
+      <SheetTrigger asChild>
         <Button variant="outline">View Code</Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <div className="mx-auto w-full mt-6">
-          <DrawerHeader>
-            <DrawerTitle>{data[type].title}</DrawerTitle>
-            <DrawerDescription>{data[type].description}</DrawerDescription>
-          </DrawerHeader>
-          <div className="pl-4">
+      </SheetTrigger>
+      <SheetContent side="bottom">
+        <div className="mx-auto w-full">
+          <SheetHeader>
+            <SheetTitle>{data[type].title}</SheetTitle>
+            <SheetDescription>{data[type].description}</SheetDescription>
+          </SheetHeader>
+          <div className="pt-4">
             <Tabs defaultValue={data[type].code[0].filename}>
               <TabsList>
                 {data[type].code.map((file, index) => {
@@ -132,7 +134,7 @@ export function ViewCode({ type }: { type: string }) {
             </DrawerClose>
           </DrawerFooter> */}
         </div>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }

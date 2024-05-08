@@ -8,7 +8,7 @@ const tokenId: string = ...
 const response = await client.ipAsset.register({
   tokenContract,
   tokenId,
-  txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
+  txOptions: { waitForTransaction: true },
 });
 console.log(\`Root IPA created at tx hash \${response.txHash}, IPA ID: \${response.ipId}\`);
 `;

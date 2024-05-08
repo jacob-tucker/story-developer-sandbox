@@ -9,35 +9,33 @@ import { defaultNftContractAbi } from "../defaultNftContractAbi";
 
 const sepoliaChainId = "0xaa36a7";
 
-const defaultValue: {
+interface StoryContextType {
   txLoading: boolean;
   txHash: string;
   txName: string;
-  setTxLoading: any;
-  setTxHash: any;
-  setTxName: any;
+  transactions: { txHash: string; action: string; data: any }[];
+  setTxLoading: (loading: boolean) => void;
+  setTxHash: (txHash: string) => void;
+  setTxName: (txName: string) => void;
   client: StoryClient | null;
   walletAddress: string;
-  initializeStoryClient: any;
-  logout: any;
-  mintNFT: any;
-} = {
-  txLoading: false,
-  txHash: "",
-  client: null,
-  walletAddress: "",
-  txName: "",
-  setTxLoading: () => {},
-  setTxHash: () => {},
-  setTxName: () => {},
-  initializeStoryClient: async () => {},
-  logout: () => {},
-  mintNFT: async () => {},
+  initializeStoryClient: () => Promise<void>;
+  logout: () => void;
+  mintNFT: (to: Address, uri: string) => Promise<string>;
+  addTransaction: (txHash: string, action: string, data: any) => void;
+}
+
+export const StoryContext = createContext<StoryContextType | undefined>(
+  undefined
+);
+
+export const useStory = () => {
+  const context = useContext(StoryContext);
+  if (!context) {
+    throw new Error("useStory must be used within an StoryProvider");
+  }
+  return context;
 };
-
-export const StoryContext = createContext(defaultValue);
-
-export const useStory = () => useContext(StoryContext);
 
 export default function StoryProvider({ children }: PropsWithChildren) {
   const [client, setClient] = useState<StoryClient | null>(null);
@@ -45,6 +43,9 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   const [txLoading, setTxLoading] = useState<boolean>(false);
   const [txName, setTxName] = useState<string>("");
   const [txHash, setTxHash] = useState<string>("");
+  const [transactions, setTransactions] = useState<
+    { txHash: string; action: string; data: any }[]
+  >([]);
 
   const initializeStoryClient = async () => {
     if (!window.ethereum) return;
@@ -76,7 +77,7 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   };
 
   const mintNFT = async (to: Address, uri: string) => {
-    if (!window.ethereum) return;
+    if (!window.ethereum) return "";
     console.log("Minting a new NFT...");
     const walletClient = createWalletClient({
       account: walletAddress as Address,
@@ -100,7 +101,13 @@ export default function StoryProvider({ children }: PropsWithChildren) {
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
     const tokenId = Number(receipt.logs[0].topics[3]).toString();
     console.log(`Minted NFT tokenId: ${tokenId}`);
+    addTransaction(hash, "Mint NFT", { tokenId });
     return tokenId;
+  };
+
+  const addTransaction = (txHash: string, action: string, data: any) => {
+    let newTxs = transactions.concat({ txHash, action, data });
+    setTransactions(newTxs);
   };
 
   useEffect(() => {
@@ -117,12 +124,14 @@ export default function StoryProvider({ children }: PropsWithChildren) {
         txLoading,
         txHash,
         txName,
+        transactions,
         setTxLoading,
         setTxName,
         setTxHash,
         initializeStoryClient,
         logout,
         mintNFT,
+        addTransaction,
       }}
     >
       {children}

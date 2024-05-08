@@ -15,7 +15,8 @@ import { useStory } from "@/lib/context/StoryContext";
 import { Address } from "viem";
 
 export default function CollectRoyalty() {
-  const { client, setTxHash, setTxLoading, setTxName } = useStory();
+  const { client, setTxHash, setTxLoading, setTxName, addTransaction } =
+    useStory();
   const [parentIpId, setParentIpId] = useState("");
   const [childIpId, setChildIpId] = useState("");
 
@@ -34,6 +35,9 @@ export default function CollectRoyalty() {
     );
     setTxLoading(false);
     setTxHash(response.txHash);
+    addTransaction(response.txHash, "Collect Royalty", {
+      royaltyTokensCollected: response.royaltyTokensCollected,
+    });
   }
 
   return (

@@ -17,8 +17,15 @@ import { useStory } from "@/lib/context/StoryContext";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 
 export default function RegisterIPA() {
-  const { client, walletAddress, mintNFT, setTxHash, setTxLoading, setTxName } =
-    useStory();
+  const {
+    client,
+    walletAddress,
+    mintNFT,
+    setTxHash,
+    setTxLoading,
+    setTxName,
+    addTransaction,
+  } = useStory();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState();
@@ -56,7 +63,10 @@ export default function RegisterIPA() {
       `Root IPA created at tx hash ${response.txHash}, IPA ID: ${response.ipId}`
     );
     setTxLoading(false);
-    setTxHash(response.txHash);
+    setTxHash(response.txHash as string);
+    addTransaction(response.txHash as string, "Register IPA", {
+      ipId: response.ipId,
+    });
   };
 
   return (

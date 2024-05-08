@@ -3,7 +3,7 @@ const { client } from './config.ts';
 import { Address } from 'viem';
 
 const licenseTermsId: string = ...
-const licensorIpId: \`0x\${string}\` = ...
+const licensorIpId: Address = ...
 const receiver: Address = ...
 
 const response = await client.license.mintLicenseTokens({
@@ -11,7 +11,7 @@ const response = await client.license.mintLicenseTokens({
     licensorIpId,
     receiver,
     amount: 1,
-    txOptions: { waitForTransaction: true, gasPrice: BigInt(10000000000) },
+    txOptions: { waitForTransaction: true },
 });
 
 console.log(\`License minted at tx hash \${response.txHash}, License ID: \${response.licenseId}\`);

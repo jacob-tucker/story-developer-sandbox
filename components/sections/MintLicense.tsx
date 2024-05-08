@@ -22,7 +22,8 @@ import {
 } from "../ui/select";
 
 export default function MintLicense() {
-  const { client, setTxHash, setTxLoading, setTxName } = useStory();
+  const { client, setTxHash, setTxLoading, setTxName, addTransaction } =
+    useStory();
   const [licensorIpId, setLicensorIpId] = useState("");
   const [receiverAddress, setReceiverAddress] = useState("");
   const [termsId, setTermsId] = useState("");
@@ -43,7 +44,10 @@ export default function MintLicense() {
       `License minted at tx hash ${response.txHash}, License ID: ${response.licenseTokenId}`
     );
     setTxLoading(false);
-    setTxHash(response.txHash);
+    setTxHash(response.txHash as string);
+    addTransaction(response.txHash as string, "Mint License", {
+      licenseTokenId: response.licenseTokenId,
+    });
   }
 
   return (

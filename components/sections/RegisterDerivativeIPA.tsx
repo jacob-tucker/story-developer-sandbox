@@ -16,8 +16,15 @@ import { Address } from "viem";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 
 export default function RegisterDerivativeIPA() {
-  const { client, mintNFT, walletAddress, setTxLoading, setTxName, setTxHash } =
-    useStory();
+  const {
+    client,
+    mintNFT,
+    walletAddress,
+    setTxLoading,
+    setTxName,
+    setTxHash,
+    addTransaction,
+  } = useStory();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState();
@@ -60,6 +67,9 @@ export default function RegisterDerivativeIPA() {
     console.log(
       `IPA created at tx hash ${registerResponse.txHash}, IPA ID: ${registerResponse.ipId}`
     );
+    addTransaction(registerResponse.txHash as string, "Register IPA", {
+      ipId: registerResponse.ipId,
+    });
     setTxName(
       "Registering the IP Asset as a derivative of another IP Asset..."
     );
@@ -74,6 +84,11 @@ export default function RegisterDerivativeIPA() {
     );
     setTxLoading(false);
     setTxHash(registerDerivativeResponse.txHash);
+    addTransaction(
+      registerDerivativeResponse.txHash,
+      "Linked IPA as Derivative",
+      {}
+    );
   }
 
   return (
