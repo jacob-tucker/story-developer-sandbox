@@ -106,8 +106,7 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   };
 
   const addTransaction = (txHash: string, action: string, data: any) => {
-    let newTxs = transactions.concat({ txHash, action, data });
-    setTransactions(newTxs);
+    setTransactions((oldTxs) => [...oldTxs, { txHash, action, data }]);
   };
 
   useEffect(() => {

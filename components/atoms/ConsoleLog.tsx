@@ -23,7 +23,7 @@ import {
 import { useStory } from "@/lib/context/StoryContext";
 
 export function ConsoleLog() {
-  const { transactions } = useStory();
+  const { transactions, txLoading } = useStory();
   return (
     <Sheet>
       <SheetTrigger
@@ -49,14 +49,21 @@ export function ConsoleLog() {
           {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Action</TableHead>
+              <TableHead>ID</TableHead>
+              <TableHead>Action</TableHead>
               <TableHead>Tx Hash</TableHead>
               <TableHead>Data</TableHead>
             </TableRow>
           </TableHeader>
+          {txLoading ? (
+            <TableRow>
+              <TableCell>Pending transaction...</TableCell>
+            </TableRow>
+          ) : null}
           <TableBody>
-            {transactions.map((tx) => (
+            {transactions.toReversed().map((tx, index) => (
               <TableRow key={tx.txHash}>
+                <TableCell>{transactions.length - 1 - index}</TableCell>
                 <TableCell className="font-medium">{tx.action}</TableCell>
                 <TableCell className="flex items-center gap-[5px]">
                   {tx.txHash}{" "}
@@ -74,7 +81,7 @@ export function ConsoleLog() {
           </TableBody>
           {/* <TableFooter>
             <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell colSpan={2}>Total</TableCell>
               <TableCell className="text-right">$2,500.00</TableCell>
             </TableRow>
           </TableFooter> */}
