@@ -32,7 +32,7 @@ export function ConsoleLog() {
       >
         <Button
           variant="outline"
-          className="rounded-tr-none rounded-br-none gap-[10px]"
+          className="rounded-bl-none rounded-br-none gap-[10px]"
         >
           <Icon icon="tabler:arrow-up" />
           Open log

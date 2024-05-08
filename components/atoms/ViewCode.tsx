@@ -23,6 +23,8 @@ import { setupClientForMint } from "@/lib/code-snippets/setupClientForMint";
 import { registerNewNftDerivative } from "@/lib/code-snippets/registerNewNftDerivative";
 import { registerExistingNftDerivative } from "@/lib/code-snippets/registerExistingNftDerivative";
 import { collectRoyalty } from "@/lib/code-snippets/collectRoyalty";
+import { snapshot } from "@/lib/code-snippets/snapshot";
+import { claimRevenue } from "@/lib/code-snippets/claimRevenue";
 
 const data: {
   [type: string]: {
@@ -90,6 +92,24 @@ const data: {
       "Claim the royalty tokens and any accrued revenue tokens from children.",
     code: [
       { filename: "index.ts", code: collectRoyalty },
+      { filename: "config.ts", code: setupClient },
+    ],
+  },
+  snapshot: {
+    title: "Snapshot",
+    description:
+      "Take a snapshot of the current state of the royalty system so you can claim revenue in the next step.",
+    code: [
+      { filename: "index.ts", code: snapshot },
+      { filename: "config.ts", code: setupClient },
+    ],
+  },
+  "claim-revenue": {
+    title: "Claim Revenue",
+    description:
+      "Claim the revenue you are due from holding the Royalty Token of a child IP Asset.",
+    code: [
+      { filename: "index.ts", code: claimRevenue },
       { filename: "config.ts", code: setupClient },
     ],
   },

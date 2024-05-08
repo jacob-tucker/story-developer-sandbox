@@ -13,6 +13,8 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import Footer from "@/components/sections/Footer";
 import CollectRoyalty from "@/components/sections/CollectRoyalty";
 import { ConsoleLog } from "@/components/atoms/ConsoleLog";
+import Snapshot from "@/components/sections/Snapshot";
+import ClaimRevenue from "@/components/sections/ClaimRevenue";
 
 export default function Home() {
   const { client, txLoading, txHash, txName } = useStory();
@@ -82,6 +84,10 @@ export default function Home() {
       <RegisterDerivativeIPA />
       <VerticalLine />
       <CollectRoyalty />
+      <VerticalLine />
+      <Snapshot />
+      <VerticalLine />
+      <ClaimRevenue />
       <Footer />
     </main>
   );
