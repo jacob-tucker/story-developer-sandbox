@@ -70,7 +70,7 @@ export default function AttachTerms() {
                     <SelectValue placeholder="Select pre-set terms" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">
+                    <SelectItem value="2">
                       Non-Commercial Social Remixing
                     </SelectItem>
                   </SelectContent>
