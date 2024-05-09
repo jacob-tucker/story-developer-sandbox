@@ -70,23 +70,26 @@ export function ConsoleLog() {
             </TableRow>
           ) : null}
           <TableBody>
-            {transactions.toReversed().map((tx, index) => (
-              <TableRow key={tx.txHash}>
-                <TableCell>{transactions.length - 1 - index}</TableCell>
-                <TableCell className="font-medium">{tx.action}</TableCell>
-                <TableCell className="flex items-center gap-[5px]">
-                  {tx.txHash}{" "}
-                  <a
-                    href={`https://explorer.storyprotocol.xyz/transactions/${tx.txHash}`}
-                    target="_blank"
-                    style={{ color: "rgb(255, 40, 37)" }}
-                  >
-                    <Icon icon="tabler:link" />
-                  </a>
-                </TableCell>
-                <TableCell>{JSON.stringify(tx.data)}</TableCell>
-              </TableRow>
-            ))}
+            {transactions
+              .slice()
+              .reverse()
+              .map((tx, index) => (
+                <TableRow key={tx.txHash}>
+                  <TableCell>{transactions.length - 1 - index}</TableCell>
+                  <TableCell className="font-medium">{tx.action}</TableCell>
+                  <TableCell className="flex items-center gap-[5px]">
+                    {tx.txHash}{" "}
+                    <a
+                      href={`https://explorer.storyprotocol.xyz/transactions/${tx.txHash}`}
+                      target="_blank"
+                      style={{ color: "rgb(255, 40, 37)" }}
+                    >
+                      <Icon icon="tabler:link" />
+                    </a>
+                  </TableCell>
+                  <TableCell>{JSON.stringify(tx.data)}</TableCell>
+                </TableRow>
+              ))}
           </TableBody>
           {/* <TableFooter>
             <TableRow>
