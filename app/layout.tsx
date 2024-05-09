@@ -20,7 +20,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <StoryProvider>{children}</StoryProvider>
-        <script src="myscripts.js"></script>
       </body>
     </html>
   );
