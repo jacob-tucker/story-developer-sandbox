@@ -15,9 +15,12 @@ import CollectRoyalty from "@/components/sections/CollectRoyalty";
 import { ConsoleLog } from "@/components/atoms/ConsoleLog";
 import Snapshot from "@/components/sections/Snapshot";
 import ClaimRevenue from "@/components/sections/ClaimRevenue";
+import introJs from "intro.js";
 
 export default function Home() {
   const { client, txLoading, txHash, txName } = useStory();
+
+  introJs().setOption("dontShowAgain", true).start();
   return (
     <main className="flex min-h-screen flex-col">
       {txLoading ? (

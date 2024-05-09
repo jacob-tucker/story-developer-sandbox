@@ -70,7 +70,11 @@ export default function RegisterIPA() {
   };
 
   return (
-    <div>
+    <div
+      data-title="Step-by-Step"
+      data-intro="Each step shows you how to interact with your IP."
+      data-step="2"
+    >
       <div className="flex md:flex-row gap-3 justify-center items-center flex-col">
         <Card className="w-[350px]">
           <CardHeader>
@@ -109,7 +113,13 @@ export default function RegisterIPA() {
             >
               Register
             </Button>
-            <ViewCode type="register-existing-nft" />
+            <div
+              data-title="View Code"
+              data-intro="You can view the code associated with each step."
+              data-step="3"
+            >
+              <ViewCode type="register-existing-nft" />
+            </div>
           </CardFooter>
         </Card>
         <h3>OR</h3>

@@ -29,6 +29,9 @@ export function ConsoleLog() {
       <SheetTrigger
         asChild
         className="w-[150px] bottom-[0px] right-[50px] fixed"
+        data-title="Console Log"
+        data-intro="On each step, you'll need data from a previous step. You can find all that information, including transaction data, in the console log."
+        data-step="4"
       >
         <Button
           variant="outline"

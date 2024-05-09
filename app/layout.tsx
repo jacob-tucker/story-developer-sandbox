@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import StoryProvider from "@/lib/context/StoryContext";
 import { Metadata } from "next";
+import "intro.js/introjs.css";
 
 export const metadata: Metadata = {
   title: "Developer Sandbox",
@@ -19,6 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <StoryProvider>{children}</StoryProvider>
+        <script src="myscripts.js"></script>
       </body>
     </html>
   );
