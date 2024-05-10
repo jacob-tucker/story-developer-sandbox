@@ -77,6 +77,7 @@ export default function RegisterIPA() {
           data-title="Step-by-Step"
           data-intro="Each step shows you how to interact with your IP."
           data-step="2"
+          data-position="left"
         >
           <CardHeader>
             <CardTitle>Step 1a. Register existing NFT</CardTitle>
