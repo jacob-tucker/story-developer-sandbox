@@ -4,7 +4,7 @@ import { Address } from 'viem';
 
 const childIpId: Address = ...
 
-const response = await client.license.attachLicenseTerms({
+const response = await client.royalty.snapshot({
     royaltyVaultIpId: childIpId,
     txOptions: { waitForTransaction: true },
 });
