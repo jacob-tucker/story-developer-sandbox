@@ -22,7 +22,12 @@ export default function Home() {
   const { client, txLoading, txHash, txName } = useStory();
 
   useEffect(() => {
-    introJs().setOption("dontShowAgain", true).start();
+    introJs()
+      .setOptions({
+        dontShowAgain: true,
+        disableInteraction: true,
+      })
+      .start();
   }, []);
   return (
     <main className="flex min-h-screen flex-col">
