@@ -5,9 +5,12 @@ This is a Next.js app built to help you learn the Story Protocol TypeScript SDK 
 The sandbox will walk you through building with Story Protocol step-by-step. More specifically:
 
 1. Registering an IP Asset
-2. Attaching terms to that IP Asset
+2. Attaching License Terms to that IP Asset
 3. Minting a License Token from an IP Asset
 4. Registering a derivative IP Asset from a License Token
+5. Collecting Royalty Tokens
+6. Taking a snapshot
+7. Claiming revenue from a snapshot
 
 ## Get Started
 
