@@ -52,15 +52,12 @@ export default function RegisterDerivativeIPA() {
     );
   };
 
-  async function registerDerivativeIPA(
-    tokenId: string,
-    tokenContract: Address
-  ) {
+  async function registerDerivativeIPA(tokenId: string, nftContract: Address) {
     if (!client) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
     const registerResponse = await client.ipAsset.register({
-      tokenContract,
+      nftContract,
       tokenId,
       txOptions: { waitForTransaction: true },
     });
@@ -75,7 +72,7 @@ export default function RegisterDerivativeIPA() {
     );
     const registerDerivativeResponse =
       await client.ipAsset.registerDerivativeWithLicenseTokens({
-        childIpId: registerResponse.ipId!,
+        childIpId: registerResponse.ipId as Address,
         licenseTokenIds: [licenseId],
         txOptions: { waitForTransaction: true },
       });

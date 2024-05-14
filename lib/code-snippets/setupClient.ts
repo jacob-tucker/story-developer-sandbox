@@ -3,12 +3,12 @@ import { custom, Address } from "viem";
 import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
 
 if (window.ethereum) {
-    const [account]: [Address] = await window.ethereum!.request({
+    const [account]: [Address] = await window.ethereum.request({
         method: "eth_requestAccounts",
     });
     const config: StoryConfig = {
         account: account,
-        transport: custom(window.ethereum!),
+        transport: custom(window.ethereum),
         chainId: "sepolia"
     };
     export const client = StoryClient.newClient(config);

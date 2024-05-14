@@ -19,7 +19,7 @@
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
-    "@story-protocol/core-sdk": "^1.0.0-rc.10",
+    "@story-protocol/core-sdk": "^1.0.0-rc.11",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "intro.js": "^7.2.0",

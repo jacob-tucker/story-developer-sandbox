@@ -47,15 +47,12 @@ export default function RegisterIPA() {
     registerExistingNFT(tokenId, "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc");
   };
 
-  const registerExistingNFT = async (
-    tokenId: string,
-    tokenContract: Address
-  ) => {
+  const registerExistingNFT = async (tokenId: string, nftContract: Address) => {
     if (!client) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
     const response = await client.ipAsset.register({
-      tokenContract,
+      nftContract,
       tokenId,
       txOptions: { waitForTransaction: true },
     });

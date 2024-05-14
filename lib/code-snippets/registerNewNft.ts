@@ -6,10 +6,10 @@ import { mintNFT } from './mint.ts';
 const walletAddress: Address = ...
 
 const tokenId: string = await mintNFT(walletAddress);
-const tokenContract: Address = "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc";
+const nftContract: Address = "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc";
 
 const response = await client.ipAsset.register({
-  tokenContract,
+  nftContract,
   tokenId,
   txOptions: { waitForTransaction: true },
 });
