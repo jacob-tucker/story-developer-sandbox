@@ -109,11 +109,11 @@ export default function StoryProvider({ children }: PropsWithChildren) {
     setTransactions((oldTxs) => [...oldTxs, { txHash, action, data }]);
   };
 
-  useEffect(() => {
-    if (!client || !walletAddress) {
-      initializeStoryClient();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!client || !walletAddress) {
+  //     initializeStoryClient();
+  //   }
+  // }, []);
 
   return (
     <StoryContext.Provider
