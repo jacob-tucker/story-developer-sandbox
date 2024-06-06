@@ -60,7 +60,6 @@ export default function RegisterIPA() {
   ) => {
     const client = await initializeStoryClient();
     if (!client) return;
-    console.log({ ipfsUri, ipfsJson });
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
     const response = await client.ipAsset.register({
