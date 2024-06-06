@@ -15,13 +15,19 @@ import { useStory } from "@/lib/context/StoryContext";
 import { Address } from "viem";
 
 export default function ClaimRevenue() {
-  const { client, setTxHash, setTxLoading, setTxName, addTransaction } =
-    useStory();
+  const {
+    initializeStoryClient,
+    setTxHash,
+    setTxLoading,
+    setTxName,
+    addTransaction,
+  } = useStory();
   const [childIpId, setChildIpId] = useState("");
   const [currencyTokenAddress, setCurrencyTokenAddress] = useState("");
   const [snapshotId, setSnapshotId] = useState("");
 
   async function claimRevenue() {
+    const client = await initializeStoryClient();
     if (!client) return;
     setTxLoading(true);
     setTxName("Claiming the revenue you are due...");

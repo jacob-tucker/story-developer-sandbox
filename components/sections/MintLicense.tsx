@@ -22,13 +22,19 @@ import {
 } from "../ui/select";
 
 export default function MintLicense() {
-  const { client, setTxHash, setTxLoading, setTxName, addTransaction } =
-    useStory();
+  const {
+    initializeStoryClient,
+    setTxHash,
+    setTxLoading,
+    setTxName,
+    addTransaction,
+  } = useStory();
   const [licensorIpId, setLicensorIpId] = useState("");
   const [receiverAddress, setReceiverAddress] = useState("");
   const [termsId, setTermsId] = useState("");
 
   async function mintLicense() {
+    const client = await initializeStoryClient();
     if (!client) return;
     setTxLoading(true);
     setTxName("Minting a License Token from an IP Asset...");
@@ -41,12 +47,12 @@ export default function MintLicense() {
     });
 
     console.log(
-      `License minted at tx hash ${response.txHash}, License ID: ${response.licenseTokenId}`
+      `License minted at tx hash ${response.txHash}, License IDs: ${response.licenseTokenIds}`
     );
     setTxLoading(false);
     setTxHash(response.txHash as string);
     addTransaction(response.txHash as string, "Mint License", {
-      licenseTokenId: response.licenseTokenId,
+      licenseTokenIds: response.licenseTokenIds,
     });
   }
 

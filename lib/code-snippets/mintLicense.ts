@@ -14,5 +14,5 @@ const response = await client.license.mintLicenseTokens({
     txOptions: { waitForTransaction: true },
 });
 
-console.log(\`License minted at tx hash \${response.txHash}, License ID: \${response.licenseId}\`);
+console.log(\`License minted at tx hash \${response.txHash}, License IDs: \${response.licenseTokenIds}\`);
 `;

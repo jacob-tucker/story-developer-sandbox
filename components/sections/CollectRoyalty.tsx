@@ -15,12 +15,18 @@ import { useStory } from "@/lib/context/StoryContext";
 import { Address } from "viem";
 
 export default function CollectRoyalty() {
-  const { client, setTxHash, setTxLoading, setTxName, addTransaction } =
-    useStory();
+  const {
+    initializeStoryClient,
+    setTxHash,
+    setTxLoading,
+    setTxName,
+    addTransaction,
+  } = useStory();
   const [parentIpId, setParentIpId] = useState("");
   const [childIpId, setChildIpId] = useState("");
 
   async function collectRoyalty() {
+    const client = await initializeStoryClient();
     if (!client) return;
     setTxLoading(true);
     setTxName("Collecting the Royalty Token...");

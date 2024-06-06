@@ -22,12 +22,18 @@ import {
 import { Address } from "viem";
 
 export default function AttachTerms() {
-  const { client, setTxHash, setTxLoading, setTxName, addTransaction } =
-    useStory();
+  const {
+    initializeStoryClient,
+    setTxHash,
+    setTxLoading,
+    setTxName,
+    addTransaction,
+  } = useStory();
   const [ipId, setIpId] = useState("");
   const [termsId, setTermsId] = useState("");
 
   async function attachTermsToIPA() {
+    const client = await initializeStoryClient();
     if (!client) return;
     setTxLoading(true);
     setTxName("Attaching terms to an IP Asset...");

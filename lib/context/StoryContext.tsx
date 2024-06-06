@@ -51,7 +51,6 @@ export default function StoryProvider({ children }: PropsWithChildren) {
     StoryClient | undefined
   > = async () => {
     if (!wallet?.account.address) return;
-    console.log(wallet);
     const config: StoryConfig = {
       account: wallet.account,
       transport: custom(wallet.transport),
