@@ -12,14 +12,14 @@ import { Label } from "../ui/label";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/StoryContext";
-import { Address } from "viem";
+import { Address, toHex } from "viem";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
+import { useWalletClient } from "wagmi";
 
 export default function RegisterDerivativeIPA() {
   const {
-    client,
+    initializeStoryClient,
     mintNFT,
-    walletAddress,
     setTxLoading,
     setTxName,
     setTxHash,
@@ -31,9 +31,10 @@ export default function RegisterDerivativeIPA() {
   const [licenseId, setLicenseId] = useState("");
   const [nftId, setNftId] = useState("");
   const [nftContractAddress, setNftContractAddress] = useState("");
+  const { data: wallet } = useWalletClient();
 
   const mintAndRegisterNFT = async () => {
-    if (!client) return;
+    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName(
       "Minting an NFT so it can be registered as a derivative of an IP Asset..."
@@ -43,22 +44,35 @@ export default function RegisterDerivativeIPA() {
     formData.append("description", description);
     //@ts-ignore
     formData.append("file", image);
-    const ipfsUri = await uploadJSONToIPFS(formData);
+    const { ipfsUri, ipfsJson } = await uploadJSONToIPFS(formData);
 
-    const tokenId = await mintNFT(walletAddress as Address, ipfsUri);
+    const tokenId = await mintNFT(wallet?.account.address as Address, ipfsUri);
     registerDerivativeIPA(
       tokenId,
-      "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc"
+      "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc",
+      ipfsUri,
+      ipfsJson
     );
   };
 
-  async function registerDerivativeIPA(tokenId: string, nftContract: Address) {
+  async function registerDerivativeIPA(
+    tokenId: string,
+    nftContract: Address,
+    ipfsUri: string | null,
+    ipfsJson: any | null
+  ) {
+    const client = await initializeStoryClient();
     if (!client) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
     const registerResponse = await client.ipAsset.register({
       nftContract,
       tokenId,
+      metadata: {
+        metadataURI: ipfsUri || "test-metadata-uri", // uri of IP metadata
+        metadataHash: toHex(ipfsJson || "test-metadata-hash", { size: 32 }), // hash of IP metadata
+        nftMetadataHash: toHex("test-nft-metadata-hash", { size: 32 }), // hash of NFT metadata
+      },
       txOptions: { waitForTransaction: true },
     });
     console.log(
@@ -133,7 +147,12 @@ export default function RegisterDerivativeIPA() {
           <CardFooter className="flex gap-3">
             <Button
               onClick={() =>
-                registerDerivativeIPA(nftId, nftContractAddress as Address)
+                registerDerivativeIPA(
+                  nftId,
+                  nftContractAddress as Address,
+                  null,
+                  null
+                )
               }
             >
               Register

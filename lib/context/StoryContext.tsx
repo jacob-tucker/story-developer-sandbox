@@ -2,12 +2,16 @@
 import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
 import { PropsWithChildren, createContext } from "react";
 import { useContext, useState } from "react";
-import { useEffect } from "react";
-import { createPublicClient, createWalletClient, Address, custom } from "viem";
+import {
+  createPublicClient,
+  createWalletClient,
+  Address,
+  custom,
+  Account,
+} from "viem";
 import { sepolia } from "viem/chains";
 import { defaultNftContractAbi } from "../defaultNftContractAbi";
-
-const sepoliaChainId = "0xaa36a7";
+import { useWalletClient } from "wagmi";
 
 interface StoryContextType {
   txLoading: boolean;
@@ -17,10 +21,7 @@ interface StoryContextType {
   setTxLoading: (loading: boolean) => void;
   setTxHash: (txHash: string) => void;
   setTxName: (txName: string) => void;
-  client: StoryClient | null;
-  walletAddress: string;
-  initializeStoryClient: () => Promise<void>;
-  logout: () => void;
+  initializeStoryClient: () => Promise<StoryClient | undefined>;
   mintNFT: (to: Address, uri: string) => Promise<string>;
   addTransaction: (txHash: string, action: string, data: any) => void;
 }
@@ -38,49 +39,33 @@ export const useStory = () => {
 };
 
 export default function StoryProvider({ children }: PropsWithChildren) {
-  const [client, setClient] = useState<StoryClient | null>(null);
-  const [walletAddress, setWalletAddress] = useState<string>("");
   const [txLoading, setTxLoading] = useState<boolean>(false);
   const [txName, setTxName] = useState<string>("");
   const [txHash, setTxHash] = useState<string>("");
   const [transactions, setTransactions] = useState<
     { txHash: string; action: string; data: any }[]
   >([]);
+  const { data: wallet } = useWalletClient();
 
-  const initializeStoryClient = async () => {
-    if (!window.ethereum) return;
-    if (!client || !walletAddress) {
-      const [account]: [Address] = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      const config: StoryConfig = {
-        account: account,
-        transport: custom(window.ethereum),
-        chainId: "sepolia",
-      };
-      const client = StoryClient.newClient(config);
-      setWalletAddress(account);
-      setClient(client);
-    }
-    const chainId = await window.ethereum.request({ method: "eth_chainId" });
-    if (chainId !== sepoliaChainId) {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: sepoliaChainId }],
-      });
-    }
-  };
-
-  const logout = () => {
-    setWalletAddress("");
-    setClient(null);
+  const initializeStoryClient: () => Promise<
+    StoryClient | undefined
+  > = async () => {
+    if (!wallet?.account.address) return;
+    console.log(wallet);
+    const config: StoryConfig = {
+      account: wallet.account,
+      transport: custom(wallet.transport),
+      chainId: "sepolia",
+    };
+    const client = StoryClient.newClient(config);
+    return client;
   };
 
   const mintNFT = async (to: Address, uri: string) => {
     if (!window.ethereum) return "";
     console.log("Minting a new NFT...");
     const walletClient = createWalletClient({
-      account: walletAddress as Address,
+      account: wallet?.account.address as Address,
       chain: sepolia,
       transport: custom(window.ethereum),
     });
@@ -110,7 +95,7 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   };
 
   // useEffect(() => {
-  //   if (!client || !walletAddress) {
+  //   if (!client) {
   //     initializeStoryClient();
   //   }
   // }, []);
@@ -118,8 +103,6 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   return (
     <StoryContext.Provider
       value={{
-        client,
-        walletAddress,
         txLoading,
         txHash,
         txName,
@@ -128,7 +111,6 @@ export default function StoryProvider({ children }: PropsWithChildren) {
         setTxName,
         setTxHash,
         initializeStoryClient,
-        logout,
         mintNFT,
         addTransaction,
       }}

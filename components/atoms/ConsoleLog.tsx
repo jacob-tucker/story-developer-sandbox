@@ -74,7 +74,7 @@ export function ConsoleLog() {
               .slice()
               .reverse()
               .map((tx, index) => (
-                <TableRow key={tx.txHash}>
+                <TableRow key={index}>
                   <TableCell>{transactions.length - 1 - index}</TableCell>
                   <TableCell className="font-medium">{tx.action}</TableCell>
                   <TableCell className="flex items-center gap-[5px]">

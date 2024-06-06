@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@dynamic-labs/ethereum": "^2.0.8",
+    "@dynamic-labs/sdk-react-core": "^2.0.8",
+    "@dynamic-labs/wagmi-connector": "^2.0.8",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@iconify/react": "^4.1.1",
@@ -19,7 +22,8 @@
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
-    "@story-protocol/core-sdk": "^1.0.0-rc.11",
+    "@story-protocol/core-sdk": "^1.0.0-rc.14",
+    "@tanstack/react-query": "^5.40.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "intro.js": "^7.2.0",
@@ -33,7 +37,9 @@
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.0",
-    "viem": "^2.9.4"
+    "viem": "^2.9.4",
+    "wagmi": "^2.9.8",
+    "rpc-websockets": "7.11.0"
   },
   "devDependencies": {
     "@types/node": "^20",

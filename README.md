@@ -14,7 +14,13 @@ The sandbox will walk you through building with Story Protocol step-by-step. Mor
 
 ## Get Started
 
-_(Optional) If you are going to mint NFTs (options 1b and 4b), you must first go to [Pinata and get a JWT](https://knowledge.pinata.cloud/en/articles/6191471-how-to-create-an-pinata-api-key). Change `.env.example` to `.env` and set `PINATA_JWT` equal to your JWT._
+### Configure your .env
+
+1. Rename the `.env.example` file to `.env`
+2. Go to [Pinata and get a JWT](https://knowledge.pinata.cloud/en/articles/6191471-how-to-create-an-pinata-api-key). Set `PINATA_JWT` equal to your JWT.
+3. Login to to [Dynamic](https://app.dynamic.xyz/). Set `NEXT_PUBLIC_DYNAMIC_ENV_ID` equal to your Environment ID, which you will get when you create a project.
+
+### Run the sandbox
 
 1. `npm install` in the root directory
 2. `npm run dev` in the root directory

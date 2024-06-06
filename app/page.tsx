@@ -17,9 +17,11 @@ import Snapshot from "@/components/sections/Snapshot";
 import ClaimRevenue from "@/components/sections/ClaimRevenue";
 import introJs from "intro.js";
 import { useEffect } from "react";
+import { useWalletClient } from "wagmi";
 
 export default function Home() {
-  const { client, txLoading, txHash, txName } = useStory();
+  const { txLoading, txHash, txName } = useStory();
+  const { data: wallet } = useWalletClient();
 
   useEffect(() => {
     introJs()
@@ -65,7 +67,7 @@ export default function Home() {
             </AlertDescription>
           </Alert>
         </div>
-      ) : !client ? (
+      ) : !wallet?.account.address ? (
         <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px] z-10">
           <Alert>
             <Icon
