@@ -18,8 +18,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { attachTerms } from "@/lib/code-snippets/attachTerms";
 import { mintLicense } from "@/lib/code-snippets/mintLicense";
 import { registerNewNft } from "@/lib/code-snippets/registerNewNft";
-import { mintNft } from "@/lib/code-snippets/mintNft";
-import { setupClientForMint } from "@/lib/code-snippets/setupClientForMint";
 import { registerNewNftDerivative } from "@/lib/code-snippets/registerNewNftDerivative";
 import { registerExistingNftDerivative } from "@/lib/code-snippets/registerExistingNftDerivative";
 import { collectRoyalty } from "@/lib/code-snippets/collectRoyalty";
@@ -47,8 +45,7 @@ const data: {
       "Mint a new NFT to represent your IP and register it as an IP Asset.",
     code: [
       { filename: "index.ts", code: registerNewNft },
-      { filename: "mint.ts", code: mintNft },
-      { filename: "config.ts", code: setupClientForMint },
+      { filename: "config.ts", code: setupClient },
     ],
   },
   "attach-terms": {
@@ -82,8 +79,7 @@ const data: {
       "Mint a new NFT to represent your IP and register it as a derivative of an existing IP Asset.",
     code: [
       { filename: "index.ts", code: registerNewNftDerivative },
-      { filename: "mint.ts", code: mintNft },
-      { filename: "config.ts", code: setupClientForMint },
+      { filename: "config.ts", code: setupClient },
     ],
   },
   "collect-royalty": {
@@ -140,7 +136,11 @@ export function ViewCode({ type }: { type: string }) {
               </TabsList>
               {data[type].code.map((file, index) => {
                 return (
-                  <TabsContent value={file.filename} key={index}>
+                  <TabsContent
+                    value={file.filename}
+                    key={index}
+                    className="max-h-[400px] overflow-y-scroll"
+                  >
                     <Code code={file.code} />
                   </TabsContent>
                 );

@@ -1,12 +1,23 @@
 export const snapshot = `
-const { client } from './config.ts';
 import { Address } from 'viem';
+import { useStory } from './StoryContext';
+import { useWalletClient } from 'wagmi';
 
-const childIpId: Address = ...
+export default function Snapshot() {
+  const { data: wallet } = useWalletClient();
+  const { initializeStoryClient } = useStory();
 
-const response = await client.royalty.snapshot({
-    royaltyVaultIpId: childIpId,
-    txOptions: { waitForTransaction: true },
-});
-console.log(\`Took a snapshot with ID \${response.snapshotId} at transaction hash \${response.txHash}\`);
+  async function snapshot() {
+    if (!wallet?.account.address) return;
+
+    const childIpId: Address = ...
+
+    const client = await initializeStoryClient();
+    const response = await client.royalty.snapshot({
+        royaltyVaultIpId: childIpId,
+        txOptions: { waitForTransaction: true },
+    });
+    console.log(\`Took a snapshot with ID \${response.snapshotId} at transaction hash \${response.txHash}\`);
+  }
+}
 `;

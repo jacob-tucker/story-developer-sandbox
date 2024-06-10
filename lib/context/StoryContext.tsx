@@ -2,13 +2,7 @@
 import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
 import { PropsWithChildren, createContext } from "react";
 import { useContext, useState } from "react";
-import {
-  createPublicClient,
-  createWalletClient,
-  Address,
-  custom,
-  Account,
-} from "viem";
+import { createPublicClient, createWalletClient, Address, custom } from "viem";
 import { sepolia } from "viem/chains";
 import { defaultNftContractAbi } from "../defaultNftContractAbi";
 import { useWalletClient } from "wagmi";
@@ -33,7 +27,7 @@ export const StoryContext = createContext<StoryContextType | undefined>(
 export const useStory = () => {
   const context = useContext(StoryContext);
   if (!context) {
-    throw new Error("useStory must be used within an StoryProvider");
+    throw new Error("useStory must be used within a StoryProvider");
   }
   return context;
 };

@@ -1,14 +1,25 @@
 export const attachTerms = `
-const { client } from './config.ts';
 import { Address } from 'viem';
+import { useStory } from './StoryContext';
+import { useWalletClient } from 'wagmi';
 
-const licenseTermsId: string = ...
-const ipId: Address = ...
+export default function ClaimRevenue() {
+    const { data: wallet } = useWalletClient();
+    const { initializeStoryClient } = useStory();
 
-const response = await client.license.attachLicenseTerms({
-    licenseTermsId,
-    ipId,
-    txOptions: { waitForTransaction: true },
-});
-console.log(\`Attached License Terms to IP at tx hash \${response.txHash}\`);
+    async function claimRevenue() {
+        if (!wallet?.account.address) return;
+
+        const licenseTermsId: string = ...
+        const ipId: Address = ...
+
+        const client = await initializeStoryClient();
+        const response = await client.license.attachLicenseTerms({
+            licenseTermsId,
+            ipId,
+            txOptions: { waitForTransaction: true },
+        });
+        console.log(\`Attached License Terms to IP at tx hash \${response.txHash}\`);
+    }
+}
 `;

@@ -1,17 +1,28 @@
 export const claimRevenue = `
-const { client } from './config.ts';
 import { Address } from 'viem';
+import { useStory } from './StoryContext';
+import { useWalletClient } from 'wagmi';
 
-const currencyTokenAddress: Address = ...
-const childIpId: Address = ...
-const snapshotId: string = ...
+export default function ClaimRevenue() {
+    const { data: wallet } = useWalletClient();
+    const { initializeStoryClient } = useStory();
 
-const response = await client.royalty.claimRevenue({
-    snapshotIds: [snapshotId],
-    royaltyVaultIpId: childIpId,
-    token: currencyTokenAddress,
-    txOptions: { waitForTransaction: true },
-});
+    async function claimRevenue() {
+        if (!wallet?.account.address) return;
 
-console.log(\`Claimed revenue token \${response.claimableToken} at transaction hash \${response.txHash}\`);
+        const currencyTokenAddress: Address = ...
+        const childIpId: Address = ...
+        const snapshotId: string = ...
+
+        const client = await initializeStoryClient();
+        const response = await client.royalty.claimRevenue({
+            snapshotIds: [snapshotId],
+            royaltyVaultIpId: childIpId,
+            token: currencyTokenAddress,
+            txOptions: { waitForTransaction: true },
+        });
+        
+        console.log(\`Claimed revenue token \${response.claimableToken} at transaction hash \${response.txHash}\`);
+    }
+}
 `;
