@@ -68,7 +68,9 @@ export default function RegisterIPA() {
       metadata: {
         metadataURI: ipfsUri || "test-metadata-uri", // uri of IP metadata
         metadataHash: toHex(ipfsJson || "test-metadata-hash", { size: 32 }), // hash of IP metadata
-        nftMetadataHash: toHex("test-nft-metadata-hash", { size: 32 }), // hash of NFT metadata
+        nftMetadataHash: toHex(ipfsJson || "test-nft-metadata-hash", {
+          size: 32,
+        }), // hash of NFT metadata
       },
       txOptions: { waitForTransaction: true },
     });
