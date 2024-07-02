@@ -11,20 +11,15 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
-import { useStory } from "@/lib/context/StoryContext";
+import { useStory } from "@/lib/context/AppContext";
 import { Address, toHex } from "viem";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 import { useWalletClient } from "wagmi";
+import { useIpAsset } from "react-sdk57";
 
 export default function RegisterDerivativeIPA() {
-  const {
-    initializeStoryClient,
-    mintNFT,
-    setTxLoading,
-    setTxName,
-    setTxHash,
-    addTransaction,
-  } = useStory();
+  const { mintNFT, setTxLoading, setTxName, setTxHash, addTransaction } =
+    useStory();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState();
@@ -32,6 +27,7 @@ export default function RegisterDerivativeIPA() {
   const [nftId, setNftId] = useState("");
   const [nftContractAddress, setNftContractAddress] = useState("");
   const { data: wallet } = useWalletClient();
+  const { register, registerDerivativeWithLicenseTokens } = useIpAsset();
 
   const mintAndRegisterNFT = async () => {
     if (!wallet?.account.address) return;
@@ -61,11 +57,9 @@ export default function RegisterDerivativeIPA() {
     ipfsUri: string | null,
     ipfsJson: any | null
   ) {
-    const client = await initializeStoryClient();
-    if (!client) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
-    const registerResponse = await client.ipAsset.register({
+    const registerResponse = await register({
       nftContract,
       tokenId,
       metadata: {
@@ -87,7 +81,7 @@ export default function RegisterDerivativeIPA() {
       "Registering the IP Asset as a derivative of another IP Asset..."
     );
     const registerDerivativeResponse =
-      await client.ipAsset.registerDerivativeWithLicenseTokens({
+      await registerDerivativeWithLicenseTokens({
         childIpId: registerResponse.ipId as Address,
         licenseTokenIds: [licenseId],
         txOptions: { waitForTransaction: true },

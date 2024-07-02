@@ -11,26 +11,20 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
-import { useStory } from "@/lib/context/StoryContext";
+import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
+import { useRoyalty } from "react-sdk57";
 
 export default function CollectRoyalty() {
-  const {
-    initializeStoryClient,
-    setTxHash,
-    setTxLoading,
-    setTxName,
-    addTransaction,
-  } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [parentIpId, setParentIpId] = useState("");
   const [childIpId, setChildIpId] = useState("");
+  const { collectRoyaltyTokens } = useRoyalty();
 
   async function collectRoyalty() {
-    const client = await initializeStoryClient();
-    if (!client) return;
     setTxLoading(true);
     setTxName("Collecting the Royalty Token...");
-    const response = await client.royalty.collectRoyaltyTokens({
+    const response = await collectRoyaltyTokens({
       parentIpId: parentIpId as Address,
       royaltyVaultIpId: childIpId as Address,
       txOptions: { waitForTransaction: true },

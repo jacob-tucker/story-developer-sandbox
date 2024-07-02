@@ -7,7 +7,7 @@ import { VerticalLine } from "@/components/atoms/VerticalLine";
 import AttachTerms from "@/components/sections/AttachTerms";
 import MintLicense from "@/components/sections/MintLicense";
 import RegisterDerivativeIPA from "@/components/sections/RegisterDerivativeIPA";
-import { useStory } from "@/lib/context/StoryContext";
+import { useStory } from "@/lib/context/AppContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Footer from "@/components/sections/Footer";

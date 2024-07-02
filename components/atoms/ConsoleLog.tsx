@@ -20,7 +20,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useStory } from "@/lib/context/StoryContext";
+import { useStory } from "@/lib/context/AppContext";
+
+function stringifyData(data: any) {
+  console.log(data);
+  return JSON.stringify(
+    data,
+    (key, value) => (typeof value === "bigint" ? value.toString() : value) // return everything else unchanged
+  );
+}
 
 export function ConsoleLog() {
   const { transactions, txLoading } = useStory();
@@ -58,18 +66,19 @@ export function ConsoleLog() {
               <TableHead>Data</TableHead>
             </TableRow>
           </TableHeader>
-          {txLoading ? (
-            <TableRow>
-              <TableCell className="italic">Pending transaction...</TableCell>
-            </TableRow>
-          ) : transactions.length == 0 ? (
-            <TableRow>
-              <TableCell className="italic">
-                There are no transactions yet.
-              </TableCell>
-            </TableRow>
-          ) : null}
+
           <TableBody>
+            {txLoading ? (
+              <TableRow>
+                <TableCell className="italic">Pending transaction...</TableCell>
+              </TableRow>
+            ) : transactions.length == 0 ? (
+              <TableRow>
+                <TableCell className="italic">
+                  There are no transactions yet.
+                </TableCell>
+              </TableRow>
+            ) : null}
             {transactions
               .slice()
               .reverse()
@@ -87,7 +96,7 @@ export function ConsoleLog() {
                       <Icon icon="tabler:link" />
                     </a>
                   </TableCell>
-                  <TableCell>{JSON.stringify(tx.data)}</TableCell>
+                  <TableCell>{stringifyData(tx.data)}</TableCell>
                 </TableRow>
               ))}
           </TableBody>

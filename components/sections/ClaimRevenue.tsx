@@ -11,27 +11,23 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
-import { useStory } from "@/lib/context/StoryContext";
+import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
+import { useRoyalty } from "react-sdk57";
 
 export default function ClaimRevenue() {
-  const {
-    initializeStoryClient,
-    setTxHash,
-    setTxLoading,
-    setTxName,
-    addTransaction,
-  } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [childIpId, setChildIpId] = useState("");
-  const [currencyTokenAddress, setCurrencyTokenAddress] = useState("");
+  const [currencyTokenAddress, setCurrencyTokenAddress] = useState(
+    "0xB132A6B7AE652c974EE1557A3521D53d18F6739f"
+  );
   const [snapshotId, setSnapshotId] = useState("");
+  const { claimRevenue } = useRoyalty();
 
-  async function claimRevenue() {
-    const client = await initializeStoryClient();
-    if (!client) return;
+  async function claimRevenueTokens() {
     setTxLoading(true);
     setTxName("Claiming the revenue you are due...");
-    const response = await client.royalty.claimRevenue({
+    const response = await claimRevenue({
       snapshotIds: [snapshotId],
       royaltyVaultIpId: childIpId as Address,
       token: currencyTokenAddress as Address,
@@ -83,14 +79,14 @@ export default function ClaimRevenue() {
                 <Input
                   type="text"
                   id="currencyTokenAddress"
-                  placeholder="0x6Bba939A4215b8705bCaFdD34B99876D4D36FcaC"
+                  value={currencyTokenAddress}
                   onChange={(e) => setCurrencyTokenAddress(e.target.value)}
                 />
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex gap-3">
-            <Button onClick={claimRevenue}>Claim</Button>
+            <Button onClick={claimRevenueTokens}>Claim</Button>
             <ViewCode type="claim-revenue" />
           </CardFooter>
         </Card>

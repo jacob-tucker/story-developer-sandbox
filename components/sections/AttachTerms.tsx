@@ -11,7 +11,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
-import { useStory } from "@/lib/context/StoryContext";
+import { useStory } from "@/lib/context/AppContext";
 import {
   Select,
   SelectContent,
@@ -20,32 +20,30 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Address } from "viem";
+import { useLicense } from "react-sdk57";
 
 export default function AttachTerms() {
-  const {
-    initializeStoryClient,
-    setTxHash,
-    setTxLoading,
-    setTxName,
-    addTransaction,
-  } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [ipId, setIpId] = useState("");
   const [termsId, setTermsId] = useState("");
+  const { attachLicenseTerms } = useLicense();
 
   async function attachTermsToIPA() {
-    const client = await initializeStoryClient();
-    if (!client) return;
     setTxLoading(true);
     setTxName("Attaching terms to an IP Asset...");
-    const response = await client.license.attachLicenseTerms({
-      licenseTermsId: termsId,
-      ipId: ipId as Address,
-      txOptions: { waitForTransaction: true },
-    });
-    console.log(`Attached License Terms to IP at tx hash ${response.txHash}`);
-    setTxLoading(false);
-    setTxHash(response.txHash);
-    addTransaction(response.txHash, "Attach Terms", {});
+    try {
+      const response = await attachLicenseTerms({
+        licenseTermsId: termsId,
+        ipId: ipId as Address,
+        txOptions: { waitForTransaction: true },
+      });
+      console.log(`Attached License Terms to IP at tx hash ${response.txHash}`);
+      setTxLoading(false);
+      setTxHash(response.txHash);
+      addTransaction(response.txHash, "Attach Terms", {});
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return (
