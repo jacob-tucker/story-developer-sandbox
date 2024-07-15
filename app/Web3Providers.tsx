@@ -1,11 +1,12 @@
 "use client";
-import StoryProvider from "@/lib/context/StoryContext";
 import { http, createConfig, WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { sepolia } from "wagmi/chains";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { DynamicWagmiConnector } from "@dynamic-labs/wagmi-connector";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import AppProvider from "@/lib/context/AppContext";
+import { PropsWithChildren } from "react";
 
 const config = createConfig({
   chains: [sepolia],
@@ -32,11 +33,7 @@ const evmNetworks = [
   },
 ];
 
-export default function Web3Providers({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function Web3Providers({ children }: PropsWithChildren) {
   return (
     <DynamicContextProvider
       settings={{
@@ -51,7 +48,7 @@ export default function Web3Providers({
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <DynamicWagmiConnector>
-            <StoryProvider>{children}</StoryProvider>
+            <AppProvider>{children}</AppProvider>
           </DynamicWagmiConnector>
         </QueryClientProvider>
       </WagmiProvider>

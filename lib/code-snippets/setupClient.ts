@@ -1,28 +1,23 @@
 export const setupClient = `
-import { custom } from 'viem';
-import { StoryClient, StoryConfig } from '@story-protocol/core-sdk';
+import { http } from 'viem';
+import { StoryProvider } from "@story-protocol/react-sdk";
 import { useWalletClient } from 'wagmi';
 
-/* context code, emitted to shorten example */
-
-export default function StoryProvider({ children }) {
+// wrapper around your app
+export default function StoryWrapper({ children }) {
+    // from wagmi or some other wallet provider
     const { data: wallet } = useWalletClient();
 
-    const initializeStoryClient: () => Promise<StoryClient | undefined> = async () => {
-        if (!wallet?.account.address) return;
-        const config: StoryConfig = {
-            account: wallet.account,
-            transport: custom(wallet.transport),
-            chainId: "sepolia",
-        };
-        const client = StoryClient.newClient(config);
-        return client;
-    };
-
     return (
-        <StoryContext.Provider value={{ initializeStoryClient }}>
+        <StoryProvider
+            config={{
+                chainId: "sepolia",
+                transport: http("https://ethereum-sepolia-rpc.publicnode.com"),
+                wallet: wallet,
+            }}
+        >
           {children}
-        </StoryContext.Provider>
+        </StoryProvider>
     );
 }
 `;

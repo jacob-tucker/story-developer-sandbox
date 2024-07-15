@@ -2,12 +2,19 @@
 import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
 import { PropsWithChildren, createContext } from "react";
 import { useContext, useState } from "react";
-import { createPublicClient, createWalletClient, Address, custom } from "viem";
+import {
+  createPublicClient,
+  createWalletClient,
+  Address,
+  custom,
+  http,
+} from "viem";
 import { sepolia } from "viem/chains";
 import { defaultNftContractAbi } from "../defaultNftContractAbi";
 import { useWalletClient } from "wagmi";
+import { StoryProvider } from "@story-protocol/react-sdk";
 
-interface StoryContextType {
+interface AppContextType {
   txLoading: boolean;
   txHash: string;
   txName: string;
@@ -20,19 +27,17 @@ interface StoryContextType {
   addTransaction: (txHash: string, action: string, data: any) => void;
 }
 
-export const StoryContext = createContext<StoryContextType | undefined>(
-  undefined
-);
+export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const useStory = () => {
-  const context = useContext(StoryContext);
+  const context = useContext(AppContext);
   if (!context) {
-    throw new Error("useStory must be used within a StoryProvider");
+    throw new Error("useStory must be used within a AppProvider");
   }
   return context;
 };
 
-export default function StoryProvider({ children }: PropsWithChildren) {
+export default function AppProvider({ children }: PropsWithChildren) {
   const [txLoading, setTxLoading] = useState<boolean>(false);
   const [txName, setTxName] = useState<string>("");
   const [txHash, setTxHash] = useState<string>("");
@@ -93,22 +98,51 @@ export default function StoryProvider({ children }: PropsWithChildren) {
   //   }
   // }, []);
 
+  if (!wallet) {
+    return (
+      <AppContext.Provider
+        value={{
+          txLoading,
+          txHash,
+          txName,
+          transactions,
+          setTxLoading,
+          setTxName,
+          setTxHash,
+          initializeStoryClient,
+          mintNFT,
+          addTransaction,
+        }}
+      >
+        {children}
+      </AppContext.Provider>
+    );
+  }
+
   return (
-    <StoryContext.Provider
-      value={{
-        txLoading,
-        txHash,
-        txName,
-        transactions,
-        setTxLoading,
-        setTxName,
-        setTxHash,
-        initializeStoryClient,
-        mintNFT,
-        addTransaction,
+    <StoryProvider
+      config={{
+        chainId: "sepolia",
+        transport: http("https://ethereum-sepolia-rpc.publicnode.com"),
+        wallet: wallet,
       }}
     >
-      {children}
-    </StoryContext.Provider>
+      <AppContext.Provider
+        value={{
+          txLoading,
+          txHash,
+          txName,
+          transactions,
+          setTxLoading,
+          setTxName,
+          setTxHash,
+          initializeStoryClient,
+          mintNFT,
+          addTransaction,
+        }}
+      >
+        {children}
+      </AppContext.Provider>
+    </StoryProvider>
   );
 }

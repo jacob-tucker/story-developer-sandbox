@@ -35,8 +35,8 @@ const data: {
     title: "Register IP Asset",
     description: "Register an existing NFT in your wallet as an IP Asset.",
     code: [
-      { filename: "index.ts", code: registerExistingNft },
-      { filename: "config.ts", code: setupClient },
+      { filename: "RegisterIPA.tsx", code: registerExistingNft },
+      { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
   "register-new-nft": {
@@ -44,24 +44,24 @@ const data: {
     description:
       "Mint a new NFT to represent your IP and register it as an IP Asset.",
     code: [
-      { filename: "index.ts", code: registerNewNft },
-      { filename: "config.ts", code: setupClient },
+      { filename: "RegisterIPA.tsx", code: registerNewNft },
+      { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
   "attach-terms": {
     title: "Attach terms to IP Asset",
     description: "Attach existing pre-set terms to an IP Asset.",
     code: [
-      { filename: "index.ts", code: attachTerms },
-      { filename: "config.ts", code: setupClient },
+      { filename: "AttachTerms.tsx", code: attachTerms },
+      { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
   "mint-license": {
     title: "Mint a License Token",
     description: "Mint a License Token from an existing IP Asset.",
     code: [
-      { filename: "index.ts", code: mintLicense },
-      { filename: "config.ts", code: setupClient },
+      { filename: "MintLicense.tsx", code: mintLicense },
+      { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
   "register-existing-nft-derivative": {
@@ -69,8 +69,11 @@ const data: {
     description:
       "Register an existing NFT in your wallet as a derivative of an existing IP Asset.",
     code: [
-      { filename: "index.ts", code: registerExistingNftDerivative },
-      { filename: "config.ts", code: setupClient },
+      {
+        filename: "RegisterDerivative.tsx",
+        code: registerExistingNftDerivative,
+      },
+      { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
   "register-new-nft-derivative": {
@@ -78,8 +81,8 @@ const data: {
     description:
       "Mint a new NFT to represent your IP and register it as a derivative of an existing IP Asset.",
     code: [
-      { filename: "index.ts", code: registerNewNftDerivative },
-      { filename: "config.ts", code: setupClient },
+      { filename: "RegisterDerivative.tsx", code: registerNewNftDerivative },
+      { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
   "collect-royalty": {
@@ -87,8 +90,8 @@ const data: {
     description:
       "Claim the royalty tokens and any accrued revenue tokens from children.",
     code: [
-      { filename: "index.ts", code: collectRoyalty },
-      { filename: "config.ts", code: setupClient },
+      { filename: "CollectRoyalty.tsx", code: collectRoyalty },
+      { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
   snapshot: {
@@ -96,8 +99,8 @@ const data: {
     description:
       "Take a snapshot of the current state of the royalty system so you can claim revenue in the next step.",
     code: [
-      { filename: "index.ts", code: snapshot },
-      { filename: "config.ts", code: setupClient },
+      { filename: "Snapshot.tsx", code: snapshot },
+      { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
   "claim-revenue": {
@@ -105,8 +108,8 @@ const data: {
     description:
       "Claim the revenue you are due from holding the Royalty Token of a child IP Asset.",
     code: [
-      { filename: "index.ts", code: claimRevenue },
-      { filename: "config.ts", code: setupClient },
+      { filename: "ClaimRevenue.tsx", code: claimRevenue },
+      { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
 };

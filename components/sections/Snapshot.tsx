@@ -11,25 +11,19 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
-import { useStory } from "@/lib/context/StoryContext";
+import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
+import { useRoyalty } from "@story-protocol/react-sdk";
 
 export default function Snapshot() {
-  const {
-    initializeStoryClient,
-    setTxHash,
-    setTxLoading,
-    setTxName,
-    addTransaction,
-  } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [childIpId, setChildIpId] = useState("");
+  const { snapshot } = useRoyalty();
 
   async function takeSnapshot() {
-    const client = await initializeStoryClient();
-    if (!client) return;
     setTxLoading(true);
     setTxName("Taking a snapshot...");
-    const response = await client.royalty.snapshot({
+    const response = await snapshot({
       royaltyVaultIpId: childIpId as Address,
       txOptions: { waitForTransaction: true },
     });

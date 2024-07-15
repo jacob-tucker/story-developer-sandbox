@@ -1,25 +1,22 @@
 export const attachTerms = `
 import { Address } from 'viem';
-import { useStory } from './StoryContext';
-import { useWalletClient } from 'wagmi';
+import { useLicense } from "@story-protocol/react-sdk";
 
-export default function ClaimRevenue() {
-    const { data: wallet } = useWalletClient();
-    const { initializeStoryClient } = useStory();
+export default function AttachTerms() {
+    const { attachLicenseTerms } = useLicense();
 
-    async function claimRevenue() {
-        if (!wallet?.account.address) return;
+    const licenseTermsId: string = ...
+    const ipId: Address = ...
 
-        const licenseTermsId: string = ...
-        const ipId: Address = ...
-
-        const client = await initializeStoryClient();
-        const response = await client.license.attachLicenseTerms({
+    try {
+        const response = await attachLicenseTerms({
             licenseTermsId,
             ipId,
             txOptions: { waitForTransaction: true },
         });
         console.log(\`Attached License Terms to IP at tx hash \${response.txHash}\`);
+    } catch (e) {
+        console.error(e);
     }
 }
 `;

@@ -20,7 +20,7 @@ export default function Introduction() {
           maxWidth: "570px",
         }}
       >
-        Learn the TypeScript SDK by playing around with the most common actions.
+        Learn the React SDK by playing around with the most common actions.
       </span>
     </section>
   );

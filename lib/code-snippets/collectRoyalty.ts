@@ -1,28 +1,18 @@
 export const collectRoyalty = `
 import { Address } from 'viem';
-import { useStory } from './StoryContext';
-import { useWalletClient } from 'wagmi';
+import { useRoyalty } from "@story-protocol/react-sdk";
 
-export default function MintLicense() {
-    const { data: wallet } = useWalletClient();
-    const { initializeStoryClient } = useStory();
+export default function CollectRoyalty() {
+    const { collectRoyaltyTokens } = useRoyalty();
 
-    async function mintLicense() {
-        if (!wallet?.account.address) return;
+    const parentIpId: Address = ...
+    const childIpId: Address = ...
 
-        const parentIpId: Address = ...
-        const childIpId: Address = ...
-
-        const client = await initializeStoryClient();
-
-
-        const response = await client.royalty.collectRoyaltyTokens({
-            parentIpId,
-            royaltyVaultIpId: childIpId,
-            txOptions: { waitForTransaction: true },
-        });
-
-        console.log(\`Collected royalty token \${response.royaltyTokensCollected} at transaction hash \${response.txHash}\`);
-    }
+    const response = await collectRoyaltyTokens({
+        parentIpId,
+        royaltyVaultIpId: childIpId,
+        txOptions: { waitForTransaction: true },
+    });
+    console.log(\`Collected royalty token \${response.royaltyTokensCollected} at transaction hash \${response.txHash}\`);
 }
 `;

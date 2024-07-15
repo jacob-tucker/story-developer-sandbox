@@ -11,7 +11,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
-import { useStory } from "@/lib/context/StoryContext";
+import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
 import {
   Select,
@@ -20,25 +20,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useLicense } from "@story-protocol/react-sdk";
 
 export default function MintLicense() {
-  const {
-    initializeStoryClient,
-    setTxHash,
-    setTxLoading,
-    setTxName,
-    addTransaction,
-  } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [licensorIpId, setLicensorIpId] = useState("");
   const [receiverAddress, setReceiverAddress] = useState("");
   const [termsId, setTermsId] = useState("");
+  const { mintLicenseTokens } = useLicense();
 
   async function mintLicense() {
-    const client = await initializeStoryClient();
-    if (!client) return;
     setTxLoading(true);
     setTxName("Minting a License Token from an IP Asset...");
-    const response = await client.license.mintLicenseTokens({
+    const response = await mintLicenseTokens({
       licenseTermsId: termsId,
       licensorIpId: licensorIpId as Address,
       receiver: receiverAddress as Address,

@@ -1,29 +1,21 @@
 export const mintLicense = `
 import { Address } from 'viem';
-import { useStory } from './StoryContext';
-import { useWalletClient } from 'wagmi';
+import { useLicense } from "@story-protocol/react-sdk";
 
 export default function MintLicense() {
-    const { data: wallet } = useWalletClient();
-    const { initializeStoryClient } = useStory();
+    const { mintLicenseTokens } = useLicense();
 
-    async function mintLicense() {
-        if (!wallet?.account.address) return;
+    const licenseTermsId: string = ...
+    const parentIpId: Address = ...
+    const receiver: Address = ...
 
-        const licenseTermsId: string = ...
-        const licensorIpId: Address = ...
-        const receiver: Address = ...
-
-        const client = await initializeStoryClient();
-        const response = await client.license.mintLicenseTokens({
-            licenseTermsId,
-            licensorIpId,
-            receiver,
-            amount: 1,
-            txOptions: { waitForTransaction: true },
-        });
-
-        console.log(\`License minted at tx hash \${response.txHash}, License IDs: \${response.licenseTokenIds}\`);
-    }
+    const response = await mintLicenseTokens({
+        licenseTermsId,
+        licensorIpId: parentIpId,
+        receiver,
+        amount: 1,
+        txOptions: { waitForTransaction: true },
+    });
+    console.log(\`License minted at tx hash \${response.txHash}, License IDs: \${response.licenseTokenIds}\`);
 }
 `;
