@@ -12,7 +12,7 @@ import {
 import { sepolia } from "viem/chains";
 import { defaultNftContractAbi } from "../defaultNftContractAbi";
 import { useWalletClient } from "wagmi";
-import { StoryProvider } from "react-sdk57";
+import { StoryProvider } from "@story-protocol/react-sdk";
 
 interface AppContextType {
   txLoading: boolean;

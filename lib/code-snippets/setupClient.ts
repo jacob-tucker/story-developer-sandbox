@@ -1,6 +1,6 @@
 export const setupClient = `
 import { http } from 'viem';
-import { StoryProvider } from "react-sdk57";
+import { StoryProvider } from "@story-protocol/react-sdk";
 import { useWalletClient } from 'wagmi';
 
 // wrapper around your app

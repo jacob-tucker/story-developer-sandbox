@@ -1,6 +1,6 @@
 export const mintLicense = `
 import { Address } from 'viem';
-import { useLicense } from "react-sdk57";
+import { useLicense } from "@story-protocol/react-sdk";
 
 export default function MintLicense() {
     const { mintLicenseTokens } = useLicense();

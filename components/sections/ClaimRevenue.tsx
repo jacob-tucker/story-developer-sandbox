@@ -13,7 +13,7 @@ import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
-import { useRoyalty } from "react-sdk57";
+import { useRoyalty } from "@story-protocol/react-sdk";
 
 export default function ClaimRevenue() {
   const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();

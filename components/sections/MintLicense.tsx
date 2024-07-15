@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useLicense } from "react-sdk57";
+import { useLicense } from "@story-protocol/react-sdk";
 
 export default function MintLicense() {
   const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();

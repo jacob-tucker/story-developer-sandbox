@@ -1,6 +1,6 @@
 export const claimRevenue = `
 import { Address } from 'viem';
-import { useRoyalty } from "react-sdk57";
+import { useRoyalty } from "@story-protocol/react-sdk";
 
 export default function ClaimRevenue() {
     const { claimRevenue } = useRoyalty();

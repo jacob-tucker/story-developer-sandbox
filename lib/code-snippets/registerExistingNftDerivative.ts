@@ -1,6 +1,6 @@
 export const registerExistingNftDerivative = `
 import { Address, toHex } from 'viem';
-import { useIpAsset } from "react-sdk57";
+import { useIpAsset } from "@story-protocol/react-sdk";
 
 export default function RegisterDerivative() {
   const { register, registerDerivativeWithLicenseTokens } = useIpAsset();

@@ -1,6 +1,6 @@
 export const collectRoyalty = `
 import { Address } from 'viem';
-import { useRoyalty } from "react-sdk57";
+import { useRoyalty } from "@story-protocol/react-sdk";
 
 export default function CollectRoyalty() {
     const { collectRoyaltyTokens } = useRoyalty();

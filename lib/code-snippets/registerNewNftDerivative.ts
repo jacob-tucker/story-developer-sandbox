@@ -1,6 +1,6 @@
 export const registerNewNftDerivative = `
 import { Address, toHex } from 'viem';
-import { useIpAsset } from "react-sdk57";
+import { useIpAsset } from "@story-protocol/react-sdk";
 import { mintNFT } from './mintNFT.ts'; // some function to mint an nft that returns a tokenId
 
 export default function RegisterDerivative() {

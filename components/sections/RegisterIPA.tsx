@@ -16,7 +16,7 @@ import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 import { useWalletClient } from "wagmi";
-import { useIpAsset } from "react-sdk57";
+import { useIpAsset } from "@story-protocol/react-sdk";
 
 export default function RegisterIPA() {
   const { mintNFT, setTxHash, setTxLoading, setTxName, addTransaction } =

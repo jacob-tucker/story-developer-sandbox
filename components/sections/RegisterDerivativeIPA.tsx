@@ -15,7 +15,7 @@ import { useStory } from "@/lib/context/AppContext";
 import { Address, toHex } from "viem";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 import { useWalletClient } from "wagmi";
-import { useIpAsset } from "react-sdk57";
+import { useIpAsset } from "@story-protocol/react-sdk";
 
 export default function RegisterDerivativeIPA() {
   const { mintNFT, setTxLoading, setTxName, setTxHash, addTransaction } =
