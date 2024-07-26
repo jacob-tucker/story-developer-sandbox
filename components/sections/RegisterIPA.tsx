@@ -55,6 +55,7 @@ export default function RegisterIPA() {
     ipfsUri: string | null,
     ipfsJson: any | null
   ) => {
+    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
     const response = await register({

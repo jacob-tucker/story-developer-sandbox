@@ -14,13 +14,16 @@ import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
 import { useRoyalty } from "@story-protocol/react-sdk";
+import { useWalletClient } from "wagmi";
 
 export default function Snapshot() {
   const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [childIpId, setChildIpId] = useState("");
   const { snapshot } = useRoyalty();
+  const { data: wallet } = useWalletClient();
 
   async function takeSnapshot() {
+    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Taking a snapshot...");
     const response = await snapshot({

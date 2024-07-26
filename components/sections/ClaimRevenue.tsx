@@ -14,6 +14,7 @@ import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
 import { useRoyalty } from "@story-protocol/react-sdk";
+import { useWalletClient } from "wagmi";
 
 export default function ClaimRevenue() {
   const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
@@ -23,8 +24,10 @@ export default function ClaimRevenue() {
   );
   const [snapshotId, setSnapshotId] = useState("");
   const { claimRevenue } = useRoyalty();
+  const { data: wallet } = useWalletClient();
 
   async function claimRevenueTokens() {
+    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Claiming the revenue you are due...");
     const response = await claimRevenue({
