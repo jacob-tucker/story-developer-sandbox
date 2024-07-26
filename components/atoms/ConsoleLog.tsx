@@ -87,14 +87,20 @@ export function ConsoleLog() {
                   <TableCell>{transactions.length - 1 - index}</TableCell>
                   <TableCell className="font-medium">{tx.action}</TableCell>
                   <TableCell className="flex items-center gap-[5px]">
-                    {tx.txHash}{" "}
-                    <a
-                      href={`https://explorer.storyprotocol.xyz/transactions/${tx.txHash}`}
-                      target="_blank"
-                      style={{ color: "rgb(255, 40, 37)" }}
-                    >
-                      <Icon icon="tabler:link" />
-                    </a>
+                    {tx.txHash ? (
+                      <>
+                        {tx.txHash}{" "}
+                        <a
+                          href={`https://explorer.storyprotocol.xyz/transactions/${tx.txHash}`}
+                          target="_blank"
+                          style={{ color: "rgb(255, 40, 37)" }}
+                        >
+                          <Icon icon="tabler:link" />
+                        </a>
+                      </>
+                    ) : (
+                      "N/A"
+                    )}
                   </TableCell>
                   <TableCell>{stringifyData(tx.data)}</TableCell>
                 </TableRow>
