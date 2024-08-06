@@ -22,7 +22,6 @@ interface AppContextType {
   setTxLoading: (loading: boolean) => void;
   setTxHash: (txHash: string) => void;
   setTxName: (txName: string) => void;
-  initializeStoryClient: () => Promise<StoryClient | undefined>;
   mintNFT: (to: Address, uri: string) => Promise<string>;
   addTransaction: (txHash: string, action: string, data: any) => void;
 }
@@ -45,19 +44,6 @@ export default function AppProvider({ children }: PropsWithChildren) {
     { txHash: string; action: string; data: any }[]
   >([]);
   const { data: wallet } = useWalletClient();
-
-  const initializeStoryClient: () => Promise<
-    StoryClient | undefined
-  > = async () => {
-    if (!wallet?.account.address) return;
-    const config: StoryConfig = {
-      account: wallet.account,
-      transport: custom(wallet.transport),
-      chainId: "sepolia",
-    };
-    const client = StoryClient.newClient(config);
-    return client;
-  };
 
   const mintNFT = async (to: Address, uri: string) => {
     if (!window.ethereum) return "";
@@ -92,12 +78,6 @@ export default function AppProvider({ children }: PropsWithChildren) {
     setTransactions((oldTxs) => [...oldTxs, { txHash, action, data }]);
   };
 
-  // useEffect(() => {
-  //   if (!client) {
-  //     initializeStoryClient();
-  //   }
-  // }, []);
-
   if (!wallet) {
     return (
       <AppContext.Provider
@@ -109,7 +89,6 @@ export default function AppProvider({ children }: PropsWithChildren) {
           setTxLoading,
           setTxName,
           setTxHash,
-          initializeStoryClient,
           mintNFT,
           addTransaction,
         }}
@@ -136,7 +115,6 @@ export default function AppProvider({ children }: PropsWithChildren) {
           setTxLoading,
           setTxName,
           setTxHash,
-          initializeStoryClient,
           mintNFT,
           addTransaction,
         }}
