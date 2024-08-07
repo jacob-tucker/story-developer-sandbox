@@ -23,14 +23,14 @@ export default function Home() {
   const { txLoading, txHash, txName } = useStory();
   const { data: wallet } = useWalletClient();
 
-  useEffect(() => {
-    introJs()
-      .setOptions({
-        dontShowAgain: true,
-        disableInteraction: true,
-      })
-      .start();
-  }, []);
+  // useEffect(() => {
+  //   introJs()
+  //     .setOptions({
+  //       dontShowAgain: true,
+  //       disableInteraction: true,
+  //     })
+  //     .start();
+  // }, []);
   return (
     <main className="flex min-h-screen flex-col">
       {txLoading ? (
