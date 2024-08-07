@@ -1,4 +1,3 @@
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { Icon } from "@iconify/react";
 
 export default function Navbar() {
@@ -51,7 +50,7 @@ export default function Navbar() {
           >
             Docs
           </a>
-          <DynamicWidget />
+          <w3m-button />
         </div>
       </div>
     </div>
