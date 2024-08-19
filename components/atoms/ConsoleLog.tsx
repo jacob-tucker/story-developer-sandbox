@@ -91,7 +91,7 @@ export function ConsoleLog() {
                       <>
                         {tx.txHash}{" "}
                         <a
-                          href={`https://explorer.storyprotocol.xyz/transactions/${tx.txHash}`}
+                          href={`https://explorer.story.foundation/transactions/${tx.txHash}`}
                           target="_blank"
                           style={{ color: "rgb(255, 40, 37)" }}
                         >

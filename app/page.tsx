@@ -57,7 +57,7 @@ export default function Home() {
             <AlertDescription>
               View your transaction on the{" "}
               <a
-                href={`https://explorer.storyprotocol.xyz/transactions/${txHash}`}
+                href={`https://explorer.story.foundation/transactions/${txHash}`}
                 target="_blank"
                 style={{ color: "rgb(255, 40, 37)" }}
               >

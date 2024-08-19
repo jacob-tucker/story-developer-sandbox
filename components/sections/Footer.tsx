@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="text-white flex flex-col md:flex-row justify-around md:pb-16 align-center">
         <a
           className="hover:underline text-center"
-          href="https://www.storyprotocol.xyz/builder-program"
+          href="https://www.story.foundation/builder-program"
           target="_blank"
         >
           Builder Program

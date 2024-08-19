@@ -13,7 +13,7 @@ export default function Navbar() {
             />
           </a>
           <a
-            href="https://docs.storyprotocol.xyz/v1/docs/sdk-overview"
+            href="https://docs.story.foundation/v1/docs/sdk-overview"
             target="_blank"
             className="hidden sm:block"
           >
@@ -25,7 +25,7 @@ export default function Navbar() {
             </div>
           </a>
           <a
-            href="https://docs.storyprotocol.xyz/v1/docs/sdk-overview"
+            href="https://docs.story.foundation/v1/docs/sdk-overview"
             target="_blank"
             className="block sm:hidden"
           >
@@ -46,7 +46,7 @@ export default function Navbar() {
           </a>
           <a
             className="text-sm/6 font-medium text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
-            href="https://docs.storyprotocol.xyz/v1/docs/what-is-story-protocol"
+            href="https://docs.story.foundation/v1/docs/what-is-story-protocol"
             target="_blank"
           >
             Docs
