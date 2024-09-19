@@ -26,8 +26,8 @@ export async function uploadJSONToIPFS(formData: FormData) {
   const json = {
     name,
     description,
-    image: `ipfs://${ImageIpfsHash}`,
+    image: `https://ipfs.io/ipfs/${ImageIpfsHash}`,
   };
   const { IpfsHash: JsonIpfsHash } = await pinata.pinJSONToIPFS(json);
-  return { ipfsUri: `ipfs://${JsonIpfsHash}`, ipfsJson: json };
+  return { ipfsUri: `https://ipfs.io/ipfs/${JsonIpfsHash}`, ipfsJson: json };
 }
