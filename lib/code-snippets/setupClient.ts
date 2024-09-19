@@ -11,8 +11,8 @@ export default function StoryWrapper({ children }) {
     return (
         <StoryProvider
             config={{
-                chainId: "sepolia",
-                transport: http("https://ethereum-sepolia-rpc.publicnode.com"),
+                chainId: "iliad",
+                transport: http("https://testnet.storyrpc.io"),
                 wallet: wallet,
             }}
         >

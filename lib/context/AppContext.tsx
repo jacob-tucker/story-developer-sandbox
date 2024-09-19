@@ -1,16 +1,7 @@
 "use client";
-import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
 import { PropsWithChildren, createContext } from "react";
 import { useContext, useState } from "react";
-import {
-  createPublicClient,
-  createWalletClient,
-  Address,
-  custom,
-  http,
-} from "viem";
-import { sepolia } from "viem/chains";
-import { defaultNftContractAbi } from "../defaultNftContractAbi";
+import { http } from "viem";
 import { useWalletClient } from "wagmi";
 import { StoryProvider } from "@story-protocol/react-sdk";
 
