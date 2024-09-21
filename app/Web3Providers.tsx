@@ -1,5 +1,5 @@
 "use client";
-import { http, createConfig, WagmiProvider } from "wagmi";
+import { http, createConfig, WagmiProvider, useWalletClient } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { DynamicWagmiConnector } from "@dynamic-labs/wagmi-connector";
@@ -7,12 +7,13 @@ import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import AppProvider from "@/lib/context/AppContext";
 import { PropsWithChildren } from "react";
 import { type Chain } from "viem";
+import { StoryProvider } from "@story-protocol/react-sdk";
 
-const iliad: Chain = {
+const iliad = {
   id: 1513, // Your custom chain ID
   name: "Story Network Testnet",
   nativeCurrency: {
-    name: "IP",
+    name: "Testnet IP",
     symbol: "IP",
     decimals: 18,
   },
@@ -20,10 +21,10 @@ const iliad: Chain = {
     default: { http: ["https://testnet.storyrpc.io"] },
   },
   blockExplorers: {
-    default: { name: "Story Scan", url: "https://testnet.storyscan.xyz" },
+    default: { name: "Blockscout", url: "https://testnet.storyscan.xyz" },
   },
   testnet: true,
-};
+} as const satisfies Chain;
 
 const config = createConfig({
   chains: [iliad],
@@ -41,7 +42,7 @@ const evmNetworks = [
     name: "Story Network Testnet",
     nativeCurrency: {
       decimals: 18,
-      name: "IP",
+      name: "Testnet IP",
       symbol: "IP",
     },
     networkId: 1513,
@@ -65,10 +66,30 @@ export default function Web3Providers({ children }: PropsWithChildren) {
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <DynamicWagmiConnector>
-            <AppProvider>{children}</AppProvider>
+            <AppProvider>
+              <StoryProviderWrapper>{children}</StoryProviderWrapper>
+            </AppProvider>
           </DynamicWagmiConnector>
         </QueryClientProvider>
       </WagmiProvider>
     </DynamicContextProvider>
+  );
+}
+
+function StoryProviderWrapper({ children }: PropsWithChildren) {
+  const { data: wallet } = useWalletClient();
+  if (!wallet) {
+    return <>{children}</>;
+  }
+  return (
+    <StoryProvider
+      config={{
+        chainId: "iliad",
+        wallet: wallet,
+        transport: http("https://testnet.storyrpc.io"),
+      }}
+    >
+      {children}
+    </StoryProvider>
   );
 }

@@ -1,9 +1,6 @@
 "use client";
 import { PropsWithChildren, createContext } from "react";
 import { useContext, useState } from "react";
-import { http } from "viem";
-import { useWalletClient } from "wagmi";
-import { StoryProvider } from "@story-protocol/react-sdk";
 
 interface AppContextType {
   txLoading: boolean;
@@ -33,53 +30,25 @@ export default function AppProvider({ children }: PropsWithChildren) {
   const [transactions, setTransactions] = useState<
     { txHash: string; action: string; data: any }[]
   >([]);
-  const { data: wallet } = useWalletClient();
 
   const addTransaction = (txHash: string, action: string, data: any) => {
     setTransactions((oldTxs) => [...oldTxs, { txHash, action, data }]);
   };
 
-  if (!wallet) {
-    return (
-      <AppContext.Provider
-        value={{
-          txLoading,
-          txHash,
-          txName,
-          transactions,
-          setTxLoading,
-          setTxName,
-          setTxHash,
-          addTransaction,
-        }}
-      >
-        {children}
-      </AppContext.Provider>
-    );
-  }
-
   return (
-    <StoryProvider
-      config={{
-        chainId: "iliad",
-        transport: http("https://testnet.storyrpc.io"),
-        wallet: wallet,
+    <AppContext.Provider
+      value={{
+        txLoading,
+        txHash,
+        txName,
+        transactions,
+        setTxLoading,
+        setTxName,
+        setTxHash,
+        addTransaction,
       }}
     >
-      <AppContext.Provider
-        value={{
-          txLoading,
-          txHash,
-          txName,
-          transactions,
-          setTxLoading,
-          setTxName,
-          setTxHash,
-          addTransaction,
-        }}
-      >
-        {children}
-      </AppContext.Provider>
-    </StoryProvider>
+      {children}
+    </AppContext.Provider>
   );
 }
