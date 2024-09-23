@@ -75,21 +75,6 @@ export default function Home() {
             </AlertDescription>
           </Alert>
         </div>
-      ) : !wallet?.account.address ? (
-        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px] z-10">
-          <Alert>
-            <Icon
-              style={{ color: "#ff2825", marginTop: "-5px" }}
-              className="h-4 w-4"
-              icon="tabler:alert-triangle"
-            />
-            <AlertTitle>Please connect your wallet!</AlertTitle>
-            <AlertDescription>
-              In order to use the Developer Sandbox, you must connect your
-              wallet in the top right.
-            </AlertDescription>
-          </Alert>
-        </div>
       ) : null}
       <Navbar />
       <div className="relative">
@@ -116,7 +101,9 @@ export default function Home() {
         <div className="flex justify-center items-center">
           <Card className="w-[350px]">
             <CardHeader>
-              <CardTitle>Connect your wallet</CardTitle>
+              <CardTitle style={{ color: "#ff2825" }}>
+                Connect your wallet
+              </CardTitle>
               <CardDescription>
                 In order to use the Developer Sandbox, you must connect your
                 wallet in the top right.
