@@ -24,7 +24,6 @@ export default function CollectRoyalty() {
   const { data: wallet } = useWalletClient();
 
   async function collectRoyalty() {
-    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Collecting the Royalty Token...");
     const response = await collectRoyaltyTokens({
@@ -37,8 +36,8 @@ export default function CollectRoyalty() {
       `Collected royalty token ${response.royaltyTokensCollected} at transaction hash ${response.txHash}`
     );
     setTxLoading(false);
-    setTxHash(response.txHash);
-    addTransaction(response.txHash, "Collect Royalty", {
+    setTxHash(response.txHash as string);
+    addTransaction(response.txHash as string, "Collect Royalty", {
       royaltyTokensCollected: response.royaltyTokensCollected,
     });
   }

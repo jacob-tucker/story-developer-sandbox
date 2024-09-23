@@ -5,18 +5,16 @@ import { useLicense } from "@story-protocol/react-sdk";
 export default function AttachTerms() {
     const { attachLicenseTerms } = useLicense();
 
-    const licenseTermsId: string = ...
-    const ipId: Address = ...
-
-    try {
-        const response = await attachLicenseTerms({
-            licenseTermsId,
-            ipId,
-            txOptions: { waitForTransaction: true },
-        });
-        console.log(\`Attached License Terms to IP at tx hash \${response.txHash}\`);
-    } catch (e) {
-        console.error(e);
+    const response = await attachLicenseTerms({
+        licenseTermsId: "1", 
+        ipId: "0x4c1f8c1035a8cE379dd4ed666758Fb29696CF721",
+        txOptions: { waitForTransaction: true }
+    });
+    
+    if (response.success) {
+        console.log(\`Attached License Terms to IPA at transaction hash \${response.txHash}.\`)
+    } else {
+        console.log(\`License Terms already attached to this IPA.\`)
     }
 }
 `;

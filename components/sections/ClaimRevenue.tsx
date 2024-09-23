@@ -27,7 +27,6 @@ export default function ClaimRevenue() {
   const { data: wallet } = useWalletClient();
 
   async function claimRevenueTokens() {
-    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Claiming the revenue you are due...");
     const response = await claimRevenue({
@@ -40,8 +39,8 @@ export default function ClaimRevenue() {
       `Claimed revenue token ${response.claimableToken} at transaction hash ${response.txHash}`
     );
     setTxLoading(false);
-    setTxHash(response.txHash);
-    addTransaction(response.txHash, "Claim Revenue", {
+    setTxHash(response.txHash as string);
+    addTransaction(response.txHash as string, "Claim Revenue", {
       claimableToken: response.claimableToken,
     });
   }

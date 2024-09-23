@@ -9,7 +9,7 @@ import { PropsWithChildren } from "react";
 import { type Chain } from "viem";
 import { StoryProvider } from "@story-protocol/react-sdk";
 
-const iliad = {
+export const iliad = {
   id: 1513, // Your custom chain ID
   name: "Story Network Testnet",
   nativeCurrency: {

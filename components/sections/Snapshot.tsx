@@ -23,7 +23,6 @@ export default function Snapshot() {
   const { data: wallet } = useWalletClient();
 
   async function takeSnapshot() {
-    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Taking a snapshot...");
     const response = await snapshot({
@@ -34,8 +33,8 @@ export default function Snapshot() {
       `Took a snapshot with ID ${response.snapshotId} at transaction hash ${response.txHash}`
     );
     setTxLoading(false);
-    setTxHash(response.txHash);
-    addTransaction(response.txHash, "Snapshot", {
+    setTxHash(response.txHash as string);
+    addTransaction(response.txHash as string, "Snapshot", {
       snapshotId: response.snapshotId,
     });
   }
