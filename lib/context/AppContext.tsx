@@ -1,18 +1,10 @@
 "use client";
-import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
+import { iliad } from "@/app/Web3Providers";
 import { PropsWithChildren, createContext } from "react";
 import { useContext, useState } from "react";
-import {
-  createPublicClient,
-  createWalletClient,
-  Address,
-  custom,
-  http,
-} from "viem";
-import { sepolia } from "viem/chains";
-import { defaultNftContractAbi } from "../defaultNftContractAbi";
+import { Address, createPublicClient, createWalletClient, custom } from "viem";
 import { useWalletClient } from "wagmi";
-import { StoryProvider } from "@story-protocol/react-sdk";
+import { defaultNftContractAbi } from "../defaultNftContractAbi";
 
 interface AppContextType {
   txLoading: boolean;
@@ -50,17 +42,17 @@ export default function AppProvider({ children }: PropsWithChildren) {
     console.log("Minting a new NFT...");
     const walletClient = createWalletClient({
       account: wallet?.account.address as Address,
-      chain: sepolia,
+      chain: iliad,
       transport: custom(window.ethereum),
     });
     const publicClient = createPublicClient({
       transport: custom(window.ethereum),
-      chain: sepolia,
+      chain: iliad,
     });
 
     const { request } = await publicClient.simulateContract({
-      address: "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc",
-      functionName: "mint",
+      address: "0xd2a4a4Cb40357773b658BECc66A6c165FD9Fc485",
+      functionName: "mintNFT",
       args: [to, uri],
       abi: defaultNftContractAbi,
     });
@@ -78,49 +70,21 @@ export default function AppProvider({ children }: PropsWithChildren) {
     setTransactions((oldTxs) => [...oldTxs, { txHash, action, data }]);
   };
 
-  if (!wallet) {
-    return (
-      <AppContext.Provider
-        value={{
-          txLoading,
-          txHash,
-          txName,
-          transactions,
-          setTxLoading,
-          setTxName,
-          setTxHash,
-          mintNFT,
-          addTransaction,
-        }}
-      >
-        {children}
-      </AppContext.Provider>
-    );
-  }
-
   return (
-    <StoryProvider
-      config={{
-        chainId: "sepolia",
-        transport: http("https://ethereum-sepolia-rpc.publicnode.com"),
-        wallet: wallet,
+    <AppContext.Provider
+      value={{
+        txLoading,
+        txHash,
+        txName,
+        transactions,
+        setTxLoading,
+        setTxName,
+        setTxHash,
+        mintNFT,
+        addTransaction,
       }}
     >
-      <AppContext.Provider
-        value={{
-          txLoading,
-          txHash,
-          txName,
-          transactions,
-          setTxLoading,
-          setTxName,
-          setTxHash,
-          mintNFT,
-          addTransaction,
-        }}
-      >
-        {children}
-      </AppContext.Provider>
-    </StoryProvider>
+      {children}
+    </AppContext.Provider>
   );
 }

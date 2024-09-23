@@ -32,7 +32,6 @@ export default function MintLicense() {
   const { mintLicenseTokens } = useLicense();
 
   async function mintLicense() {
-    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Minting a License Token from an IP Asset...");
     const response = await mintLicenseTokens({

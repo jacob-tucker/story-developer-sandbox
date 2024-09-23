@@ -102,7 +102,22 @@ export function ConsoleLog() {
                       "N/A"
                     )}
                   </TableCell>
-                  <TableCell>{stringifyData(tx.data)}</TableCell>
+                  <TableCell>
+                    {tx.action == "Register IPA" ? (
+                      <div className="flex items-center gap-[5px]">
+                        IPA{" "}
+                        <a
+                          href={`https://explorer.story.foundation/ipa/${tx.data["ipId"]}`}
+                          target="_blank"
+                          style={{ color: "rgb(255, 40, 37)" }}
+                        >
+                          <Icon icon="tabler:link" />
+                        </a>
+                      </div>
+                    ) : (
+                      stringifyData(tx.data)
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
           </TableBody>

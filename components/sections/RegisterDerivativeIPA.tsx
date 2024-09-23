@@ -16,6 +16,7 @@ import { Address, toHex } from "viem";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 import { useWalletClient } from "wagmi";
 import { useIpAsset } from "@story-protocol/react-sdk";
+import CryptoJS from "crypto-js";
 
 export default function RegisterDerivativeIPA() {
   const { mintNFT, setTxLoading, setTxName, setTxHash, addTransaction } =
@@ -45,7 +46,7 @@ export default function RegisterDerivativeIPA() {
     const tokenId = await mintNFT(wallet?.account.address as Address, ipfsUri);
     registerDerivativeIPA(
       tokenId,
-      "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc",
+      "0xd2a4a4Cb40357773b658BECc66A6c165FD9Fc485",
       ipfsUri,
       ipfsJson
     );
@@ -60,15 +61,19 @@ export default function RegisterDerivativeIPA() {
     if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
+
+    // Hash the string using SHA-256 and convert the result to hex
+    const metadataHash = CryptoJS.SHA256(
+      JSON.stringify(ipfsJson || {})
+    ).toString(CryptoJS.enc.Hex);
     const registerResponse = await register({
       nftContract,
       tokenId,
-      metadata: {
-        metadataURI: ipfsUri || "test-metadata-uri", // uri of IP metadata
-        metadataHash: toHex(ipfsJson || "test-metadata-hash", { size: 32 }), // hash of IP metadata
-        nftMetadataHash: toHex(ipfsJson || "test-nft-metadata-hash", {
-          size: 32,
-        }), // hash of NFT metadata
+      ipMetadata: {
+        ipMetadataURI: ipfsUri || "test-ip-metadata-uri", // uri of IP metadata
+        ipMetadataHash: `0x${metadataHash}`, // hash of IP metadata
+        nftMetadataURI: ipfsUri || "test-nft-metadata-uri", // uri of NFT metadata
+        nftMetadataHash: `0x${metadataHash}`, // hash of NFT metadata
       },
       txOptions: { waitForTransaction: true },
     });
@@ -91,9 +96,9 @@ export default function RegisterDerivativeIPA() {
       `IPA registered as derivative at tx hash ${registerDerivativeResponse.txHash}`
     );
     setTxLoading(false);
-    setTxHash(registerDerivativeResponse.txHash);
+    setTxHash(registerDerivativeResponse.txHash as string);
     addTransaction(
-      registerDerivativeResponse.txHash,
+      registerDerivativeResponse.txHash as string,
       "Linked IPA as Derivative",
       {}
     );

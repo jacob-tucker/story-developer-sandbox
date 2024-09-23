@@ -18,19 +18,27 @@ import ClaimRevenue from "@/components/sections/ClaimRevenue";
 import introJs from "intro.js";
 import { useEffect } from "react";
 import { useWalletClient } from "wagmi";
+import {
+  Card,
+  CardTitle,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card";
 
 export default function Home() {
   const { txLoading, txHash, txName } = useStory();
   const { data: wallet } = useWalletClient();
 
   useEffect(() => {
-    introJs()
-      .setOptions({
-        dontShowAgain: true,
-        disableInteraction: true,
-      })
-      .start();
-  }, []);
+    if (wallet) {
+      introJs()
+        .setOptions({
+          dontShowAgain: true,
+          disableInteraction: true,
+        })
+        .start();
+    }
+  }, [wallet]);
   return (
     <main className="flex min-h-screen flex-col">
       {txLoading ? (
@@ -88,19 +96,35 @@ export default function Home() {
         <ConsoleLog />
       </div>
       <Introduction />
-      <RegisterIPA />
-      <VerticalLine />
-      <AttachTerms />
-      <VerticalLine />
-      <MintLicense />
-      <VerticalLine />
-      <RegisterDerivativeIPA />
-      <VerticalLine />
-      <CollectRoyalty />
-      <VerticalLine />
-      <Snapshot />
-      <VerticalLine />
-      <ClaimRevenue />
+      {wallet ? (
+        <>
+          <RegisterIPA />
+          <VerticalLine />
+          <AttachTerms />
+          <VerticalLine />
+          <MintLicense />
+          <VerticalLine />
+          <RegisterDerivativeIPA />
+          <VerticalLine />
+          <CollectRoyalty />
+          <VerticalLine />
+          <Snapshot />
+          <VerticalLine />
+          <ClaimRevenue />
+        </>
+      ) : (
+        <div className="flex justify-center items-center">
+          <Card className="w-[350px]">
+            <CardHeader>
+              <CardTitle>Connect your wallet</CardTitle>
+              <CardDescription>
+                In order to use the Developer Sandbox, you must connect your
+                wallet in the top right.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      )}
       <Footer />
     </main>
   );

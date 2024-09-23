@@ -31,22 +31,22 @@ export default function AttachTerms() {
   const { data: wallet } = useWalletClient();
 
   async function attachTermsToIPA() {
-    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Attaching terms to an IP Asset...");
-    try {
-      const response = await attachLicenseTerms({
-        licenseTermsId: termsId,
-        ipId: ipId as Address,
-        txOptions: { waitForTransaction: true },
-      });
+    const response = await attachLicenseTerms({
+      licenseTermsId: termsId,
+      ipId: ipId as Address,
+      txOptions: { waitForTransaction: true },
+    });
+    if (response.success) {
       console.log(`Attached License Terms to IP at tx hash ${response.txHash}`);
-      setTxLoading(false);
-      setTxHash(response.txHash);
-      addTransaction(response.txHash, "Attach Terms", {});
-    } catch (e) {
-      console.error(e);
+    } else {
+      console.log(`License terms ${termsId} already attached to IP`);
     }
+
+    setTxLoading(false);
+    setTxHash(response.txHash as string);
+    addTransaction(response.txHash as string, "Attach Terms", {});
   }
 
   return (

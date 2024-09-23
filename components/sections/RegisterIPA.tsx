@@ -10,13 +10,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Address, toHex } from "viem";
+import { Address } from "viem";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 import { useWalletClient } from "wagmi";
 import { useIpAsset } from "@story-protocol/react-sdk";
+import CryptoJS from "crypto-js";
 
 export default function RegisterIPA() {
   const { mintNFT, setTxHash, setTxLoading, setTxName, addTransaction } =
@@ -30,7 +31,6 @@ export default function RegisterIPA() {
   const { register } = useIpAsset();
 
   const mintAndRegisterNFT = async () => {
-    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Minting an NFT so it can be registered as an IP Asset...");
     const formData = new FormData();
@@ -43,7 +43,7 @@ export default function RegisterIPA() {
     const tokenId = await mintNFT(wallet?.account.address as Address, ipfsUri);
     registerExistingNFT(
       tokenId,
-      "0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc",
+      "0xd2a4a4Cb40357773b658BECc66A6c165FD9Fc485",
       ipfsUri,
       ipfsJson
     );
@@ -55,18 +55,21 @@ export default function RegisterIPA() {
     ipfsUri: string | null,
     ipfsJson: any | null
   ) => {
-    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
+
+    // Hash the string using SHA-256 and convert the result to hex
+    const metadataHash = CryptoJS.SHA256(
+      JSON.stringify(ipfsJson || {})
+    ).toString(CryptoJS.enc.Hex);
     const response = await register({
       nftContract,
       tokenId,
-      metadata: {
-        metadataURI: ipfsUri || "test-metadata-uri", // uri of IP metadata
-        metadataHash: toHex(ipfsJson || "test-metadata-hash", { size: 32 }), // hash of IP metadata
-        nftMetadataHash: toHex(ipfsJson || "test-nft-metadata-hash", {
-          size: 32,
-        }), // hash of NFT metadata
+      ipMetadata: {
+        ipMetadataURI: ipfsUri || "test-ip-metadata-uri", // uri of IP metadata
+        ipMetadataHash: `0x${metadataHash}`, // hash of IP metadata
+        nftMetadataURI: ipfsUri || "test-nft-metadata-uri", // uri of NFT metadata
+        nftMetadataHash: `0x${metadataHash}`, // hash of NFT metadata
       },
       txOptions: { waitForTransaction: true },
     });

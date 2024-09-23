@@ -4,20 +4,21 @@ import { StoryProvider } from "@story-protocol/react-sdk";
 import { useWalletClient } from 'wagmi';
 
 // wrapper around your app
-export default function StoryWrapper({ children }) {
-    // from wagmi or some other wallet provider
-    const { data: wallet } = useWalletClient();
-
-    return (
-        <StoryProvider
-            config={{
-                chainId: "sepolia",
-                transport: http("https://ethereum-sepolia-rpc.publicnode.com"),
-                wallet: wallet,
-            }}
-        >
-          {children}
-        </StoryProvider>
-    );
+function StoryProviderWrapper({ children }: PropsWithChildren) {
+  const { data: wallet } = useWalletClient();
+  if (!wallet) {
+    return <>{children}</>;
+  }
+  return (
+    <StoryProvider
+      config={{
+        chainId: "iliad",
+        wallet: wallet,
+        transport: http("https://testnet.storyrpc.io"),
+      }}
+    >
+      {children}
+    </StoryProvider>
+  );
 }
 `;
