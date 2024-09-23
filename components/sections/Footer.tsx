@@ -4,10 +4,10 @@ export default function Footer() {
       <div className="text-white flex flex-col md:flex-row justify-around md:pb-16 align-center">
         <a
           className="hover:underline text-center"
-          href="https://www.story.foundation/builder-program"
+          href="https://www.story.foundation/academy"
           target="_blank"
         >
-          Builder Program
+          Story Academy
         </a>
         <a
           className="hover:underline text-center"
