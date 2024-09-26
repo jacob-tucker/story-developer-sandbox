@@ -27,10 +27,13 @@ export default function AttachTerms() {
   const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [ipId, setIpId] = useState("");
   const [termsId, setTermsId] = useState("");
-  const { attachLicenseTerms } = useLicense();
   const { data: wallet } = useWalletClient();
+  const { attachLicenseTerms } = wallet
+    ? useLicense()
+    : { attachLicenseTerms: null };
 
   async function attachTermsToIPA() {
+    if (!attachLicenseTerms) return;
     setTxLoading(true);
     setTxName("Attaching terms to an IP Asset...");
     const response = await attachLicenseTerms({

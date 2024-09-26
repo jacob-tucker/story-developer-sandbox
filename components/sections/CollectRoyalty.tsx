@@ -20,10 +20,13 @@ export default function CollectRoyalty() {
   const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [parentIpId, setParentIpId] = useState("");
   const [childIpId, setChildIpId] = useState("");
-  const { collectRoyaltyTokens } = useRoyalty();
   const { data: wallet } = useWalletClient();
+  const { collectRoyaltyTokens } = wallet
+    ? useRoyalty()
+    : { collectRoyaltyTokens: null };
 
   async function collectRoyalty() {
+    if (!collectRoyaltyTokens) return;
     setTxLoading(true);
     setTxName("Collecting the Royalty Token...");
     const response = await collectRoyaltyTokens({

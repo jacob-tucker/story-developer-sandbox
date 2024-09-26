@@ -28,9 +28,10 @@ export default function RegisterIPA() {
   const [nftId, setNftId] = useState("");
   const [nftContractAddress, setNftContractAddress] = useState("");
   const { data: wallet } = useWalletClient();
-  const { register } = useIpAsset();
+  const { register } = wallet ? useIpAsset() : { register: null };
 
   const mintAndRegisterNFT = async () => {
+    if (!register) return;
     setTxLoading(true);
     setTxName("Minting an NFT so it can be registered as an IP Asset...");
     const formData = new FormData();
@@ -55,6 +56,7 @@ export default function RegisterIPA() {
     ipfsUri: string | null,
     ipfsJson: any | null
   ) => {
+    if (!register) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
 

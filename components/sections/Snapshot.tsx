@@ -19,10 +19,11 @@ import { useWalletClient } from "wagmi";
 export default function Snapshot() {
   const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [childIpId, setChildIpId] = useState("");
-  const { snapshot } = useRoyalty();
   const { data: wallet } = useWalletClient();
+  const { snapshot } = wallet ? useRoyalty() : { snapshot: null };
 
   async function takeSnapshot() {
+    if (!snapshot) return;
     setTxLoading(true);
     setTxName("Taking a snapshot...");
     const response = await snapshot({

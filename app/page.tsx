@@ -18,12 +18,6 @@ import ClaimRevenue from "@/components/sections/ClaimRevenue";
 import introJs from "intro.js";
 import { useEffect } from "react";
 import { useWalletClient } from "wagmi";
-import {
-  Card,
-  CardTitle,
-  CardDescription,
-  CardHeader,
-} from "@/components/ui/card";
 
 export default function Home() {
   const { txLoading, txHash, txName } = useStory();
@@ -69,9 +63,24 @@ export default function Home() {
                 target="_blank"
                 style={{ color: "rgb(255, 40, 37)" }}
               >
-                Story Protocol explorer
+                Story explorer
               </a>
               .
+            </AlertDescription>
+          </Alert>
+        </div>
+      ) : !wallet?.account.address ? (
+        <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px] z-10">
+          <Alert>
+            <Icon
+              style={{ color: "#ff2825", marginTop: "-5px" }}
+              className="h-4 w-4"
+              icon="tabler:alert-triangle"
+            />
+            <AlertTitle>Please connect your wallet!</AlertTitle>
+            <AlertDescription>
+              In order to use the Developer Sandbox, you must connect your
+              wallet in the top right.
             </AlertDescription>
           </Alert>
         </div>
@@ -81,37 +90,19 @@ export default function Home() {
         <ConsoleLog />
       </div>
       <Introduction />
-      {wallet ? (
-        <>
-          <RegisterIPA />
-          <VerticalLine />
-          <AttachTerms />
-          <VerticalLine />
-          <MintLicense />
-          <VerticalLine />
-          <RegisterDerivativeIPA />
-          <VerticalLine />
-          <CollectRoyalty />
-          <VerticalLine />
-          <Snapshot />
-          <VerticalLine />
-          <ClaimRevenue />
-        </>
-      ) : (
-        <div className="flex justify-center items-center">
-          <Card className="w-[350px]">
-            <CardHeader>
-              <CardTitle style={{ color: "#ff2825" }}>
-                Connect your wallet
-              </CardTitle>
-              <CardDescription>
-                In order to use the Developer Sandbox, you must connect your
-                wallet in the top right.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-      )}
+      <RegisterIPA />
+      <VerticalLine />
+      <AttachTerms />
+      <VerticalLine />
+      <MintLicense />
+      <VerticalLine />
+      <RegisterDerivativeIPA />
+      <VerticalLine />
+      <CollectRoyalty />
+      <VerticalLine />
+      <Snapshot />
+      <VerticalLine />
+      <ClaimRevenue />
       <Footer />
     </main>
   );
