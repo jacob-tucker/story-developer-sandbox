@@ -6,7 +6,7 @@ import Web3Providers from "./Web3Providers";
 
 export const metadata: Metadata = {
   title: "Developer Sandbox",
-  description: "A developer sandbox for building on Story Protocol.",
+  description: "A developer sandbox for building on Story.",
 };
 
 const inter = Inter({ subsets: ["latin"] });
