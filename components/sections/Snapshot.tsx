@@ -20,10 +20,10 @@ export default function Snapshot() {
   const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
   const [childIpId, setChildIpId] = useState("");
   const { data: wallet } = useWalletClient();
-  const { snapshot } = wallet ? useRoyalty() : { snapshot: null };
+  const { snapshot } = useRoyalty();
 
   async function takeSnapshot() {
-    if (!snapshot) return;
+    if (!wallet) return;
     setTxLoading(true);
     setTxName("Taking a snapshot...");
     const response = await snapshot({

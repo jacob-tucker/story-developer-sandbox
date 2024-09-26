@@ -28,12 +28,10 @@ export default function RegisterDerivativeIPA() {
   const [nftId, setNftId] = useState("");
   const [nftContractAddress, setNftContractAddress] = useState("");
   const { data: wallet } = useWalletClient();
-  const { register, registerDerivativeWithLicenseTokens } = wallet
-    ? useIpAsset()
-    : { register: null, registerDerivativeWithLicenseTokens: null };
+  const { register, registerDerivativeWithLicenseTokens } = useIpAsset();
 
   const mintAndRegisterNFT = async () => {
-    if (!register || !registerDerivativeWithLicenseTokens) return;
+    if (!wallet) return;
     setTxLoading(true);
     setTxName(
       "Minting an NFT so it can be registered as a derivative of an IP Asset..."
@@ -60,7 +58,7 @@ export default function RegisterDerivativeIPA() {
     ipfsUri: string | null,
     ipfsJson: any | null
   ) {
-    if (!register || !registerDerivativeWithLicenseTokens) return;
+    if (!wallet) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
 

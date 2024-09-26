@@ -24,10 +24,10 @@ export default function ClaimRevenue() {
   );
   const [snapshotId, setSnapshotId] = useState("");
   const { data: wallet } = useWalletClient();
-  const { claimRevenue } = wallet ? useRoyalty() : { claimRevenue: null };
+  const { claimRevenue } = useRoyalty();
 
   async function claimRevenueTokens() {
-    if (!claimRevenue) return;
+    if (!wallet) return;
     setTxLoading(true);
     setTxName("Claiming the revenue you are due...");
     const response = await claimRevenue({

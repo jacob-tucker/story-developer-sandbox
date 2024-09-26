@@ -29,12 +29,10 @@ export default function MintLicense() {
   const [receiverAddress, setReceiverAddress] = useState("");
   const [termsId, setTermsId] = useState("");
   const { data: wallet } = useWalletClient();
-  const { mintLicenseTokens } = wallet
-    ? useLicense()
-    : { mintLicenseTokens: null };
+  const { mintLicenseTokens } = useLicense();
 
   async function mintLicense() {
-    if (!mintLicenseTokens) return;
+    if (!wallet) return;
     setTxLoading(true);
     setTxName("Minting a License Token from an IP Asset...");
     const response = await mintLicenseTokens({
