@@ -27,7 +27,7 @@ export default function ClaimRevenue() {
   const { claimRevenue } = useRoyalty();
 
   async function claimRevenueTokens() {
-    if (!wallet) return;
+    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Claiming the revenue you are due...");
     const response = await claimRevenue({

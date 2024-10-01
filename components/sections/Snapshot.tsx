@@ -23,7 +23,7 @@ export default function Snapshot() {
   const { snapshot } = useRoyalty();
 
   async function takeSnapshot() {
-    if (!wallet) return;
+    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Taking a snapshot...");
     const response = await snapshot({

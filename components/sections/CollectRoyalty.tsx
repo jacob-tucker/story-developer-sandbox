@@ -24,7 +24,7 @@ export default function CollectRoyalty() {
   const { collectRoyaltyTokens } = useRoyalty();
 
   async function collectRoyalty() {
-    if (!wallet) return;
+    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Collecting the Royalty Token...");
     const response = await collectRoyaltyTokens({

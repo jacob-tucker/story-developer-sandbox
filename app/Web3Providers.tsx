@@ -5,8 +5,8 @@ import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { DynamicWagmiConnector } from "@dynamic-labs/wagmi-connector";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import AppProvider from "@/lib/context/AppContext";
-import { PropsWithChildren } from "react";
-import { createWalletClient, type Chain } from "viem";
+import { PropsWithChildren, useEffect, useState } from "react";
+import { createWalletClient, WalletClient, type Chain } from "viem";
 import { StoryProvider } from "@story-protocol/react-sdk";
 
 export const iliad = {
@@ -77,17 +77,22 @@ export default function Web3Providers({ children }: PropsWithChildren) {
 }
 
 function StoryProviderWrapper({ children }: PropsWithChildren) {
-  const { data: wallet } = useWalletClient();
   const dummyWallet = createWalletClient({
     chain: iliad,
     transport: http("https://testnet.storyrpc.io"),
   });
+  const { data: wallet } = useWalletClient();
+  const [walletClient, setWalletClient] = useState<WalletClient>(dummyWallet);
+
+  useEffect(() => {
+    setWalletClient(wallet ?? dummyWallet);
+  }, [wallet]);
 
   return (
     <StoryProvider
       config={{
         chainId: "iliad",
-        wallet: wallet || dummyWallet,
+        wallet: walletClient,
         transport: http("https://testnet.storyrpc.io"),
       }}
     >

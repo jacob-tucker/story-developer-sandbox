@@ -31,7 +31,7 @@ export default function AttachTerms() {
   const { attachLicenseTerms } = useLicense();
 
   async function attachTermsToIPA() {
-    if (!wallet) return;
+    if (!wallet?.account.address) return;
     setTxLoading(true);
     setTxName("Attaching terms to an IP Asset...");
     const response = await attachLicenseTerms({
