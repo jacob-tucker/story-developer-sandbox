@@ -77,22 +77,17 @@ export default function Web3Providers({ children }: PropsWithChildren) {
 }
 
 function StoryProviderWrapper({ children }: PropsWithChildren) {
-  const dummyWallet = createWalletClient({
-    chain: iliad,
-    transport: http("https://testnet.storyrpc.io"),
-  });
   const { data: wallet } = useWalletClient();
-  const [walletClient, setWalletClient] = useState<WalletClient>(dummyWallet);
 
-  useEffect(() => {
-    setWalletClient(wallet ?? dummyWallet);
-  }, [wallet]);
+  if (!wallet) {
+    return <>{children}</>;
+  }
 
   return (
     <StoryProvider
       config={{
         chainId: "iliad",
-        wallet: walletClient,
+        wallet: wallet,
         transport: http("https://testnet.storyrpc.io"),
       }}
     >
