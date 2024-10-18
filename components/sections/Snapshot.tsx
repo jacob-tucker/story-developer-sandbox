@@ -13,20 +13,19 @@ import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
-import { useRoyalty } from "@story-protocol/react-sdk";
 import { useWalletClient } from "wagmi";
 
 export default function Snapshot() {
-  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction, client } =
+    useStory();
   const [childIpId, setChildIpId] = useState("");
   const { data: wallet } = useWalletClient();
-  const { snapshot } = useRoyalty();
 
   async function takeSnapshot() {
-    if (!wallet?.account.address) return;
+    if (!client) return;
     setTxLoading(true);
     setTxName("Taking a snapshot...");
-    const response = await snapshot({
+    const response = await client.royalty.snapshot({
       royaltyVaultIpId: childIpId as Address,
       txOptions: { waitForTransaction: true },
     });

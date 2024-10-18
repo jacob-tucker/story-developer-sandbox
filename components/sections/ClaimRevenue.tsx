@@ -13,24 +13,23 @@ import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
-import { useRoyalty } from "@story-protocol/react-sdk";
 import { useWalletClient } from "wagmi";
 
 export default function ClaimRevenue() {
-  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction, client } =
+    useStory();
   const [childIpId, setChildIpId] = useState("");
   const [currencyTokenAddress, setCurrencyTokenAddress] = useState(
     "0xB132A6B7AE652c974EE1557A3521D53d18F6739f"
   );
   const [snapshotId, setSnapshotId] = useState("");
   const { data: wallet } = useWalletClient();
-  const { claimRevenue } = useRoyalty();
 
   async function claimRevenueTokens() {
-    if (!wallet?.account.address) return;
+    if (!client) return;
     setTxLoading(true);
     setTxName("Claiming the revenue you are due...");
-    const response = await claimRevenue({
+    const response = await client.royalty.claimRevenue({
       snapshotIds: [snapshotId],
       royaltyVaultIpId: childIpId as Address,
       token: currencyTokenAddress as Address,

@@ -1,16 +1,17 @@
 "use client";
-import { iliad } from "@/app/Web3Providers";
-import { PropsWithChildren, createContext } from "react";
+import { PropsWithChildren, createContext, useEffect } from "react";
 import { useContext, useState } from "react";
 import { Address, createPublicClient, createWalletClient, custom } from "viem";
 import { useWalletClient } from "wagmi";
 import { defaultNftContractAbi } from "../defaultNftContractAbi";
+import { iliad, StoryClient, StoryConfig } from "@story-protocol/core-sdk";
 
 interface AppContextType {
   txLoading: boolean;
   txHash: string;
   txName: string;
   transactions: { txHash: string; action: string; data: any }[];
+  client: StoryClient | null;
   setTxLoading: (loading: boolean) => void;
   setTxHash: (txHash: string) => void;
   setTxName: (txName: string) => void;
@@ -36,6 +37,17 @@ export default function AppProvider({ children }: PropsWithChildren) {
     { txHash: string; action: string; data: any }[]
   >([]);
   const { data: wallet } = useWalletClient();
+  const [client, setClient] = useState<StoryClient | null>(null);
+
+  const setupStoryClient: () => StoryClient = () => {
+    const config: StoryConfig = {
+      account: wallet!.account,
+      transport: custom(wallet!.transport),
+      chainId: "iliad",
+    };
+    const client = StoryClient.newClient(config);
+    return client;
+  };
 
   const mintNFT = async (to: Address, uri: string) => {
     if (!window.ethereum) return "";
@@ -70,6 +82,13 @@ export default function AppProvider({ children }: PropsWithChildren) {
     setTransactions((oldTxs) => [...oldTxs, { txHash, action, data }]);
   };
 
+  useEffect(() => {
+    if (!client && wallet?.account.address) {
+      let newClient = setupStoryClient();
+      setClient(newClient);
+    }
+  }, [wallet]);
+
   return (
     <AppContext.Provider
       value={{
@@ -82,6 +101,7 @@ export default function AppProvider({ children }: PropsWithChildren) {
         setTxHash,
         mintNFT,
         addTransaction,
+        client,
       }}
     >
       {children}

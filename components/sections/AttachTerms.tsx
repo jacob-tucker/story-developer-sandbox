@@ -20,21 +20,20 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Address } from "viem";
-import { useLicense } from "@story-protocol/react-sdk";
 import { useWalletClient } from "wagmi";
 
 export default function AttachTerms() {
-  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction, client } =
+    useStory();
   const [ipId, setIpId] = useState("");
   const [termsId, setTermsId] = useState("");
   const { data: wallet } = useWalletClient();
-  const { attachLicenseTerms } = useLicense();
 
   async function attachTermsToIPA() {
-    if (!wallet?.account.address) return;
+    if (!client) return;
     setTxLoading(true);
     setTxName("Attaching terms to an IP Asset...");
-    const response = await attachLicenseTerms({
+    const response = await client.license.attachLicenseTerms({
       licenseTermsId: termsId,
       ipId: ipId as Address,
       txOptions: { waitForTransaction: true },

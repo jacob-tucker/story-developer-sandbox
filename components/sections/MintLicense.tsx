@@ -20,22 +20,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useLicense } from "@story-protocol/react-sdk";
 import { useWalletClient } from "wagmi";
 
 export default function MintLicense() {
-  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction, client } =
+    useStory();
   const [licensorIpId, setLicensorIpId] = useState("");
   const [receiverAddress, setReceiverAddress] = useState("");
   const [termsId, setTermsId] = useState("");
   const { data: wallet } = useWalletClient();
-  const { mintLicenseTokens } = useLicense();
 
   async function mintLicense() {
-    if (!wallet?.account.address) return;
+    if (!client) return;
     setTxLoading(true);
     setTxName("Minting a License Token from an IP Asset...");
-    const response = await mintLicenseTokens({
+    const response = await client.license.mintLicenseTokens({
       licenseTermsId: termsId,
       licensorIpId: licensorIpId as Address,
       receiver: receiverAddress as Address,

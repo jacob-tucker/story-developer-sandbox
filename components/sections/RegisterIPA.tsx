@@ -13,25 +13,29 @@ import { Label } from "../ui/label";
 import { Address } from "viem";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
-import { useStory } from "@/lib/context/AppContext";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 import { useWalletClient } from "wagmi";
-import { useIpAsset } from "@story-protocol/react-sdk";
 import CryptoJS from "crypto-js";
+import { useStory } from "@/lib/context/AppContext";
 
 export default function RegisterIPA() {
-  const { mintNFT, setTxHash, setTxLoading, setTxName, addTransaction } =
-    useStory();
+  const {
+    mintNFT,
+    setTxHash,
+    setTxLoading,
+    setTxName,
+    addTransaction,
+    client,
+  } = useStory();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState();
   const [nftId, setNftId] = useState("");
   const [nftContractAddress, setNftContractAddress] = useState("");
   const { data: wallet } = useWalletClient();
-  const { register } = useIpAsset();
 
   const mintAndRegisterNFT = async () => {
-    if (!wallet?.account.address) return;
+    if (!client) return;
     setTxLoading(true);
     setTxName("Minting an NFT so it can be registered as an IP Asset...");
     const formData = new FormData();
@@ -56,7 +60,7 @@ export default function RegisterIPA() {
     ipfsUri: string | null,
     ipfsJson: any | null
   ) => {
-    if (!wallet?.account.address) return;
+    if (!client) return;
     setTxLoading(true);
     setTxName("Registering an NFT as an IP Asset...");
 
@@ -64,7 +68,7 @@ export default function RegisterIPA() {
     const metadataHash = CryptoJS.SHA256(
       JSON.stringify(ipfsJson || {})
     ).toString(CryptoJS.enc.Hex);
-    const response = await register({
+    const response = await client.ipAsset.register({
       nftContract,
       tokenId,
       ipMetadata: {

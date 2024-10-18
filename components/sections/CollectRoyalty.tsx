@@ -13,21 +13,20 @@ import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
-import { useRoyalty } from "@story-protocol/react-sdk";
 import { useWalletClient } from "wagmi";
 
 export default function CollectRoyalty() {
-  const { setTxHash, setTxLoading, setTxName, addTransaction } = useStory();
+  const { setTxHash, setTxLoading, setTxName, addTransaction, client } =
+    useStory();
   const [parentIpId, setParentIpId] = useState("");
   const [childIpId, setChildIpId] = useState("");
   const { data: wallet } = useWalletClient();
-  const { collectRoyaltyTokens } = useRoyalty();
 
   async function collectRoyalty() {
-    if (!wallet?.account.address) return;
+    if (!client) return;
     setTxLoading(true);
     setTxName("Collecting the Royalty Token...");
-    const response = await collectRoyaltyTokens({
+    const response = await client.royalty.collectRoyaltyTokens({
       parentIpId: parentIpId as Address,
       royaltyVaultIpId: childIpId as Address,
       txOptions: { waitForTransaction: true },
