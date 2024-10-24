@@ -1,11 +1,10 @@
 export const attachTerms = `
-import { Address } from 'viem';
-import { useLicense } from "@story-protocol/react-sdk";
+import { useStory } from './StoryContext';
 
-export default function AttachTerms() {
-    const { attachLicenseTerms } = useLicense();
+export default async function AttachTerms() {
+    const { client } = useStory();
 
-    const response = await attachLicenseTerms({
+    const response = await client?.ipAsset.attachLicenseTerms({
         licenseTermsId: "1", 
         ipId: "0x4c1f8c1035a8cE379dd4ed666758Fb29696CF721",
         txOptions: { waitForTransaction: true }

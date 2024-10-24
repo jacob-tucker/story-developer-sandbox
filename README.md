@@ -8,9 +8,7 @@ The sandbox will walk you through building with Story step-by-step. More specifi
 2. Attaching License Terms to that IP Asset
 3. Minting a License Token from an IP Asset
 4. Registering a derivative IP Asset from a License Token
-5. Collecting Royalty Tokens
-6. Taking a snapshot
-7. Claiming revenue from a snapshot
+5. Claiming revenue from a child IP Asset
 
 ## Get Started
 

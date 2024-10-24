@@ -11,9 +11,7 @@ import { useStory } from "@/lib/context/AppContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Footer from "@/components/sections/Footer";
-import CollectRoyalty from "@/components/sections/CollectRoyalty";
 import { ConsoleLog } from "@/components/atoms/ConsoleLog";
-import Snapshot from "@/components/sections/Snapshot";
 import ClaimRevenue from "@/components/sections/ClaimRevenue";
 import introJs from "intro.js";
 import { useEffect } from "react";
@@ -97,10 +95,6 @@ export default function Home() {
       <MintLicense />
       <VerticalLine />
       <RegisterDerivativeIPA />
-      <VerticalLine />
-      <CollectRoyalty />
-      <VerticalLine />
-      <Snapshot />
       <VerticalLine />
       <ClaimRevenue />
       <Footer />

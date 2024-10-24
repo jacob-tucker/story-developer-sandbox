@@ -20,14 +20,12 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Address } from "viem";
-import { useWalletClient } from "wagmi";
 
 export default function AttachTerms() {
   const { setTxHash, setTxLoading, setTxName, addTransaction, client } =
     useStory();
   const [ipId, setIpId] = useState("");
   const [termsId, setTermsId] = useState("");
-  const { data: wallet } = useWalletClient();
 
   async function attachTermsToIPA() {
     if (!client) return;

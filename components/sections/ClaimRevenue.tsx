@@ -13,35 +13,39 @@ import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
-import { useWalletClient } from "wagmi";
 
 export default function ClaimRevenue() {
   const { setTxHash, setTxLoading, setTxName, addTransaction, client } =
     useStory();
+  const [ancestorIpId, setAncestorIpId] = useState("");
   const [childIpId, setChildIpId] = useState("");
-  const [currencyTokenAddress, setCurrencyTokenAddress] = useState(
-    "0xB132A6B7AE652c974EE1557A3521D53d18F6739f"
-  );
-  const [snapshotId, setSnapshotId] = useState("");
-  const { data: wallet } = useWalletClient();
+  const [amount, setAmount] = useState("");
 
   async function claimRevenueTokens() {
     if (!client) return;
     setTxLoading(true);
     setTxName("Claiming the revenue you are due...");
-    const response = await client.royalty.claimRevenue({
-      snapshotIds: [snapshotId],
-      royaltyVaultIpId: childIpId as Address,
-      token: currencyTokenAddress as Address,
-      txOptions: { waitForTransaction: true },
-    });
+    const response =
+      await client.royalty.transferToVaultAndSnapshotAndClaimByTokenBatch({
+        ancestorIpId: ancestorIpId as Address,
+        claimer: ancestorIpId as Address,
+        royaltyClaimDetails: [
+          {
+            childIpId: childIpId as Address,
+            royaltyPolicy: "0x793Df8d32c12B0bE9985FFF6afB8893d347B6686",
+            currencyToken: "0x91f6F05B08c16769d3c85867548615d270C42fC7",
+            amount: amount,
+          },
+        ],
+        txOptions: { waitForTransaction: true },
+      });
     console.log(
-      `Claimed revenue token ${response.claimableToken} at transaction hash ${response.txHash}`
+      `Claimed ${response.amountsClaimed} revenue at snapshotId ${response.snapshotId}`
     );
     setTxLoading(false);
     setTxHash(response.txHash as string);
     addTransaction(response.txHash as string, "Claim Revenue", {
-      claimableToken: response.claimableToken,
+      amountsClaimed: response.amountsClaimed,
     });
   }
 
@@ -50,16 +54,24 @@ export default function ClaimRevenue() {
       <div className="flex justify-center items-center">
         <Card className="w-[350px]">
           <CardHeader>
-            <CardTitle>Step 7. Claim Revenue</CardTitle>
+            <CardTitle>Step 5. Claim Revenue</CardTitle>
             <CardDescription>
-              Claim the revenue you are due from holding the Royalty Token of a
-              child IP Asset.
+              Claim the revenue you are due from a child IP Asset.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-3">
               <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="parentIpId">Child IP ID</Label>
+                <Label htmlFor="parentIpId">Ancestor IP ID</Label>
+                <Input
+                  type="text"
+                  id="ancestorIpId"
+                  placeholder="0x6Bba939A4215b8705bCaFdD34B99876D4D36FcaC"
+                  onChange={(e) => setAncestorIpId(e.target.value)}
+                />
+              </div>
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="childIpId">Child IP ID</Label>
                 <Input
                   type="text"
                   id="childIpId"
@@ -68,21 +80,12 @@ export default function ClaimRevenue() {
                 />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="parentIpId">Snapshot ID</Label>
+                <Label htmlFor="amount">Amount</Label>
                 <Input
                   type="text"
-                  id="snapshotId"
+                  id="amount"
                   placeholder="2"
-                  onChange={(e) => setSnapshotId(e.target.value)}
-                />
-              </div>
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="parentIpId">Currency Token Address</Label>
-                <Input
-                  type="text"
-                  id="currencyTokenAddress"
-                  value={currencyTokenAddress}
-                  onChange={(e) => setCurrencyTokenAddress(e.target.value)}
+                  onChange={(e) => setAmount(e.target.value)}
                 />
               </div>
             </div>

@@ -12,16 +12,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Code } from "./CodeBlock";
-import { registerExistingNft } from "@/lib/code-snippets/registerExistingNft";
+import { mintThenRegisterNft } from "@/lib/code-snippets/mintThenRegisterNft";
+import { mintAndRegisterNft } from "@/lib/code-snippets/mintAndRegisterNft";
 import { setupClient } from "@/lib/code-snippets/setupClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { attachTerms } from "@/lib/code-snippets/attachTerms";
 import { mintLicense } from "@/lib/code-snippets/mintLicense";
-import { registerNewNft } from "@/lib/code-snippets/registerNewNft";
-import { registerNewNftDerivative } from "@/lib/code-snippets/registerNewNftDerivative";
-import { registerExistingNftDerivative } from "@/lib/code-snippets/registerExistingNftDerivative";
-import { collectRoyalty } from "@/lib/code-snippets/collectRoyalty";
-import { snapshot } from "@/lib/code-snippets/snapshot";
+import { registerDerivative } from "@/lib/code-snippets/registerDerivative";
 import { claimRevenue } from "@/lib/code-snippets/claimRevenue";
 
 const data: {
@@ -31,20 +28,20 @@ const data: {
     code: { filename: string; code: string }[];
   };
 } = {
-  "register-existing-nft": {
-    title: "Register IP Asset",
-    description: "Register an existing NFT in your wallet as an IP Asset.",
+  "mint-then-register": {
+    title: "Mint then Register NFT",
+    description:
+      "Mint an NFT and then register it as an IP Asset in 2 transactions.",
     code: [
-      { filename: "RegisterIPA.tsx", code: registerExistingNft },
+      { filename: "RegisterIPA.tsx", code: mintThenRegisterNft },
       { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
-  "register-new-nft": {
-    title: "Register IP Asset",
-    description:
-      "Mint a new NFT to represent your IP and register it as an IP Asset.",
+  "mint-and-register": {
+    title: "Mint and Register NFT",
+    description: "Mint an NFT and register it as an IP Asset in 1 transaction.",
     code: [
-      { filename: "RegisterIPA.tsx", code: registerNewNft },
+      { filename: "RegisterIPA.tsx", code: mintAndRegisterNft },
       { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
@@ -64,42 +61,15 @@ const data: {
       { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },
-  "register-existing-nft-derivative": {
+  "register-derivative": {
     title: "Register Derivative IP Asset",
     description:
       "Register an existing NFT in your wallet as a derivative of an existing IP Asset.",
     code: [
       {
         filename: "RegisterDerivative.tsx",
-        code: registerExistingNftDerivative,
+        code: registerDerivative,
       },
-      { filename: "StoryWrapper.tsx", code: setupClient },
-    ],
-  },
-  "register-new-nft-derivative": {
-    title: "Register Derivative IP Asset",
-    description:
-      "Mint a new NFT to represent your IP and register it as a derivative of an existing IP Asset.",
-    code: [
-      { filename: "RegisterDerivative.tsx", code: registerNewNftDerivative },
-      { filename: "StoryWrapper.tsx", code: setupClient },
-    ],
-  },
-  "collect-royalty": {
-    title: "Collect Royalty Tokens",
-    description:
-      "Claim the royalty tokens and any accrued revenue tokens from children.",
-    code: [
-      { filename: "CollectRoyalty.tsx", code: collectRoyalty },
-      { filename: "StoryWrapper.tsx", code: setupClient },
-    ],
-  },
-  snapshot: {
-    title: "Snapshot",
-    description:
-      "Take a snapshot of the current state of the royalty system so you can claim revenue in the next step.",
-    code: [
-      { filename: "Snapshot.tsx", code: snapshot },
       { filename: "StoryWrapper.tsx", code: setupClient },
     ],
   },

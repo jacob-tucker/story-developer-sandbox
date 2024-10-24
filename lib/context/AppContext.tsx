@@ -1,6 +1,11 @@
 "use client";
-import { PropsWithChildren, createContext, useEffect } from "react";
-import { useContext, useState } from "react";
+import {
+  PropsWithChildren,
+  createContext,
+  useEffect,
+  useContext,
+  useState,
+} from "react";
 import { Address, createPublicClient, createWalletClient, custom } from "viem";
 import { useWalletClient } from "wagmi";
 import { defaultNftContractAbi } from "../defaultNftContractAbi";
@@ -41,7 +46,7 @@ export default function AppProvider({ children }: PropsWithChildren) {
 
   const setupStoryClient: () => StoryClient = () => {
     const config: StoryConfig = {
-      account: wallet!.account,
+      wallet: wallet,
       transport: custom(wallet!.transport),
       chainId: "iliad",
     };

@@ -20,7 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useWalletClient } from "wagmi";
 
 export default function MintLicense() {
   const { setTxHash, setTxLoading, setTxName, addTransaction, client } =
@@ -28,7 +27,6 @@ export default function MintLicense() {
   const [licensorIpId, setLicensorIpId] = useState("");
   const [receiverAddress, setReceiverAddress] = useState("");
   const [termsId, setTermsId] = useState("");
-  const { data: wallet } = useWalletClient();
 
   async function mintLicense() {
     if (!client) return;
