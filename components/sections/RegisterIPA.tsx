@@ -13,10 +13,18 @@ import { Label } from "../ui/label";
 import { Address } from "viem";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
-import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
+import {
+  uploadImageToIPFS,
+  uploadJSONToIPFS,
+} from "@/lib/functions/uploadJSONToIpfs";
 import { useWalletClient } from "wagmi";
 import CryptoJS from "crypto-js";
 import { useStory } from "@/lib/context/AppContext";
+import { getFileHash } from "@/lib/functions/getFileHash";
+import {
+  NFT_CONTRACT_ADDRESS,
+  SPG_NFT_CONTRACT_ADDRESS,
+} from "@/lib/constants";
 
 export default function RegisterIPA() {
   const {
@@ -29,40 +37,67 @@ export default function RegisterIPA() {
   } = useStory();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState();
+  const [image, setImage] = useState<File | null>(null);
   const { data: wallet } = useWalletClient();
-
-  const NFT_CONTRACT_ADDRESS: Address =
-    "0xd2a4a4Cb40357773b658BECc66A6c165FD9Fc485";
-  const SPG_NFT_CONTRACT_ADDRESS: Address =
-    "0x9BDca7dbdd7cFB7984993e6EcEbB91DAE360f791";
 
   const mintThenRegisterNFT = async () => {
     if (!client) return;
     setTxLoading(true);
-    setTxName("Minting an NFT so it can be registered as an IP Asset...");
+    setTxName("Uploading data to IPFS...");
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("file", image as any);
+    formData.append("file", image as File);
+    const imageIpfsHash = await uploadImageToIPFS(formData);
 
-    // nft data
-    const { ipfsUri, ipfsJson } = await uploadJSONToIPFS(formData);
-    const tokenId = await mintNFT(wallet?.account.address as Address, ipfsUri);
-    const metadataHash = CryptoJS.SHA256(
-      JSON.stringify(ipfsJson || {})
-    ).toString(CryptoJS.enc.Hex);
+    /* NFT data */
+    const nftData = {
+      name,
+      description,
+      image: `https://ipfs.io/ipfs/${imageIpfsHash}`,
+    };
+    const nftIpfsCid = await uploadJSONToIPFS(nftData);
+    const nftMetadataHash = CryptoJS.SHA256(JSON.stringify(nftData)).toString(
+      CryptoJS.enc.Hex
+    );
 
+    /* IP data */
+    const ipData = client.ipAsset.generateIpMetadata({
+      title: name,
+      description,
+      image: `https://ipfs.io/ipfs/${imageIpfsHash}`,
+      imageHash: await getFileHash(image as File),
+      mediaUrl: `https://ipfs.io/ipfs/${imageIpfsHash}`,
+      mediaHash: await getFileHash(image as File),
+      mediaType: "image/png",
+      creators: [
+        {
+          name: "Test Creator",
+          contributionPercent: 100,
+          address: wallet?.account.address as Address,
+        },
+      ],
+    });
+    const ipIpfsCid = await uploadJSONToIPFS(ipData);
+    const ipMetadataHash = CryptoJS.SHA256(JSON.stringify(ipData)).toString(
+      CryptoJS.enc.Hex
+    );
+
+    // mint NFT
+    setTxName("Minting an NFT so it can be registered as an IP Asset...");
+    const tokenId = await mintNFT(
+      wallet?.account.address as Address,
+      `https://ipfs.io/ipfs/${nftIpfsCid}`
+    );
+    if (!tokenId) return;
+    // register IPA
     setTxName("Registering an NFT as an IP Asset...");
-
     const response = await client.ipAsset.register({
       nftContract: NFT_CONTRACT_ADDRESS,
       tokenId,
       ipMetadata: {
-        ipMetadataURI: "", // uri of IP metadata
-        ipMetadataHash: "0x", // hash of IP metadata
-        nftMetadataURI: ipfsUri, // uri of NFT metadata
-        nftMetadataHash: `0x${metadataHash}`, // hash of NFT metadata
+        ipMetadataURI: `https://ipfs.io/ipfs/${ipIpfsCid}`, // uri of IP metadata
+        ipMetadataHash: `0x${ipMetadataHash}`, // hash of IP metadata
+        nftMetadataURI: `https://ipfs.io/ipfs/${nftIpfsCid}`, // uri of NFT metadata
+        nftMetadataHash: `0x${nftMetadataHash}`, // hash of NFT metadata
       },
       txOptions: { waitForTransaction: true },
     });
@@ -79,27 +114,53 @@ export default function RegisterIPA() {
   const mintAndRegisterNFT = async () => {
     if (!client) return;
     setTxLoading(true);
-    setTxName("Minting and registering an IP Asset...");
+    setTxName("Uploading data to IPFS...");
 
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("file", image as any);
+    formData.append("file", image as File);
+    const imageIpfsHash = await uploadImageToIPFS(formData);
 
-    // nft data
-    const { ipfsUri, ipfsJson } = await uploadJSONToIPFS(formData);
+    /* NFT data */
+    const nftData = {
+      name,
+      description,
+      image: `https://ipfs.io/ipfs/${imageIpfsHash}`,
+    };
+    const nftIpfsCid = await uploadJSONToIPFS(nftData);
+    const nftMetadataHash = CryptoJS.SHA256(JSON.stringify(nftData)).toString(
+      CryptoJS.enc.Hex
+    );
 
-    const metadataHash = CryptoJS.SHA256(
-      JSON.stringify(ipfsJson || {})
-    ).toString(CryptoJS.enc.Hex);
+    /* IP data */
+    const ipData = client.ipAsset.generateIpMetadata({
+      title: name,
+      description,
+      image: `https://ipfs.io/ipfs/${imageIpfsHash}`,
+      imageHash: await getFileHash(image as File),
+      mediaUrl: `https://ipfs.io/ipfs/${imageIpfsHash}`,
+      mediaHash: await getFileHash(image as File),
+      mediaType: "image/png",
+      creators: [
+        {
+          name: "Test Creator",
+          contributionPercent: 100,
+          address: wallet?.account.address as Address,
+        },
+      ],
+    });
+    const ipIpfsCid = await uploadJSONToIPFS(ipData);
+    const ipMetadataHash = CryptoJS.SHA256(JSON.stringify(ipData)).toString(
+      CryptoJS.enc.Hex
+    );
 
+    setTxName("Minting and registering an IP Asset...");
     const response = await client.ipAsset.mintAndRegisterIp({
       spgNftContract: SPG_NFT_CONTRACT_ADDRESS,
       ipMetadata: {
-        ipMetadataURI: "", // uri of IP metadata
-        ipMetadataHash: "0x", // hash of IP metadata
-        nftMetadataURI: ipfsUri, // uri of NFT metadata
-        nftMetadataHash: `0x${metadataHash}`, // hash of NFT metadata
+        ipMetadataURI: `https://ipfs.io/ipfs/${ipIpfsCid}`, // uri of IP metadata
+        ipMetadataHash: `0x${ipMetadataHash}`, // hash of IP metadata
+        nftMetadataURI: `https://ipfs.io/ipfs/${nftIpfsCid}`, // uri of NFT metadata
+        nftMetadataHash: `0x${nftMetadataHash}`, // hash of NFT metadata
       },
       txOptions: { waitForTransaction: true },
     });

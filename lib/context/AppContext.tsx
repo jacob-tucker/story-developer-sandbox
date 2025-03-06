@@ -9,18 +9,19 @@ import {
 import { Address, createPublicClient, createWalletClient, custom } from "viem";
 import { useWalletClient } from "wagmi";
 import { defaultNftContractAbi } from "../defaultNftContractAbi";
-import { iliad, StoryClient, StoryConfig } from "@story-protocol/core-sdk";
+import { aeneid, StoryClient, StoryConfig } from "@story-protocol/core-sdk";
+import { NFT_CONTRACT_ADDRESS } from "../constants";
 
 interface AppContextType {
   txLoading: boolean;
   txHash: string;
   txName: string;
   transactions: { txHash: string; action: string; data: any }[];
-  client: StoryClient | null;
+  client: StoryClient | undefined;
   setTxLoading: (loading: boolean) => void;
   setTxHash: (txHash: string) => void;
   setTxName: (txName: string) => void;
-  mintNFT: (to: Address, uri: string) => Promise<string>;
+  mintNFT: (to: Address, uri: string) => Promise<number | null>;
   addTransaction: (txHash: string, action: string, data: any) => void;
 }
 
@@ -42,33 +43,35 @@ export default function AppProvider({ children }: PropsWithChildren) {
     { txHash: string; action: string; data: any }[]
   >([]);
   const { data: wallet } = useWalletClient();
-  const [client, setClient] = useState<StoryClient | null>(null);
+  const [client, setClient] = useState<StoryClient | undefined>(undefined);
 
   const setupStoryClient: () => StoryClient = () => {
     const config: StoryConfig = {
       wallet: wallet,
       transport: custom(wallet!.transport),
-      chainId: "iliad",
+      chainId: "aeneid",
     };
     const client = StoryClient.newClient(config);
     return client;
   };
 
-  const mintNFT = async (to: Address, uri: string) => {
-    if (!window.ethereum) return "";
+  const mintNFT = async (to: Address, uri: string): Promise<number | null> => {
+    if (!wallet?.account.address) return null;
     console.log("Minting a new NFT...");
+    console.log(to, uri);
+
     const walletClient = createWalletClient({
-      account: wallet?.account.address as Address,
-      chain: iliad,
-      transport: custom(window.ethereum),
+      account: wallet.account,
+      chain: aeneid,
+      transport: custom(wallet!.transport),
     });
     const publicClient = createPublicClient({
-      transport: custom(window.ethereum),
-      chain: iliad,
+      transport: custom(wallet!.transport),
+      chain: aeneid,
     });
 
     const { request } = await publicClient.simulateContract({
-      address: "0xd2a4a4Cb40357773b658BECc66A6c165FD9Fc485",
+      address: NFT_CONTRACT_ADDRESS,
       functionName: "mintNFT",
       args: [to, uri],
       abi: defaultNftContractAbi,
@@ -76,11 +79,16 @@ export default function AppProvider({ children }: PropsWithChildren) {
     const hash = await walletClient.writeContract(request);
     console.log(`Minted NFT successful with hash: ${hash}`);
 
-    const receipt = await publicClient.waitForTransactionReceipt({ hash });
-    const tokenId = Number(receipt.logs[0].topics[3]).toString();
-    console.log(`Minted NFT tokenId: ${tokenId}`);
-    addTransaction(hash, "Mint NFT", { tokenId });
-    return tokenId;
+    const { logs } = await publicClient.waitForTransactionReceipt({
+      hash,
+    });
+    if (logs[0].topics[3]) {
+      let tokenId = parseInt(logs[0].topics[3], 16);
+      console.log(`Minted NFT tokenId: ${tokenId}`);
+      addTransaction(hash, "Mint NFT", { tokenId });
+      return tokenId;
+    }
+    return null;
   };
 
   const addTransaction = (txHash: string, action: string, data: any) => {

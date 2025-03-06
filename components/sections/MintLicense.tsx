@@ -37,6 +37,8 @@ export default function MintLicense() {
       licensorIpId: licensorIpId as Address,
       receiver: receiverAddress as Address,
       amount: 1,
+      maxMintingFee: 0,
+      maxRevenueShare: 100,
       txOptions: { waitForTransaction: true },
     });
 
@@ -78,7 +80,7 @@ export default function MintLicense() {
                     <SelectValue placeholder="Select pre-set terms" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="2">
+                    <SelectItem value="1">
                       Non-Commercial Social Remixing
                     </SelectItem>
                   </SelectContent>

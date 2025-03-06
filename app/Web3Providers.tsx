@@ -4,13 +4,12 @@ import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
-import { iliad } from "@story-protocol/core-sdk";
-import AppProvider from "@/lib/context/AppContext";
+import { aeneid } from "@story-protocol/core-sdk";
 
 const config = getDefaultConfig({
   appName: "Developer Sandbox",
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
-  chains: [iliad],
+  chains: [aeneid],
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
 
@@ -20,9 +19,7 @@ export default function Web3Providers({ children }: PropsWithChildren) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <AppProvider>
-          <RainbowKitProvider>{children}</RainbowKitProvider>
-        </AppProvider>
+        <RainbowKitProvider>{children}</RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

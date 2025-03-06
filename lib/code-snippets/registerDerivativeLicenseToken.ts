@@ -1,4 +1,4 @@
-export const registerDerivative = `
+export const registerDerivativeLicenseToken = `
 import { toHex } from 'viem';
 import { useStory } from './StoryContext';
 
@@ -6,19 +6,16 @@ export default async function RegisterDerivative() {
   const { client } = useStory();
   if (!client) return;
   
-  const registerResponse = await client.ipAsset.mintAndRegisterIpAndMakeDerivative({
-    spgNftContract: "0xc32A8a0FF3beDDDa58393d022aF433e78739FAbc", // your SPG NFT contract address
-    derivData: {
-      parentIpIds: ["0x6Bba939A4215b8705bCaFdD34B99876D4D36FcaC"],
-      licenseTermsIds: ['1'],
-    },
-    // dummy metadata
+  const registerResponse = await client.ipAsset.mintAndRegisterIpAndMakeDerivativeWithLicenseTokens({
+    spgNftContract: "0x9BDca7dbdd7cFB7984993e6EcEbB91DAE360f791", // your SPG NFT contract address
+    licenseTokenIds: ["1"], // array of license ids relevant to the creation of the derivative, minted from the parent IPA
     ipMetadata: {
       ipMetadataURI: 'test-uri',
       ipMetadataHash: toHex('test-metadata-hash', { size: 32 }),
       nftMetadataHash: toHex('test-nft-metadata-hash', { size: 32 }),
       nftMetadataURI: 'test-nft-uri',
     },
+    maxRts: 100_000_000,
     txOptions: { waitForTransaction: true }
   });
   console.log(\`IPA created at tx hash \${registerResponse.txHash}, IPA ID: \${registerResponse.ipId}\`);

@@ -25,7 +25,7 @@ export default function StoryProvider({ children }: PropsWithChildren) {
     const config: StoryConfig = {
       wallet: wallet,
       transport: custom(wallet!.transport),
-      chainId: "iliad",
+      chainId: "aeneid",
     };
     const client = StoryClient.newClient(config);
     return client;

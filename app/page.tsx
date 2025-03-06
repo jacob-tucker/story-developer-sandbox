@@ -57,7 +57,7 @@ export default function Home() {
             <AlertDescription>
               View your transaction on the{" "}
               <a
-                href={`https://explorer.story.foundation/transactions/${txHash}`}
+                href={`https://aeneid.storyscan.xyz/tx/${txHash}`}
                 target="_blank"
                 style={{ color: "rgb(255, 40, 37)" }}
               >

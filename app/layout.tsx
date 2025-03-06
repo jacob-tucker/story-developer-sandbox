@@ -3,6 +3,7 @@ import "./globals.css";
 import { Metadata } from "next";
 import "intro.js/introjs.css";
 import Web3Providers from "./Web3Providers";
+import AppProvider from "@/lib/context/AppContext";
 
 export const metadata: Metadata = {
   title: "Developer Sandbox",
@@ -19,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Web3Providers>{children}</Web3Providers>
+        <Web3Providers>
+          <AppProvider>{children}</AppProvider>
+        </Web3Providers>
       </body>
     </html>
   );

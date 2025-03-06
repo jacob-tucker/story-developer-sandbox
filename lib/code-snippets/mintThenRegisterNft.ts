@@ -5,11 +5,12 @@ import { mintNFT } from './mintNFT'; // a separate function to mint an nft that 
 
 export default async function RegisterIPA() {
   const { client } = useStory();
+  if (!client) return;
   const { data: wallet } = useWalletClient();
 
   const tokenId = await mintNFT(wallet?.account.address as Address, 'test-uri')
-  const response = await client?.ipAsset.register({
-    nftContract: "0xd516482bef63Ff19Ed40E4C6C2e626ccE04e19ED", // your NFT contract address
+  const response = await client.ipAsset.register({
+    nftContract: "0x937bef10ba6fb941ed84b8d249abc76031429a9a", // your NFT contract address
     tokenId: tokenId,
     ipMetadata: {
       ipMetadataURI: 'test-uri',

@@ -19,7 +19,7 @@ export default function Navbar() {
           >
             <div className="flex items-center gap-2 rounded-full border border-dashed border-zinc-300 py-px pr-3 text-xs/6 font-medium text-zinc-900 dark:border-white/20 dark:text-white">
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-white/25">
-                v1.1
+                v1.3
               </div>
               SDK Version
             </div>

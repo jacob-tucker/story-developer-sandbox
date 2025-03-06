@@ -18,6 +18,7 @@ import { setupClient } from "@/lib/code-snippets/setupClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { attachTerms } from "@/lib/code-snippets/attachTerms";
 import { mintLicense } from "@/lib/code-snippets/mintLicense";
+import { registerDerivativeLicenseToken } from "@/lib/code-snippets/registerDerivativeLicenseToken";
 import { registerDerivative } from "@/lib/code-snippets/registerDerivative";
 import { claimRevenue } from "@/lib/code-snippets/claimRevenue";
 
@@ -34,7 +35,7 @@ const data: {
       "Mint an NFT and then register it as an IP Asset in 2 transactions.",
     code: [
       { filename: "RegisterIPA.tsx", code: mintThenRegisterNft },
-      { filename: "StoryWrapper.tsx", code: setupClient },
+      { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
   "mint-and-register": {
@@ -42,7 +43,7 @@ const data: {
     description: "Mint an NFT and register it as an IP Asset in 1 transaction.",
     code: [
       { filename: "RegisterIPA.tsx", code: mintAndRegisterNft },
-      { filename: "StoryWrapper.tsx", code: setupClient },
+      { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
   "attach-terms": {
@@ -50,7 +51,7 @@ const data: {
     description: "Attach existing pre-set terms to an IP Asset.",
     code: [
       { filename: "AttachTerms.tsx", code: attachTerms },
-      { filename: "StoryWrapper.tsx", code: setupClient },
+      { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
   "mint-license": {
@@ -58,19 +59,31 @@ const data: {
     description: "Mint a License Token from an existing IP Asset.",
     code: [
       { filename: "MintLicense.tsx", code: mintLicense },
-      { filename: "StoryWrapper.tsx", code: setupClient },
+      { filename: "StoryContext.tsx", code: setupClient },
+    ],
+  },
+  "register-derivative-license-token": {
+    title: "Register Derivative IP Asset with License Token",
+    description:
+      "Mint an NFT and register it as a derivative IP by burning a License Token.",
+    code: [
+      {
+        filename: "RegisterDerivative.tsx",
+        code: registerDerivativeLicenseToken,
+      },
+      { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
   "register-derivative": {
     title: "Register Derivative IP Asset",
     description:
-      "Register an existing NFT in your wallet as a derivative of an existing IP Asset.",
+      "Mint an NFT and register a derivative IP without a License Token (mints and burns it automatically).",
     code: [
       {
         filename: "RegisterDerivative.tsx",
         code: registerDerivative,
       },
-      { filename: "StoryWrapper.tsx", code: setupClient },
+      { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
   "claim-revenue": {
@@ -79,7 +92,7 @@ const data: {
       "Claim the revenue you are due from holding the Royalty Token of a child IP Asset.",
     code: [
       { filename: "ClaimRevenue.tsx", code: claimRevenue },
-      { filename: "StoryWrapper.tsx", code: setupClient },
+      { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
 };

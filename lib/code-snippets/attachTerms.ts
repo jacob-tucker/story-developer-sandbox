@@ -3,8 +3,8 @@ import { useStory } from './StoryContext';
 
 export default async function AttachTerms() {
     const { client } = useStory();
-
-    const response = await client?.ipAsset.attachLicenseTerms({
+    if (!client) return;
+    const response = await client.ipAsset.attachLicenseTerms({
         licenseTermsId: "1", 
         ipId: "0x4c1f8c1035a8cE379dd4ed666758Fb29696CF721",
         txOptions: { waitForTransaction: true }

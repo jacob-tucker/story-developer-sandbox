@@ -13,39 +13,31 @@ import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
 import { Address } from "viem";
+import { ROYALTY_POLICY_LAP_ADDRESS } from "@/lib/constants";
+import { WIP_TOKEN_ADDRESS } from "@story-protocol/core-sdk";
 
 export default function ClaimRevenue() {
   const { setTxHash, setTxLoading, setTxName, addTransaction, client } =
     useStory();
   const [ancestorIpId, setAncestorIpId] = useState("");
   const [childIpId, setChildIpId] = useState("");
-  const [amount, setAmount] = useState("");
 
   async function claimRevenueTokens() {
     if (!client) return;
     setTxLoading(true);
     setTxName("Claiming the revenue you are due...");
-    const response =
-      await client.royalty.transferToVaultAndSnapshotAndClaimByTokenBatch({
-        ancestorIpId: ancestorIpId as Address,
-        claimer: ancestorIpId as Address,
-        royaltyClaimDetails: [
-          {
-            childIpId: childIpId as Address,
-            royaltyPolicy: "0x793Df8d32c12B0bE9985FFF6afB8893d347B6686",
-            currencyToken: "0x91f6F05B08c16769d3c85867548615d270C42fC7",
-            amount: amount,
-          },
-        ],
-        txOptions: { waitForTransaction: true },
-      });
-    console.log(
-      `Claimed ${response.amountsClaimed} revenue at snapshotId ${response.snapshotId}`
-    );
+    const response = await client.royalty.claimAllRevenue({
+      ancestorIpId: ancestorIpId as Address,
+      claimer: ancestorIpId as Address,
+      childIpIds: [childIpId as Address],
+      royaltyPolicies: [ROYALTY_POLICY_LAP_ADDRESS],
+      currencyTokens: [WIP_TOKEN_ADDRESS],
+    });
+    console.log(`Claimed revenue: ${response.claimedTokens}`);
     setTxLoading(false);
-    setTxHash(response.txHash as string);
-    addTransaction(response.txHash as string, "Claim Revenue", {
-      amountsClaimed: response.amountsClaimed,
+    setTxHash(response.txHashes[0] as string);
+    addTransaction(response.txHashes[0] as string, "Claim Revenue", {
+      amountsClaimed: response.claimedTokens,
     });
   }
 
@@ -77,15 +69,6 @@ export default function ClaimRevenue() {
                   id="childIpId"
                   placeholder="0x6Bba939A4215b8705bCaFdD34B99876D4D36FcaC"
                   onChange={(e) => setChildIpId(e.target.value)}
-                />
-              </div>
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="amount">Amount</Label>
-                <Input
-                  type="text"
-                  id="amount"
-                  placeholder="2"
-                  onChange={(e) => setAmount(e.target.value)}
                 />
               </div>
             </div>

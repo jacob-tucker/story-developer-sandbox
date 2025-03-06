@@ -12,56 +12,72 @@ import { Label } from "../ui/label";
 import { useState } from "react";
 import { ViewCode } from "../atoms/ViewCode";
 import { useStory } from "@/lib/context/AppContext";
-import { Address } from "viem";
-import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
-import { useWalletClient } from "wagmi";
-import CryptoJS from "crypto-js";
+import { Address, toHex } from "viem";
+import { SPG_NFT_CONTRACT_ADDRESS } from "@/lib/constants";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export default function RegisterDerivativeIPA() {
-  const {
-    mintNFT,
-    setTxLoading,
-    setTxName,
-    setTxHash,
-    addTransaction,
-    client,
-  } = useStory();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState();
+  const { setTxLoading, setTxName, setTxHash, addTransaction, client } =
+    useStory();
   const [licenseTokenId, setLicenseTokenId] = useState("");
+  const [parentIpId, setParentIpId] = useState("");
+  const [licenseTermsId, setLicenseTermsId] = useState("");
 
-  const SPG_NFT_CONTRACT_ADDRESS: Address =
-    "0x9BDca7dbdd7cFB7984993e6EcEbB91DAE360f791";
-
-  async function registerDerivative() {
+  async function registerDerivativeLicenseToken() {
     if (!client) return;
     setTxLoading(true);
-    setTxName("Registering an NFT as an IP Asset...");
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("file", image as any);
-
-    // nft data
-    const { ipfsUri, ipfsJson } = await uploadJSONToIPFS(formData);
-    // Hash the string using SHA-256 and convert the result to hex
-    const metadataHash = CryptoJS.SHA256(
-      JSON.stringify(ipfsJson || {})
-    ).toString(CryptoJS.enc.Hex);
+    setTxName("Registering a derivative IP with a License Token...");
 
     const response =
       await client.ipAsset.mintAndRegisterIpAndMakeDerivativeWithLicenseTokens({
         spgNftContract: SPG_NFT_CONTRACT_ADDRESS, // your SPG NFT contract address
         licenseTokenIds: [licenseTokenId],
+        // just use dummy metadata
         ipMetadata: {
-          ipMetadataURI: "", // uri of IP metadata
-          ipMetadataHash: "0x", // hash of IP metadata
-          nftMetadataURI: ipfsUri, // uri of NFT metadata
-          nftMetadataHash: `0x${metadataHash}`, // hash of NFT metadata
+          ipMetadataURI: "test-uri", // uri of IP metadata
+          ipMetadataHash: toHex("test-metadata-hash", { size: 32 }), // hash of IP metadata
+          nftMetadataURI: "test-uri", // uri of NFT metadata
+          nftMetadataHash: toHex("test-metadata-hash", { size: 32 }), // hash of NFT metadata
         },
+        maxRts: 100_000_000,
         txOptions: { waitForTransaction: true },
       });
+    console.log(
+      `IPA created at tx hash ${response.txHash}, IPA ID: ${response.ipId}`
+    );
+    setTxLoading(false);
+    setTxHash(response.txHash as string);
+    addTransaction(response.txHash as string, "Register IPA Derivative", {
+      ipId: response.ipId,
+    });
+  }
+
+  async function registerDerivative() {
+    if (!client) return;
+    setTxLoading(true);
+    setTxName("Registering a derivative IP...");
+
+    const response = await client.ipAsset.mintAndRegisterIpAndMakeDerivative({
+      spgNftContract: SPG_NFT_CONTRACT_ADDRESS, // your SPG NFT contract address
+      derivData: {
+        parentIpIds: [parentIpId as Address],
+        licenseTermsIds: [licenseTermsId],
+      },
+      // just use dummy metadata
+      ipMetadata: {
+        ipMetadataURI: "test-uri", // uri of IP metadata
+        ipMetadataHash: toHex("test-metadata-hash", { size: 32 }), // hash of IP metadata
+        nftMetadataURI: "test-uri", // uri of NFT metadata
+        nftMetadataHash: toHex("test-metadata-hash", { size: 32 }), // hash of NFT metadata
+      },
+      txOptions: { waitForTransaction: true },
+    });
     console.log(
       `IPA created at tx hash ${response.txHash}, IPA ID: ${response.ipId}`
     );
@@ -77,22 +93,19 @@ export default function RegisterDerivativeIPA() {
       <div className="flex md:flex-row gap-3 justify-center items-center flex-col">
         <Card className="w-[350px]">
           <CardHeader>
-            <CardTitle>Step 4. Register a Derivative IP</CardTitle>
+            <CardTitle>
+              Step 4a. Register a Derivative w/ License Tokens
+            </CardTitle>
             <CardDescription>
-              Mint an NFT and register it as a derivative IP using a License
-              Token.
+              Mint an NFT and register it as a derivative IP by burning a
+              License Token.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-3">
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="name">Name</Label>
-                <Input
-                  type="text"
-                  id="name"
-                  placeholder="Doge"
-                  onChange={(e) => setName(e.target.value)}
-                />
+                <Input type="text" id="name" placeholder="Doge" />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="description">Description</Label>
@@ -100,17 +113,11 @@ export default function RegisterDerivativeIPA() {
                   type="text"
                   id="description"
                   placeholder="doge wif hat"
-                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="image">Image</Label>
-                <Input
-                  type="file"
-                  id="image"
-                  // @ts-ignore
-                  onChange={(e) => setImage(e.target.files[0])}
-                />
+                <Input type="file" id="image" />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="licenseTokenId">License Token ID</Label>
@@ -120,6 +127,62 @@ export default function RegisterDerivativeIPA() {
                   placeholder="5"
                   onChange={(e) => setLicenseTokenId(e.target.value)}
                 />
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex gap-3">
+            <Button onClick={registerDerivativeLicenseToken}>Register</Button>
+            <ViewCode type="register-derivative-license-token" />
+          </CardFooter>
+        </Card>
+        <h3>OR</h3>
+        <Card className="w-[350px]">
+          <CardHeader>
+            <CardTitle>Step 4b. Register a Derivative</CardTitle>
+            <CardDescription>
+              Mint an NFT and register a derivative IP without a License Token
+              (mints and burns it automatically).
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-3">
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="name">Name</Label>
+                <Input type="text" id="name" placeholder="Doge" />
+              </div>
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="description">Description</Label>
+                <Input
+                  type="text"
+                  id="description"
+                  placeholder="doge wif hat"
+                />
+              </div>
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="image">Image</Label>
+                <Input type="file" id="image" />
+              </div>
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="parentIpId">Parent IP ID</Label>
+                <Input
+                  type="text"
+                  id="parentIpId"
+                  placeholder="0x6Bba939A4215b8705bCaFdD34B99876D4D36FcaC"
+                  onChange={(e) => setParentIpId(e.target.value)}
+                />
+              </div>
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="termsId">Terms</Label>
+                <Select onValueChange={(value) => setLicenseTermsId(value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select pre-set terms" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">
+                      Non-Commercial Social Remixing
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>

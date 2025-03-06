@@ -91,7 +91,7 @@ export function ConsoleLog() {
                       <>
                         {tx.txHash}{" "}
                         <a
-                          href={`https://explorer.story.foundation/transactions/${tx.txHash}`}
+                          href={`https://aeneid.storyscan.xyz/tx/${tx.txHash}`}
                           target="_blank"
                           style={{ color: "rgb(255, 40, 37)" }}
                         >
@@ -107,7 +107,7 @@ export function ConsoleLog() {
                       <div className="flex items-center gap-[5px]">
                         IPA{" "}
                         <a
-                          href={`https://explorer.story.foundation/ipa/${tx.data["ipId"]}`}
+                          href={`https://aeneid.explorer.story.foundation/ipa/${tx.data["ipId"]}`}
                           target="_blank"
                           style={{ color: "rgb(255, 40, 37)" }}
                         >
