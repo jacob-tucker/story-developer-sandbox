@@ -220,9 +220,9 @@ export default function Home() {
       ) : null}
 
       <Navbar />
-      <div className="relative">
+      {/* <div className="relative">
         <ConsoleLog />
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="flex flex-col md:flex-row flex-1 p-4 gap-4 bg-white font-mono">
