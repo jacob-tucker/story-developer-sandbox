@@ -1,20 +1,20 @@
-export const setLicensingConfig = `
-import { zeroAddress } from 'viem';
+export const disableLicense = `
+import { zeroAddress, zeroHash } from 'viem';
 import { LicensingConfig } from '@story-protocol/core-sdk';
 
 const licensingConfig: LicensingConfig = {
   mintingFee: 0n,
-  isSet: true,
+  isSet: true, // turn license config on
   licensingHook: zeroAddress,
-  hookData: zeroAddress,
+  hookData: zeroHash,
   commercialRevShare: 0,
-  disabled: false,
+  disabled: true, // set disabled to true
   expectMinimumGroupRewardShare: 0,
   expectGroupRewardPool: zeroAddress,
 };
 
 const IP_ID: Address = 'INSERT_IP_ID_HERE';
-const LICENSE_TERMS_ID: number = INSERT_LICENSE_TERMS_ID_HERE;
+const LICENSE_TERMS_ID: string = 'INSERT_LICENSE_TERMS_ID_HERE';
 
 const response = await client.license.setLicensingConfig({
   ipId: IP_ID,

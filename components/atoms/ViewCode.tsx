@@ -14,7 +14,8 @@ import {
 import { Code } from "./CodeBlock";
 import { setupClient } from "@/lib/code-snippets/setupClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { setLicensingConfig } from "@/lib/code-snippets/setLicensingConfig";
+import { changeMintingFee } from "@/lib/code-snippets/changeMintingFee";
+import { disableLicense } from "@/lib/code-snippets/disableLicense";
 
 const data: {
   [type: string]: {
@@ -23,12 +24,12 @@ const data: {
     code: { filename: string; code: string }[];
   };
 } = {
-  "set-licensing-config": {
+  "change-minting-fee": {
     title: "Change License Minting Fee",
     description:
       "Set the licensing configuration including minting fee for a specific license terms of an IP.",
     code: [
-      { filename: "SetLicensingConfig.tsx", code: setLicensingConfig },
+      { filename: "ChangeMintingFee.tsx", code: changeMintingFee },
       { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
@@ -37,7 +38,7 @@ const data: {
     description:
       "Disable a license for a specific IP and license terms using the Licensing Config.",
     code: [
-      { filename: "SetLicensingConfig.tsx", code: setLicensingConfig },
+      { filename: "DisableLicense.tsx", code: disableLicense },
       { filename: "StoryContext.tsx", code: setupClient },
     ],
   },

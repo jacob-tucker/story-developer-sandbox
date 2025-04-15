@@ -5,7 +5,6 @@ import { useStory } from "@/lib/context/AppContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Footer from "@/components/sections/Footer";
-import { ConsoleLog } from "@/components/atoms/ConsoleLog";
 import { useEffect, useState } from "react";
 import { useWalletClient } from "wagmi";
 import { ViewCode } from "@/components/atoms/ViewCode";
@@ -19,7 +18,7 @@ import {
 } from "@/features/licensing-config";
 
 // Using the string type to match ViewCode component's expected keys
-type CodeSnippetType = "set-licensing-config" | "disable-license";
+type CodeSnippetType = "change-minting-fee" | "disable-license";
 
 // Define the card data structure
 interface ActionCard {
@@ -43,7 +42,7 @@ export default function Home() {
   // Define the cards with their actions
   const actionCards: ActionCard[] = [
     {
-      id: "set-licensing-config",
+      id: "change-minting-fee",
       title: "Change License Minting Fee",
       description:
         "Set the licensing configuration including minting fee for a specific license terms of an IP",
