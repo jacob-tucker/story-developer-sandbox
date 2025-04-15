@@ -6,11 +6,14 @@ import {
   useContext,
   useState,
 } from "react";
-import { Address, createPublicClient, createWalletClient, custom } from "viem";
+import { custom } from "viem";
 import { useWalletClient } from "wagmi";
-import { defaultNftContractAbi } from "../defaultNftContractAbi";
-import { aeneid, StoryClient, StoryConfig } from "@story-protocol/core-sdk";
-import { NFT_CONTRACT_ADDRESS } from "../constants";
+import {
+  StoryClient,
+  StoryConfig,
+  SupportedChainIds,
+} from "@story-protocol/core-sdk";
+import { useNetwork, getCurrentNetworkConfig } from "./NetworkContext";
 
 interface AppContextType {
   txLoading: boolean;
@@ -21,7 +24,6 @@ interface AppContextType {
   setTxLoading: (loading: boolean) => void;
   setTxHash: (txHash: string) => void;
   setTxName: (txName: string) => void;
-  mintNFT: (to: Address, uri: string) => Promise<number | null>;
   addTransaction: (txHash: string, action: string, data: any) => void;
 }
 
@@ -45,62 +47,58 @@ export default function AppProvider({ children }: PropsWithChildren) {
   const { data: wallet } = useWalletClient();
   const [client, setClient] = useState<StoryClient | undefined>(undefined);
 
-  const setupStoryClient: () => StoryClient = () => {
-    const config: StoryConfig = {
-      wallet: wallet,
-      transport: custom(wallet!.transport),
-      chainId: "aeneid",
-    };
-    const client = StoryClient.newClient(config);
-    return client;
-  };
-
-  const mintNFT = async (to: Address, uri: string): Promise<number | null> => {
-    if (!wallet?.account.address) return null;
-    console.log("Minting a new NFT...");
-    console.log(to, uri);
-
-    const walletClient = createWalletClient({
-      account: wallet.account,
-      chain: aeneid,
-      transport: custom(wallet!.transport),
-    });
-    const publicClient = createPublicClient({
-      transport: custom(wallet!.transport),
-      chain: aeneid,
-    });
-
-    const { request } = await publicClient.simulateContract({
-      address: NFT_CONTRACT_ADDRESS,
-      functionName: "mintNFT",
-      args: [to, uri],
-      abi: defaultNftContractAbi,
-    });
-    const hash = await walletClient.writeContract(request);
-    console.log(`Minted NFT successful with hash: ${hash}`);
-
-    const { logs } = await publicClient.waitForTransactionReceipt({
-      hash,
-    });
-    if (logs[0].topics[3]) {
-      let tokenId = parseInt(logs[0].topics[3], 16);
-      console.log(`Minted NFT tokenId: ${tokenId}`);
-      addTransaction(hash, "Mint NFT", { tokenId });
-      return tokenId;
+  const setupStoryClient = () => {
+    // Make sure wallet is defined before proceeding
+    if (!wallet || !wallet.account || !wallet.transport) {
+      console.error("Wallet is not fully initialized");
+      return undefined;
     }
-    return null;
+
+    // Get the network configuration from the global state
+    // This avoids using hooks in a non-component context
+    const networkConfig = getCurrentNetworkConfig();
+
+    // Map the network type to the appropriate chainId for the SDK
+    // The SDK expects 'aeneid' for testnet and 'story' for mainnet
+    const chainId = networkConfig.name as SupportedChainIds;
+
+    console.log(
+      `Setting up Story client with chainId: ${chainId} for network: ${networkConfig.name}`
+    );
+
+    try {
+      const config: StoryConfig = {
+        wallet: wallet,
+        transport: custom(wallet.transport),
+        chainId: chainId,
+      };
+      const client = StoryClient.newClient(config);
+      return client;
+    } catch (error) {
+      console.error("Error creating Story client:", error);
+      return undefined;
+    }
   };
 
   const addTransaction = (txHash: string, action: string, data: any) => {
     setTransactions((oldTxs) => [...oldTxs, { txHash, action, data }]);
   };
 
+  // Get the current network from the NetworkContext
+  const { network } = useNetwork();
+
+  // Create/recreate the client when wallet or network changes
   useEffect(() => {
-    if (!client && wallet?.account.address) {
+    if (wallet?.account?.address) {
+      console.log(
+        `Wallet or network (${network}) changed - recreating Story client`
+      );
       let newClient = setupStoryClient();
-      setClient(newClient);
+      if (newClient) {
+        setClient(newClient);
+      }
     }
-  }, [wallet]);
+  }, [wallet, network]);
 
   return (
     <AppContext.Provider
@@ -112,7 +110,6 @@ export default function AppProvider({ children }: PropsWithChildren) {
         setTxLoading,
         setTxName,
         setTxHash,
-        mintNFT,
         addTransaction,
         client,
       }}
