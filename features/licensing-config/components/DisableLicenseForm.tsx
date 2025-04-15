@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/atoms/Spinner';
-import { ActionType } from '../types';
-import { checkLicenseDisabledStatus } from '../services/utils';
-import { verifyLicenseDisabled } from '../services/disableLicense';
-import { BaseFormLayout } from './BaseFormLayout';
+import React, { useState, useEffect } from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/atoms/Spinner";
+import { ActionType } from "../types";
+import { checkLicenseDisabledStatus } from "../services/utils";
+import { verifyLicenseDisabled } from "../services/disableLicense";
+import { BaseFormLayout } from "./BaseFormLayout";
 
 interface DisableLicenseFormProps {
   paramValues: Record<string, string>;
@@ -14,7 +14,10 @@ interface DisableLicenseFormProps {
   isExecuting: boolean;
   executionSuccess: boolean | null;
   walletAddress?: string;
-  addTerminalMessage?: (message: string, type?: "success" | "error" | "info") => void;
+  addTerminalMessage?: (
+    message: string,
+    type?: "success" | "error" | "info"
+  ) => void;
 }
 
 export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
@@ -28,7 +31,9 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
 }) => {
   // Internal form state
   const [isFormValid, setIsFormValid] = useState(false);
-  const [licenseTermsOptions, setLicenseTermsOptions] = useState<{ value: string; label: string }[]>([]);
+  const [licenseTermsOptions, setLicenseTermsOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [isLoadingTerms, setIsLoadingTerms] = useState(false);
   const [ipIdError, setIpIdError] = useState("");
   const [isLicenseDisabled, setIsLicenseDisabled] = useState(false);
@@ -50,26 +55,29 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
         method: "GET",
         headers: {
           "X-Api-Key": "MhBsxkU1z9fG6TofE59KqiiWV-YlYE8Q4awlLQehF3U",
-          "X-Chain": "story-aeneid"
-        }
+          "X-Chain": "story-aeneid",
+        },
       };
 
-      const response = await fetch(`https://api.storyapis.com/api/v3/licenses/ip/terms/${ipId}`, options);
+      const response = await fetch(
+        `https://api.storyapis.com/api/v3/licenses/ip/terms/${ipId}`,
+        options
+      );
       const data = await response.json();
 
       if (data.data && Array.isArray(data.data) && data.data.length > 0) {
         // Format license terms options
         const options = data.data.map((term: any) => ({
           value: term.licenseTermsId.toString(),
-          label: term.licenseTermsId.toString()
+          label: term.licenseTermsId.toString(),
         }));
 
         setLicenseTermsOptions(options);
         setIpIdError("");
-        
+
         // Auto-select the first license term if available
         if (options.length > 0 && !paramValues.licenseTermsId) {
-          onParamChange('licenseTermsId', options[0].value);
+          onParamChange("licenseTermsId", options[0].value);
           // Check if the license is already disabled
           checkLicenseStatus(ipId, options[0].value);
         }
@@ -109,19 +117,19 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
   const validateForm = () => {
     // Required fields for disable license action
     const requiredFields = ["ipId", "licenseTermsId"];
-    
+
     // Check if all required fields are filled
     const hasAllRequiredFields = requiredFields.every(
       (field) => paramValues[field] && paramValues[field].trim() !== ""
     );
-    
+
     // Set form validity (also consider if license is already disabled)
     setIsFormValid(
-      hasAllRequiredFields && 
-      !isLoadingTerms && 
-      !ipIdError && 
-      licenseTermsOptions.length > 0 &&
-      !isLicenseDisabled
+      hasAllRequiredFields &&
+        !isLoadingTerms &&
+        !ipIdError &&
+        licenseTermsOptions.length > 0 &&
+        !isLicenseDisabled
     );
   };
 
@@ -143,7 +151,13 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
   // Effect to validate form when parameters change
   useEffect(() => {
     validateForm();
-  }, [paramValues, licenseTermsOptions, ipIdError, isLoadingTerms, isLicenseDisabled]);
+  }, [
+    paramValues,
+    licenseTermsOptions,
+    ipIdError,
+    isLoadingTerms,
+    isLicenseDisabled,
+  ]);
 
   // Effect to fetch license terms when IP ID is available
   useEffect(() => {
@@ -151,30 +165,55 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
       fetchLicenseTerms(paramValues.ipId);
     }
   }, []);
-  
+
   // Effect to update the license disabled status after a successful transaction
   useEffect(() => {
     // If transaction was successful and we have the necessary parameters, check if license is now disabled
-    if (executionSuccess === true && paramValues.ipId && paramValues.licenseTermsId) {
+    if (
+      executionSuccess === true &&
+      paramValues.ipId &&
+      paramValues.licenseTermsId
+    ) {
+      // Set license as disabled immediately for better UI feedback
+      setIsLicenseDisabled(true);
+
       // Add a slight delay to ensure the blockchain state has updated
       setTimeout(async () => {
-        // Update the form UI state
-        checkLicenseStatus(paramValues.ipId, paramValues.licenseTermsId);
-        
         // Verify the license disabled status and provide detailed feedback
         if (addTerminalMessage) {
           addTerminalMessage("Verifying license disabled status...", "info");
-          
-          const verificationResult = await verifyLicenseDisabled(
-            paramValues.ipId,
-            paramValues.licenseTermsId
-          );
-          
-          // Add appropriate messages based on verification result
-          addTerminalMessage(verificationResult.message, verificationResult.success ? "success" : "info");
-          
-          if (verificationResult.details) {
-            addTerminalMessage(`Verification details: ${verificationResult.details}`, "info");
+
+          try {
+            // Verify the license is actually disabled
+            const verificationResult = await verifyLicenseDisabled(
+              paramValues.ipId,
+              paramValues.licenseTermsId
+            );
+
+            // Display the verification result
+            addTerminalMessage(
+              verificationResult.message,
+              verificationResult.success ? "success" : "info"
+            );
+
+            // If there are details, show them
+            if (verificationResult.details) {
+              addTerminalMessage(
+                `Verification details: ${verificationResult.details}`,
+                "info"
+              );
+            }
+
+            // Update the UI state based on the verification result
+            if (verificationResult.isDisabled !== undefined) {
+              setIsLicenseDisabled(verificationResult.isDisabled);
+            }
+          } catch (error) {
+            console.error("Error verifying license disabled status:", error);
+            addTerminalMessage(
+              "Could not verify if license is disabled. Please check manually.",
+              "error"
+            );
           }
         }
       }, 2000); // 2 second delay
@@ -200,7 +239,7 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
         onExecute={onExecute}
         walletAddress={walletAddress}
         isDisabled={isLicenseDisabled}
-        disabledReason="Already Disabled"
+        disabledReason="License Disabled"
         isCheckingStatus={isCheckingDisabled}
         buttonText="$ execute disable license"
       >
@@ -212,13 +251,14 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
           <Input
             id="ipId"
             placeholder="IP ID (0x...)"
-            value={paramValues.ipId || ''}
-            onChange={(e) => handleParamChange('ipId', e.target.value)}
-            className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF]"
+            value={paramValues.ipId || ""}
+            onChange={(e) => handleParamChange("ipId", e.target.value)}
+            className={`bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] ${
+              isLicenseDisabled ? "opacity-70 bg-gray-50" : ""
+            }`}
+            disabled={isLicenseDisabled}
           />
-          {ipIdError && (
-            <p className="text-xs text-[#09ACFF]">{ipIdError}</p>
-          )}
+          {ipIdError && <p className="text-xs text-[#09ACFF]">{ipIdError}</p>}
         </div>
 
         {/* License Terms ID */}
@@ -228,10 +268,18 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
           </Label>
           <select
             id="licenseTermsId"
-            value={paramValues.licenseTermsId || ''}
-            onChange={(e) => handleParamChange('licenseTermsId', e.target.value)}
-            className="w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
-            disabled={isLoadingTerms || licenseTermsOptions.length === 0}
+            value={paramValues.licenseTermsId || ""}
+            onChange={(e) =>
+              handleParamChange("licenseTermsId", e.target.value)
+            }
+            className={`w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF] ${
+              isLicenseDisabled ? "opacity-70 bg-gray-50" : ""
+            }`}
+            disabled={
+              isLoadingTerms ||
+              licenseTermsOptions.length === 0 ||
+              isLicenseDisabled
+            }
           >
             <option value="">Select License Terms ID</option>
             {licenseTermsOptions.map((option) => (

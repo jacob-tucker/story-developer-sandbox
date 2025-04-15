@@ -12,10 +12,13 @@ const licensingConfig: LicensingConfig = {
   expectMinimumGroupRewardShare: 0,
   expectGroupRewardPool: zeroAddress,
 };
-  
+
+const IP_ID: Address = 'INSERT_IP_ID_HERE';
+const LICENSE_TERMS_ID: number = INSERT_LICENSE_TERMS_ID_HERE;
+
 const response = await client.license.setLicensingConfig({
-  ipId: '0x01',
-  licenseTermsId: 1,
+  ipId: IP_ID,
+  licenseTermsId: LICENSE_TERMS_ID,
   licensingConfig,
   txOptions: {
     waitForTransaction: true,

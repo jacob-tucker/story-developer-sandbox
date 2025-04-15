@@ -7,6 +7,7 @@ import { StoryClient } from "@story-protocol/core-sdk";
 import { verifyMintingFee } from "../services/changeMintingFee";
 import { BaseFormLayout } from "./BaseFormLayout";
 import { Spinner } from "@/components/atoms/Spinner";
+import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 
 interface ChangeMintingFeeFormProps {
   paramValues: Record<string, string>;
@@ -42,36 +43,11 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
   >([]);
   const [isLoadingTerms, setIsLoadingTerms] = useState(false);
   const [ipIdError, setIpIdError] = useState("");
-  // Format wei value to IP for display
-  const formatWeiToEth = (weiValue: string): string => {
-    if (!weiValue || weiValue === "0") return "0";
-    try {
-      return formatEther(BigInt(weiValue));
-    } catch (error) {
-      console.error("Error formatting wei to ETH:", error);
-      return "0";
-    }
-  };
-
-  // Convert user input IP to wei
-  const parseEthToWei = (ipValue: string): string => {
-    if (!ipValue || ipValue === "0") return "0";
-    try {
-      return parseEther(ipValue).toString();
-    } catch (error) {
-      console.error("Error parsing ETH to wei:", error);
-      return "0";
-    }
-  };
 
   // Handle minting fee input change
   const handleMintingFeeChange = (value: string) => {
-    // Update the display value
-    onParamChange("mintingFeeDisplay", value);
-
-    // Convert to wei and update the actual value
-    const weiValue = parseEthToWei(value);
-    onParamChange("mintingFee", weiValue);
+    // Just store the user input directly - it will be converted to wei at transaction time
+    onParamChange("mintingFee", value);
   };
 
   // Fetch license terms for an IP
@@ -147,22 +123,25 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
         return;
       }
 
+      // Get the license template address from the network configuration
+      const networkConfig = getCurrentNetworkConfig();
+      const licenseTemplateAddress = networkConfig.licenseTemplateAddress;
+
       // Access the licensing module through the client
       const response = await client.license.predictMintingLicenseFee({
         licensorIpId: ipId as `0x${string}`,
         licenseTermsId: parseInt(licenseTermsId),
         amount: BigInt(1),
-        licenseTemplate: "0x2E896b0b2Fdb7457499B56AAaA4AE55BCB4Cd316",
+        licenseTemplate: licenseTemplateAddress,
       });
 
       if (response && response.tokenAmount !== undefined) {
         const feeInWei = response.tokenAmount.toString();
         setCurrentMintingFee(feeInWei);
 
-        // Auto-populate the minting fee input with the current fee
-        const feeInEth = formatWeiToEth(feeInWei);
-        onParamChange("mintingFeeDisplay", feeInEth);
-        onParamChange("mintingFee", feeInWei);
+        // Auto-populate the minting fee input with the human-readable value
+        const feeInEth = formatEther(response.tokenAmount);
+        onParamChange("mintingFee", feeInEth);
 
         if (addTerminalMessage) {
           addTerminalMessage(`Current minting fee: ${feeInEth} IP`, "info");
@@ -248,27 +227,16 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
             paramValues.mintingFee
           );
 
-          // Display the formatted message (already formatted in wei to ETH in the service)
+          // Display the formatted message
           addTerminalMessage(
             verificationResult.message,
             verificationResult.success ? "success" : "info"
           );
 
-          // If there are details, they're already formatted in the service
+          // If there are details, show them
           if (verificationResult.details) {
             addTerminalMessage(
               `Verification details: ${verificationResult.details}`,
-              "info"
-            );
-          }
-
-          // If we have both current and expected fees, show them in a more readable format
-          if (verificationResult.currentFee && verificationResult.expectedFee) {
-            const currentFeeFormatted = formatWeiToEth(verificationResult.currentFee);
-            const expectedFeeFormatted = formatWeiToEth(verificationResult.expectedFee);
-
-            addTerminalMessage(
-              `Current fee: ${currentFeeFormatted} IP, Expected: ${expectedFeeFormatted} IP`,
               "info"
             );
           }
@@ -335,11 +303,11 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
         </Label>
         <div className="relative">
           <Input
-            id="mintingFeeDisplay"
+            id="mintingFee"
             type="text"
             inputMode="decimal"
             placeholder="Minting fee in IP"
-            value={paramValues.mintingFeeDisplay || ""}
+            value={paramValues.mintingFee || ""}
             onChange={(e) => handleMintingFeeChange(e.target.value)}
             className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF]"
           />
@@ -354,7 +322,7 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
           </div>
         ) : currentMintingFee ? (
           <p className="text-xs text-gray-500">
-            Current fee: {formatWeiToEth(currentMintingFee)} IP
+            Current fee: {formatEther(BigInt(currentMintingFee))} IP
           </p>
         ) : null}
         {feeError && <p className="text-xs text-[#09ACFF]">{feeError}</p>}

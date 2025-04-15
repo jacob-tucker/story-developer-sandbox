@@ -1,27 +1,21 @@
 "use client";
 import "viem/window";
-import Navbar from "../components/sections/Navbar";
+import Navbar from "@/components/sections/Navbar";
 import { useStory } from "@/lib/context/AppContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Footer from "@/components/sections/Footer";
 import { ConsoleLog } from "@/components/atoms/ConsoleLog";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useWalletClient } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ViewCode } from "@/components/atoms/ViewCode";
-import { Spinner } from "@/components/atoms/Spinner";
-import { formatEther, parseEther } from "viem";
 
 // Import licensing configuration components and services
 import {
   executeLicensingConfig,
-  checkLicenseDisabledStatus,
   ChangeMintingFeeForm,
   DisableLicenseForm,
-  ActionType
+  ActionType,
 } from "@/features/licensing-config";
 
 // Using the string type to match ViewCode component's expected keys
@@ -45,17 +39,6 @@ export default function Home() {
     null
   );
   const [paramValues, setParamValues] = useState<Record<string, string>>({});
-  const [licenseTermsOptions, setLicenseTermsOptions] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [isLoadingTerms, setIsLoadingTerms] = useState(false);
-  const [ipIdError, setIpIdError] = useState("");
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [currentMintingFee, setCurrentMintingFee] = useState<string>("");
-  const [isLoadingFee, setIsLoadingFee] = useState(false);
-  const [feeError, setFeeError] = useState("");
-  const [isLicenseDisabled, setIsLicenseDisabled] = useState(false);
-  const [isCheckingDisabled, setIsCheckingDisabled] = useState(false);
 
   // Define the cards with their actions
   const actionCards: ActionCard[] = [
@@ -87,18 +70,7 @@ export default function Home() {
     setSelectedCard(card);
     setTransactionResult(""); // Clear previous transaction result
     setParamValues({}); // Reset parameter values
-
-    // Reset license disabled status when changing action type
-    setIsLicenseDisabled(false);
-
-    // Check if the selected license is already disabled when selecting the disable action
-    if (
-      card.actionType === ActionType.DISABLE_LICENSE &&
-      paramValues.ipId &&
-      paramValues.licenseTermsId
-    ) {
-      checkLicenseStatus(paramValues.ipId, paramValues.licenseTermsId);
-    }
+    setExecutionSuccess(null); // Reset execution status
   };
 
   // Add a message to the terminal with timestamp
@@ -123,132 +95,32 @@ export default function Home() {
     );
   };
 
-  // Verify the minting fee after execution
-  const verifyMintingFee = async (
-    ipId: string,
-    licenseTermsId: string,
-    expectedFee: string
-  ) => {
-    addTerminalMessage("Verifying minting fee...");
-
-    if (!client) {
-      addTerminalMessage("Error: Client not initialized.", "error");
-      addTerminalMessage(
-        "Please visit the Story Builders Discord for assistance: https://discord.gg/storybuilders"
-      );
-      setExecutionSuccess(false);
-      return;
-    }
-
-    try {
-      // Access the licensing module through the client
-      const response = await client.license.predictMintingLicenseFee({
-        licensorIpId: ipId as `0x${string}`,
-        licenseTermsId: parseInt(licenseTermsId),
-        amount: BigInt(1),
-        licenseTemplate: "0x2E896b0b2Fdb7457499B56AAaA4AE55BCB4Cd316",
-      });
-
-      if (response && response.tokenAmount !== undefined) {
-        const actualFee = response.tokenAmount.toString();
-        const expectedFeeWei = parseEthToWei(expectedFee);
-
-        if (actualFee === expectedFeeWei) {
-          addTerminalMessage("Minting fee verified successfully!", "success");
-          addTerminalMessage(
-            `New minting fee: ${formatWeiToEth(actualFee)} IP`
-          );
-          setExecutionSuccess(true);
-        } else {
-          addTerminalMessage(
-            `Minting fee verification failed. Expected: ${formatWeiToEth(
-              expectedFeeWei
-            )} IP, Actual: ${formatWeiToEth(actualFee)} IP`,
-            "error"
-          );
-          addTerminalMessage(
-            "Please visit the Story Builders Discord for assistance: https://discord.gg/storybuilders"
-          );
-          setExecutionSuccess(false);
-        }
-      } else {
-        addTerminalMessage("Error: Could not verify minting fee.", "error");
-        addTerminalMessage(
-          "Please visit the Story Builders Discord for assistance: https://discord.gg/storybuilders"
-        );
-        setExecutionSuccess(false);
-      }
-    } catch (error) {
-      console.error("Error verifying minting fee:", error);
-      addTerminalMessage("Error: Could not verify minting fee.", "error");
-      addTerminalMessage(`Error details: ${String(error)}`);
-      addTerminalMessage(
-        "Please visit the Story Builders Discord for assistance: https://discord.gg/storybuilders"
-      );
-      setExecutionSuccess(false);
-    }
-  };
-
   // Handle the licensing configuration action
   const handleExecuteAction = async () => {
-    if (!isFormValid) return;
-
     setIsExecuting(true);
     setExecutionSuccess(null);
     setTransactionResult(""); // Clear previous results
 
     try {
       // Add action type to parameters
-      let actionParams: Record<string, string> = {
+      const actionParams: Record<string, string> = {
         ...paramValues,
         actionType:
           selectedCard?.actionType?.toString() ||
           ActionType.CHANGE_MINTING_FEE.toString(),
       };
 
-      // For change minting fee action, convert mintingFee to wei
-      if (selectedCard?.actionType === ActionType.CHANGE_MINTING_FEE) {
-        actionParams.mintingFee = parseEthToWei(paramValues.mintingFee);
-      }
-
-      // Display appropriate messages based on action type
-      if (selectedCard?.actionType === ActionType.CHANGE_MINTING_FEE) {
-        addTerminalMessage("Starting license minting fee update...");
-        addTerminalMessage(`IP ID: ${paramValues.ipId}`);
-        addTerminalMessage(`License Terms ID: ${paramValues.licenseTermsId}`);
-        addTerminalMessage(`New Minting Fee: ${paramValues.mintingFee} IP`);
-        addTerminalMessage(`Licensing Hook: ${paramValues.licensingHook}`);
-
-        if (
-          paramValues.licensingHook === "limit-license" &&
-          paramValues.licenseLimit
-        ) {
-          addTerminalMessage(`License Limit: ${paramValues.licenseLimit}`);
-        }
-      } else if (selectedCard?.actionType === ActionType.DISABLE_LICENSE) {
-        addTerminalMessage("Starting license disable operation...");
-        addTerminalMessage(`IP ID: ${paramValues.ipId}`);
-        addTerminalMessage(`License Terms ID: ${paramValues.licenseTermsId}`);
-        addTerminalMessage(`Using Lock License hook to disable the license`);
-      }
-
-      addTerminalMessage("Executing transaction...");
+      // Display basic transaction start message
+      addTerminalMessage(`Executing ${selectedCard?.title} transaction...`);
 
       if (!client) {
         addTerminalMessage("Error: No client available.", "error");
         addTerminalMessage(
           "Please connect your wallet to execute transactions."
         );
-        addTerminalMessage(
-          "Visit the Story Builders Discord for assistance: https://discord.gg/storybuilders"
-        );
         setExecutionSuccess(false);
         return;
       }
-
-      addTerminalMessage(
-        "Using Story Protocol SDK to update licensing config..."
-      );
 
       try {
         // Execute the actual transaction with the client
@@ -259,37 +131,10 @@ export default function Home() {
           addTerminalMessage(
             `Transaction submitted with hash: ${resultObj.txHash}`
           );
-          addTerminalMessage("Transaction confirmed!");
+          addTerminalMessage("Transaction confirmed!", "success");
 
-          // Verify the result based on action type
-          if (selectedCard?.actionType === ActionType.CHANGE_MINTING_FEE) {
-            // Verify the minting fee was updated correctly
-            await verifyMintingFee(
-              paramValues.ipId,
-              paramValues.licenseTermsId,
-              paramValues.mintingFee
-            );
-          } else if (selectedCard?.actionType === ActionType.DISABLE_LICENSE) {
-            // Check if the license is now disabled
-            const disabledStatus = await checkLicenseDisabledStatus(
-              paramValues.ipId,
-              paramValues.licenseTermsId
-            );
-            if (disabledStatus.isDisabled) {
-              addTerminalMessage("License successfully disabled!", "success");
-              setIsLicenseDisabled(true);
-            } else if (disabledStatus.error) {
-              addTerminalMessage(
-                `Could not verify disabled status: ${disabledStatus.error}`,
-                "error"
-              );
-            } else {
-              addTerminalMessage(
-                "Warning: License may not be properly disabled. Please verify.",
-                "error"
-              );
-            }
-          }
+          // Set execution success - the form components will handle verification
+          setExecutionSuccess(true);
         } else {
           addTerminalMessage("Transaction failed.", "error");
           if (resultObj.error) {
@@ -300,153 +145,15 @@ export default function Home() {
       } catch (error) {
         addTerminalMessage("Transaction failed.", "error");
         addTerminalMessage(`Error: ${String(error)}`);
-        addTerminalMessage(
-          "Please visit the Story Builders Discord for assistance: https://discord.gg/storybuilders"
-        );
         setExecutionSuccess(false);
       }
-
-      // Refresh the current minting fee display if it's a change minting fee action
-      if (selectedCard?.actionType === ActionType.CHANGE_MINTING_FEE) {
-        fetchCurrentMintingFee(paramValues.ipId, paramValues.licenseTermsId);
-      }
     } catch (error) {
-      console.error("Error executing licensing configuration:", error);
+      console.error("Error executing transaction:", error);
       addTerminalMessage("Error executing transaction.", "error");
       addTerminalMessage(`Error details: ${String(error)}`);
-      addTerminalMessage(
-        "Please visit the Story Builders Discord for assistance: https://discord.gg/storybuilders"
-      );
       setExecutionSuccess(false);
     } finally {
       setIsExecuting(false);
-    }
-  };
-
-  // Fetch license terms IDs for a given IP ID
-  const fetchLicenseTermsIds = useCallback(async (ipId: string) => {
-    if (!ipId || ipId === "0x1234...") return;
-
-    setIsLoadingTerms(true);
-    setLicenseTermsOptions([]);
-    setIpIdError("");
-    setIsLicenseDisabled(false);
-
-    try {
-      const options = {
-        method: "GET",
-        headers: {
-          "X-Api-Key": "MhBsxkU1z9fG6TofE59KqiiWV-YlYE8Q4awlLQehF3U",
-          "X-Chain": "story-aeneid",
-        },
-      };
-
-      const response = await fetch(
-        `https://api.storyapis.com/api/v3/licenses/ip/terms/${ipId}`,
-        options
-      );
-      const data = await response.json();
-
-      if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-        // Map terms and remove duplicates by creating a Map with licenseTermsId as key
-        const termsMap = new Map();
-        data.data.forEach((term: any) => {
-          const id = term.licenseTermsId.toString();
-          termsMap.set(id, {
-            value: id,
-            label: `Terms ID: ${id}`,
-          });
-        });
-
-        // Convert Map back to array
-        const options = Array.from(termsMap.values());
-
-        setLicenseTermsOptions(options);
-
-        // If there are options, automatically select the first one
-        if (options.length > 0) {
-          const firstTermId = options[0].value;
-          setParamValues((prev) => ({
-            ...prev,
-            licenseTermsId: firstTermId,
-          }));
-
-          // Check if the selected license is already disabled
-          if (selectedCard?.actionType === ActionType.DISABLE_LICENSE) {
-            checkLicenseStatus(ipId, firstTermId);
-          }
-        }
-      } else {
-        setIpIdError("No license terms found for this IP ID");
-      }
-    } catch (error) {
-      console.error("Error fetching license terms:", error);
-      setIpIdError("Error fetching license terms. Please check the IP ID.");
-    } finally {
-      setIsLoadingTerms(false);
-    }
-  }, []);
-
-  // Fetch the current minting fee
-  const fetchCurrentMintingFee = useCallback(
-    async (ipId: string, licenseTermsId: string) => {
-      if (!ipId || !licenseTermsId || ipId === "0x1234..." || !client) {
-        setCurrentMintingFee("");
-        return;
-      }
-
-      setIsLoadingFee(true);
-      setFeeError("");
-
-      try {
-        // Access the licensing module through the client
-        const response = await client.license.predictMintingLicenseFee({
-          licensorIpId: ipId as `0x${string}`,
-          licenseTermsId: parseInt(licenseTermsId),
-          amount: BigInt(1),
-          licenseTemplate: "0x2E896b0b2Fdb7457499B56AAaA4AE55BCB4Cd316",
-        });
-
-        if (response && response.tokenAmount !== undefined) {
-          // Store the raw wei value
-          setCurrentMintingFee(response.tokenAmount.toString());
-        } else {
-          setFeeError("Could not retrieve minting fee");
-        }
-      } catch (error) {
-        console.error("Error fetching minting fee:", error);
-        setFeeError("Error fetching minting fee");
-      } finally {
-        setIsLoadingFee(false);
-      }
-    },
-    [client]
-  );
-
-  // Format wei value to IP for display
-  const formatWeiToEth = (weiValue: string): string => {
-    if (!weiValue || weiValue === "0") return "0";
-    try {
-      // Format to IP with 6 decimal places maximum
-      const ipValue = formatEther(BigInt(weiValue));
-      const formatted = parseFloat(ipValue).toFixed(6);
-      // Remove trailing zeros
-      return formatted.replace(/\.?0+$/, "");
-    } catch (error) {
-      console.error("Error formatting wei to IP:", error);
-      return weiValue;
-    }
-  };
-
-  // Convert user input IP to wei
-  const parseEthToWei = (ipValue: string): string => {
-    if (!ipValue || ipValue === "0") return "0";
-    try {
-      const weiValue = parseEther(ipValue);
-      return weiValue.toString();
-    } catch (error) {
-      console.error("Error parsing IP to wei:", error);
-      return ipValue;
     }
   };
 
@@ -456,102 +163,6 @@ export default function Home() {
       ...prev,
       [name]: value,
     }));
-
-    // When ipId changes, fetch license terms after a short delay
-    if (name === "ipId" && value && value !== "0x1234...") {
-      const debounceTimer = setTimeout(() => {
-        fetchLicenseTermsIds(value);
-      }, 1000); // 1 second delay to avoid too many requests while typing
-
-      return () => clearTimeout(debounceTimer);
-    }
-
-    // When licenseTermsId changes, fetch the current minting fee
-    if (
-      name === "licenseTermsId" &&
-      value &&
-      paramValues.ipId &&
-      paramValues.ipId !== "0x1234..."
-    ) {
-      const debounceTimer = setTimeout(() => {
-        fetchCurrentMintingFee(paramValues.ipId, value);
-      }, 500);
-
-      return () => clearTimeout(debounceTimer);
-    }
-  };
-
-  // Set default values when component mounts
-  useEffect(() => {
-    setParamValues((prev) => ({
-      ...prev,
-      licensingHook: "none",
-    }));
-  }, []);
-
-  // Update minting fee when license terms ID changes
-  useEffect(() => {
-    if (paramValues.ipId && paramValues.licenseTermsId && client) {
-      fetchCurrentMintingFee(paramValues.ipId, paramValues.licenseTermsId);
-    }
-  }, [
-    paramValues.licenseTermsId,
-    paramValues.ipId,
-    client,
-    fetchCurrentMintingFee,
-  ]);
-
-  // Check if the form is valid
-  useEffect(() => {
-    const requiredFields = ["ipId", "licenseTermsId"];
-
-    // Add mintingFee to required fields if action type is CHANGE_MINTING_FEE
-    if (selectedCard?.actionType === ActionType.CHANGE_MINTING_FEE) {
-      requiredFields.push("mintingFee");
-    }
-
-    // Add licensingHook to required fields if action type is CHANGE_MINTING_FEE
-    if (selectedCard?.actionType === ActionType.CHANGE_MINTING_FEE) {
-      requiredFields.push("licensingHook");
-    }
-
-    // Add licenseLimit to required fields if licensingHook is 'limit-license'
-    if (paramValues.licensingHook === "limit-license") {
-      requiredFields.push("licenseLimit");
-    }
-
-    const isValid =
-      requiredFields.every(
-        (field) =>
-          paramValues[field] &&
-          paramValues[field].trim() !== "" &&
-          paramValues[field] !== "0x1234..."
-      ) &&
-      !isLoadingTerms &&
-      !ipIdError &&
-      licenseTermsOptions.length > 0;
-
-    setIsFormValid(isValid);
-  }, [paramValues, isLoadingTerms, ipIdError, licenseTermsOptions.length]);
-
-  // Check if the license is already disabled
-  const checkLicenseStatus = async (ipId: string, licenseTermsId: string) => {
-    if (!ipId || !licenseTermsId || licenseTermsId === "") return;
-
-    setIsCheckingDisabled(true);
-    const result = await checkLicenseDisabledStatus(ipId, licenseTermsId);
-    setIsCheckingDisabled(false);
-
-    setIsLicenseDisabled(result.isDisabled);
-
-    if (result.isDisabled) {
-      addTerminalMessage(`Note: This license is already disabled.`, "info");
-    } else if (result.error) {
-      addTerminalMessage(
-        `Error checking license status: ${result.error}`,
-        "error"
-      );
-    }
   };
 
   return (

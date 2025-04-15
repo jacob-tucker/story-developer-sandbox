@@ -1,5 +1,5 @@
 import { StoryClient, LicensingConfig } from "@story-protocol/core-sdk";
-import { zeroAddress, formatEther, zeroHash } from "viem";
+import { zeroAddress, formatEther, parseEther, zeroHash } from "viem";
 import { ActionType } from "../types";
 import {
   formatTransactionResponse,
@@ -34,7 +34,7 @@ export async function executeChangeMintingFee(
 
     // Create the licensing configuration with updated minting fee but preserving other values
     const licensingConfig: LicensingConfig = {
-      mintingFee: BigInt(params.mintingFee),
+      mintingFee: parseEther(params.mintingFee),
       isSet: true,
       // Preserve the existing licensing hook or use zeroAddress if none exists
       licensingHook: (currentConfig?.licensingHook ||
@@ -43,7 +43,7 @@ export async function executeChangeMintingFee(
       hookData: (currentConfig?.hookData || zeroHash) as `0x${string}`,
       // Preserve other configuration values
       commercialRevShare: currentConfig?.commercialRevShare || 0,
-      disabled: currentConfig?.disabled || false,
+      disabled: false, // disabled: currentConfig?.disabled || false,
       expectMinimumGroupRewardShare:
         currentConfig?.expectMinimumGroupRewardShare || 0,
       expectGroupRewardPool: (currentConfig?.expectGroupRewardPool ||
@@ -54,7 +54,7 @@ export async function executeChangeMintingFee(
       // Get the license template address from the network configuration
       const networkConfig = getCurrentNetworkConfig();
       const licenseTemplateAddress = networkConfig.licenseTemplateAddress;
-      
+
       const response = await client.license.setLicensingConfig({
         ipId: params.ipId as `0x${string}`,
         licenseTermsId: parseInt(params.licenseTermsId),
@@ -73,6 +73,7 @@ export async function executeChangeMintingFee(
           licensingConfig: {
             isSet: true,
             mintingFee: licensingConfig.mintingFee.toString(),
+            mintingFeeFormatted: formatEther(licensingConfig.mintingFee), // Add human-readable format
             licenseTemplate: licenseTemplateAddress,
             disabled: licensingConfig.disabled,
           },
@@ -108,7 +109,7 @@ export async function executeChangeMintingFee(
  * Verifies if a license minting fee has been updated correctly
  * @param ipId The IP ID
  * @param licenseTermsId The license terms ID
- * @param expectedFee The expected minting fee in wei
+ * @param expectedFee The expected minting fee in human-readable format
  * @returns An object with verification results
  */
 export async function verifyMintingFee(
@@ -119,8 +120,6 @@ export async function verifyMintingFee(
   success: boolean;
   message: string;
   details?: string;
-  currentFee?: string;
-  expectedFee?: string;
 }> {
   try {
     // Use the Story API to fetch the current minting fee
@@ -146,31 +145,30 @@ export async function verifyMintingFee(
       );
 
       if (licenseTerm && licenseTerm.licensingConfig) {
-        const currentFee = licenseTerm.licensingConfig.mintingFee || "0";
+        try {
+          // Get the current fee from the blockchain (in wei format)
+          const currentFeeWei = licenseTerm.licensingConfig.mintingFee || "0";
 
-        // Convert to strings for comparison
-        const currentFeeStr = currentFee.toString();
-        const expectedFeeStr = expectedFee.toString();
+          // Convert current fee from wei to human-readable format for display
+          const currentFeeHuman = formatEther(BigInt(currentFeeWei));
 
-        // Check if the minting fee matches the expected value
-        if (currentFeeStr === expectedFeeStr) {
-          return {
-            success: true,
-            message: `Verification successful: Minting fee has been updated to ${formatEther(
-              BigInt(currentFee)
-            )} IP.`,
-            currentFee: currentFeeStr,
-            expectedFee: expectedFeeStr,
-          };
-        } else {
+          if (currentFeeHuman === expectedFee) {
+            return {
+              success: true,
+              message: `Verification successful: Minting fee has been updated to ${expectedFee} IP.`,
+            };
+          } else {
+            return {
+              success: false,
+              message: `Minting fee doesn't match the expected value.`,
+              details: `Current: ${currentFeeHuman} IP, Expected: ${expectedFee} IP`,
+            };
+          }
+        } catch (error) {
           return {
             success: false,
-            message: `Warning: Minting fee doesn't match the expected value.`,
-            details: `Current: ${formatEther(
-              BigInt(currentFee)
-            )} IP, Expected: ${formatEther(BigInt(expectedFee))} IP`,
-            currentFee: currentFeeStr,
-            expectedFee: expectedFeeStr,
+            message: `Error comparing minting fees.`,
+            details: String(error),
           };
         }
       } else {

@@ -88,7 +88,7 @@ export async function executeDisableLicense(
     let mintingFee: bigint;
 
     // If we already have a minting fee in the current config, use that
-    if (currentConfig && currentConfig.mintingFee !== undefined) {
+    if (currentConfig && currentConfig.mintingFee) {
       mintingFee = BigInt(currentConfig.mintingFee);
       console.log("Using existing minting fee:", mintingFee.toString());
     } else {
