@@ -39,7 +39,7 @@ export async function executeChangeMintingFee(
       hookData: (currentConfig?.hookData || zeroHash) as `0x${string}`,
       // Preserve other configuration values
       commercialRevShare: currentConfig?.commercialRevShare || 0,
-      disabled: currentConfig?.disabled || false,
+      disabled: false,
       expectMinimumGroupRewardShare:
         currentConfig?.expectMinimumGroupRewardShare || 0,
       expectGroupRewardPool: (currentConfig?.expectGroupRewardPool ||

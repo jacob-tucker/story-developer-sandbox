@@ -9,6 +9,7 @@ import { BaseFormLayout } from "./BaseFormLayout";
 import { Spinner } from "@/components/atoms/Spinner";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 import { fetchLicenseTermsIds } from "../api";
+import { checkLicenseDisabledStatus } from "../services/utils";
 
 interface ChangeMintingFeeFormProps {
   paramValues: Record<string, string>;
@@ -104,6 +105,18 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
       if (!client) {
         setFeeError("No client available. Please connect your wallet.");
         return;
+      }
+
+      // Check if the license is disabled
+      const licenseStatus = await checkLicenseDisabledStatus(
+        ipId,
+        licenseTermsId
+      );
+      if (licenseStatus.isDisabled && addTerminalMessage) {
+        addTerminalMessage(
+          "Note: This license is currently DISABLED. Executing this action will RE-ENABLE it.",
+          "info"
+        );
       }
 
       // Get the license template address from the network configuration

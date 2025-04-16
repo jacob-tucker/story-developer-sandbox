@@ -32,7 +32,7 @@ export default function Home() {
   const { txLoading, txHash, txName, client } = useStory();
   const { data: wallet } = useWalletClient();
   const [selectedCard, setSelectedCard] = useState<ActionCard | null>(null);
-  const [transactionResult, setTransactionResult] = useState<string>("");
+  const [transactionResult, setTransactionResult] = useState<string>();
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionSuccess, setExecutionSuccess] = useState<boolean | null>(
     null
@@ -61,13 +61,18 @@ export default function Home() {
   useEffect(() => {
     if (actionCards.length > 0 && !selectedCard) {
       setSelectedCard(actionCards[0]);
+      // Set initial message
+      const timestamp = new Date().toLocaleTimeString();
+      setTransactionResult(`[${timestamp}] ℹ️ Waiting for inputs...`);
     }
   }, []);
 
   // Handle card selection
   const handleCardSelect = (card: ActionCard) => {
     setSelectedCard(card);
-    setTransactionResult(""); // Clear previous transaction result
+    // Set waiting message when changing cards
+    const timestamp = new Date().toLocaleTimeString();
+    setTransactionResult(`[${timestamp}] ℹ️ Waiting for inputs...`);
     setParamValues({}); // Reset parameter values
     setExecutionSuccess(null); // Reset execution status
   };
@@ -98,7 +103,6 @@ export default function Home() {
   const handleExecuteAction = async () => {
     setIsExecuting(true);
     setExecutionSuccess(null);
-    setTransactionResult(""); // Clear previous results
 
     try {
       // Add action type to parameters
@@ -327,10 +331,7 @@ export default function Home() {
                         : "text-white"
                     }`}
                   >
-                    <code>
-                      {transactionResult ||
-                        "// Waiting for transaction execution..."}
-                    </code>
+                    <code>{transactionResult}</code>
                   </pre>
                 </div>
                 {executionSuccess === false && (
