@@ -229,7 +229,7 @@ export default function Home() {
         {/* Left Side - Cards List */}
         <div className="w-full md:w-1/3 flex flex-col gap-4 overflow-y-auto">
           <h2 className="text-xl font-bold text-black border-b border-[#09ACFF] pb-2">
-            $ story actions
+            $ story sandbox
           </h2>
           {actionCards.map((card) => (
             <div
