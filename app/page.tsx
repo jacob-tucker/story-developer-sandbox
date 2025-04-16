@@ -321,14 +321,21 @@ export default function Home() {
                 <h3 className="text-xl font-bold text-black border-b border-[#09ACFF] pb-2 mb-4">
                   Response
                 </h3>
-                <div className="bg-black p-4 rounded-md h-[350px] overflow-y-auto">
+                <div className="bg-[#1E1E1E] p-4 rounded-md h-[350px] overflow-y-auto shadow-inner border border-[#333] font-mono">
+                  <div className="flex items-center mb-2 text-gray-500 text-sm">
+                    <span className="mr-1">$</span>
+                    <span className="text-green-400">story-sandbox</span>
+                    <span className="mr-1 ml-1">:</span>
+                    <span className="text-blue-400">~</span>
+                    <span className="animate-pulse ml-1">▌</span>
+                  </div>
                   <pre
-                    className={`font-mono ${
+                    className={`font-mono text-sm leading-relaxed ${
                       executionSuccess === true
                         ? "text-[#A1D1FF]"
                         : executionSuccess === false
-                        ? "text-red-500"
-                        : "text-white"
+                        ? "text-red-400"
+                        : "text-gray-200"
                     }`}
                   >
                     <code>{transactionResult}</code>
