@@ -1,12 +1,8 @@
 import { StoryClient, LicensingConfig } from "@story-protocol/core-sdk";
 import { zeroAddress, zeroHash } from "viem";
-import { ActionType } from "../types";
-import {
-  formatTransactionResponse,
-  getCurrentLicensingConfig,
-  checkLicenseDisabledStatus,
-} from "./utils";
+import { getCurrentLicensingConfig, checkLicenseDisabledStatus } from "./utils";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
+import { ExecuteReturnType } from "../types";
 
 /**
  * Executes the disable license action
@@ -68,7 +64,7 @@ export async function verifyLicenseDisabled(
 export async function executeDisableLicense(
   params: Record<string, string>,
   client?: StoryClient
-): Promise<string> {
+): Promise<ExecuteReturnType> {
   try {
     // We must have a client to make the transaction
     if (!client) {
@@ -148,24 +144,15 @@ export async function executeDisableLicense(
 
       if (response.success) {
         // No need to invalidate cache as we're always fetching fresh data
-        return formatTransactionResponse({
+        return {
           success: true,
-          txHash: response.txHash,
-          licensingConfig: {
-            isSet: true,
-            mintingFee: licensingConfig.mintingFee.toString(),
-            licenseTemplate: licenseTemplateAddress,
-            disabled: licensingConfig.disabled,
-          },
-          params,
-          actionType: ActionType.DISABLE_LICENSE,
-        });
+          txHash: response.txHash!,
+        };
       } else {
-        return formatTransactionResponse({
+        return {
           success: false,
           error: "Transaction failed",
-          actionType: ActionType.DISABLE_LICENSE,
-        });
+        };
       }
     } catch (error) {
       console.error("Error executing setLicensingConfig:", error);
@@ -173,10 +160,9 @@ export async function executeDisableLicense(
     }
   } catch (error) {
     console.error("Error in executeDisableLicense:", error);
-    return formatTransactionResponse({
+    return {
       success: false,
       error: String(error),
-      actionType: ActionType.DISABLE_LICENSE,
-    });
+    };
   }
 }

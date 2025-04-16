@@ -1,12 +1,8 @@
 import { StoryClient, LicensingConfig } from "@story-protocol/core-sdk";
 import { zeroAddress, formatEther, parseEther, zeroHash } from "viem";
-import { ActionType } from "../types";
-import {
-  formatTransactionResponse,
-  getCurrentLicensingConfig,
-} from "../services/utils";
+import { getCurrentLicensingConfig } from "../services/utils";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
-
+import { ExecuteReturnType } from "../types";
 /**
  * Executes the change minting fee action
  * @param params The parameters for changing the minting fee
@@ -16,7 +12,7 @@ import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 export async function executeChangeMintingFee(
   params: Record<string, string>,
   client?: StoryClient
-): Promise<string> {
+): Promise<ExecuteReturnType> {
   try {
     // We must have a client to make the transaction
     if (!client) {
@@ -43,7 +39,7 @@ export async function executeChangeMintingFee(
       hookData: (currentConfig?.hookData || zeroHash) as `0x${string}`,
       // Preserve other configuration values
       commercialRevShare: currentConfig?.commercialRevShare || 0,
-      disabled: false, // disabled: currentConfig?.disabled || false,
+      disabled: currentConfig?.disabled || false,
       expectMinimumGroupRewardShare:
         currentConfig?.expectMinimumGroupRewardShare || 0,
       expectGroupRewardPool: (currentConfig?.expectGroupRewardPool ||
@@ -67,41 +63,29 @@ export async function executeChangeMintingFee(
 
       if (response.success) {
         // No need to invalidate cache as we're always fetching fresh data
-        return formatTransactionResponse({
+        return {
           success: true,
-          txHash: response.txHash,
-          licensingConfig: {
-            isSet: true,
-            mintingFee: licensingConfig.mintingFee.toString(),
-            mintingFeeFormatted: formatEther(licensingConfig.mintingFee), // Add human-readable format
-            licenseTemplate: licenseTemplateAddress,
-            disabled: licensingConfig.disabled,
-          },
-          params,
-          actionType: ActionType.CHANGE_MINTING_FEE,
-        });
+          txHash: response.txHash!,
+        };
       } else {
-        return formatTransactionResponse({
+        return {
           success: false,
           error: "Transaction failed",
-          actionType: ActionType.CHANGE_MINTING_FEE,
-        });
+        };
       }
     } catch (error) {
       console.error("Error executing setLicensingConfig:", error);
-      return formatTransactionResponse({
+      return {
         success: false,
         error: String(error),
-        actionType: ActionType.CHANGE_MINTING_FEE,
-      });
+      };
     }
   } catch (error) {
     console.error("Error in executeChangeMintingFee:", error);
-    return formatTransactionResponse({
+    return {
       success: false,
       error: String(error),
-      actionType: ActionType.CHANGE_MINTING_FEE,
-    });
+    };
   }
 }
 
@@ -122,67 +106,41 @@ export async function verifyMintingFee(
   details?: string;
 }> {
   try {
-    // Use the Story API to fetch the current minting fee
-    const options = {
-      method: "GET",
-      headers: {
-        "X-Api-Key": "MhBsxkU1z9fG6TofE59KqiiWV-YlYE8Q4awlLQehF3U",
-        "X-Chain": "story-aeneid",
-      },
-    };
+    // Get the current licensing configuration directly from the blockchain
+    const currentConfig = await getCurrentLicensingConfig(ipId, licenseTermsId);
 
-    const response = await fetch(
-      `https://api.storyapis.com/api/v3/licenses/ip/terms/${ipId}`,
-      options
-    );
-    const data = await response.json();
+    if (currentConfig) {
+      try {
+        // Get the current fee from the blockchain (already in wei format)
+        const currentFeeWei = currentConfig.mintingFee || BigInt(0);
 
-    if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-      // Find the specific license term
-      const licenseTerm = data.data.find(
-        (term: any) =>
-          term.licenseTermsId.toString() === licenseTermsId.toString()
-      );
+        // Convert current fee from wei to human-readable format for display
+        const currentFeeHuman = formatEther(currentFeeWei);
 
-      if (licenseTerm && licenseTerm.licensingConfig) {
-        try {
-          // Get the current fee from the blockchain (in wei format)
-          const currentFeeWei = licenseTerm.licensingConfig.mintingFee || "0";
-
-          // Convert current fee from wei to human-readable format for display
-          const currentFeeHuman = formatEther(BigInt(currentFeeWei));
-
-          if (currentFeeHuman === expectedFee) {
-            return {
-              success: true,
-              message: `Verification successful: Minting fee has been updated to ${expectedFee} IP.`,
-            };
-          } else {
-            return {
-              success: false,
-              message: `Minting fee doesn't match the expected value.`,
-              details: `Current: ${currentFeeHuman} IP, Expected: ${expectedFee} IP`,
-            };
-          }
-        } catch (error) {
+        if (currentFeeHuman === expectedFee) {
+          return {
+            success: true,
+            message: `Verification successful: Minting fee has been updated to ${expectedFee} IP.`,
+          };
+        } else {
           return {
             success: false,
-            message: `Error comparing minting fees.`,
-            details: String(error),
+            message: `Minting fee doesn't match the expected value.`,
+            details: `Current: ${currentFeeHuman} IP, Expected: ${expectedFee} IP`,
           };
         }
-      } else {
+      } catch (error) {
         return {
           success: false,
-          message: `License terms found but no licensing configuration available.`,
-          details: `License terms ID ${licenseTermsId} found for IP ${ipId} but no licensing config data`,
+          message: `Error comparing minting fees.`,
+          details: String(error),
         };
       }
     } else {
       return {
         success: false,
-        message: `No license terms found for IP ${ipId}.`,
-        details: "No license terms data available",
+        message: `No licensing configuration found.`,
+        details: `Licensing config not found for IP ${ipId} with license terms ID ${licenseTermsId}`,
       };
     }
   } catch (error) {

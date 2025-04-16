@@ -8,6 +8,7 @@ import { verifyMintingFee } from "../services/changeMintingFee";
 import { BaseFormLayout } from "./BaseFormLayout";
 import { Spinner } from "@/components/atoms/Spinner";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
+import { fetchLicenseTermsIds } from "../api";
 
 interface ChangeMintingFeeFormProps {
   paramValues: Record<string, string>;
@@ -62,40 +63,22 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
     setLicenseTermsOptions([]);
 
     try {
-      // Use the Story API to fetch license terms
-      const options = {
-        method: "GET",
-        headers: {
-          "X-Api-Key": "MhBsxkU1z9fG6TofE59KqiiWV-YlYE8Q4awlLQehF3U",
-          "X-Chain": "story-aeneid",
-        },
-      };
+      // Use the existing API function instead of duplicating the logic
+      const result = await fetchLicenseTermsIds(ipId);
 
-      const response = await fetch(
-        `https://api.storyapis.com/api/v3/licenses/ip/terms/${ipId}`,
-        options
-      );
-      const data = await response.json();
-
-      if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-        // Format license terms options
-        const options = data.data.map((term: any) => ({
-          value: term.licenseTermsId.toString(),
-          label: term.licenseTermsId.toString(),
-        }));
-
-        setLicenseTermsOptions(options);
+      if (result.options.length > 0) {
+        setLicenseTermsOptions(result.options);
         setIpIdError("");
 
         // Auto-select the first license term if available
-        if (options.length > 0 && !paramValues.licenseTermsId) {
-          onParamChange("licenseTermsId", options[0].value);
+        if (result.options.length > 0 && !paramValues.licenseTermsId) {
+          onParamChange("licenseTermsId", result.options[0].value);
           // Fetch the current minting fee for the selected license term
-          fetchCurrentMintingFee(ipId, options[0].value);
+          fetchCurrentMintingFee(ipId, result.options[0].value);
         }
       } else {
         setLicenseTermsOptions([]);
-        setIpIdError("No license terms found for this IP ID.");
+        setIpIdError(result.error || "No license terms found for this IP ID.");
       }
     } catch (error) {
       console.error("Error fetching license terms:", error);
@@ -298,10 +281,10 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
 
       {/* Minting Fee */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="mintingFeeDisplay" className="text-black">
+        <Label htmlFor="mintingFee" className="text-black">
           <span className="text-[#09ACFF]">$</span> mintingFee
         </Label>
-        <div className="relative">
+        <div style={{ position: "relative" }}>
           <Input
             id="mintingFee"
             type="text"
@@ -309,11 +292,21 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
             placeholder="Minting fee in IP"
             value={paramValues.mintingFee || ""}
             onChange={(e) => handleMintingFeeChange(e.target.value)}
+            style={{ paddingRight: "32px" }}
             className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF]"
           />
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <span className="text-gray-500">IP</span>
-          </div>
+          <span
+            style={{
+              position: "absolute",
+              right: "12px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+              color: "rgb(107, 114, 128)",
+            }}
+          >
+            IP
+          </span>
         </div>
         {isLoadingFee ? (
           <div className="flex items-center text-xs text-gray-500">

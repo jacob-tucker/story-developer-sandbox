@@ -124,11 +124,10 @@ export default function Home() {
       try {
         // Execute the actual transaction with the client
         const result = await executeLicensingConfig(actionParams, client);
-        const resultObj = JSON.parse(result);
 
-        if (resultObj.success) {
+        if (result.success) {
           addTerminalMessage(
-            `Transaction submitted with hash: ${resultObj.txHash}`
+            `Transaction submitted with hash: ${result.txHash}`
           );
           addTerminalMessage("Transaction confirmed!", "success");
 
@@ -136,9 +135,7 @@ export default function Home() {
           setExecutionSuccess(true);
         } else {
           addTerminalMessage("Transaction failed.", "error");
-          if (resultObj.error) {
-            addTerminalMessage(`Error: ${resultObj.error}`);
-          }
+          addTerminalMessage(`Error: ${result.error}`);
           setExecutionSuccess(false);
         }
       } catch (error) {
@@ -228,7 +225,7 @@ export default function Home() {
         {/* Left Side - Cards List */}
         <div className="w-full md:w-1/3 flex flex-col gap-4 overflow-y-auto">
           <h2 className="text-xl font-bold text-black border-b border-[#09ACFF] pb-2">
-            $ story-protocol
+            $ story actions
           </h2>
           {actionCards.map((card) => (
             <div

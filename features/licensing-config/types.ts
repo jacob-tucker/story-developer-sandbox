@@ -53,3 +53,7 @@ export interface DisableLicenseParams extends BaseLicensingConfigParams {
 export type LicensingConfigParams =
   | ChangeMintingFeeParams
   | DisableLicenseParams;
+
+export type ExecuteReturnType =
+  | { success: true; txHash: string }
+  | { success: false; error: string };

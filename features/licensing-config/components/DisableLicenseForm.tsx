@@ -6,6 +6,7 @@ import { ActionType } from "../types";
 import { checkLicenseDisabledStatus } from "../services/utils";
 import { verifyLicenseDisabled } from "../services/disableLicense";
 import { BaseFormLayout } from "./BaseFormLayout";
+import { fetchLicenseTermsIds } from "../api";
 
 interface DisableLicenseFormProps {
   paramValues: Record<string, string>;
@@ -50,40 +51,22 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
     setLicenseTermsOptions([]);
 
     try {
-      // Use the Story API to fetch license terms
-      const options = {
-        method: "GET",
-        headers: {
-          "X-Api-Key": "MhBsxkU1z9fG6TofE59KqiiWV-YlYE8Q4awlLQehF3U",
-          "X-Chain": "story-aeneid",
-        },
-      };
+      // Use the existing API function instead of duplicating the logic
+      const result = await fetchLicenseTermsIds(ipId);
 
-      const response = await fetch(
-        `https://api.storyapis.com/api/v3/licenses/ip/terms/${ipId}`,
-        options
-      );
-      const data = await response.json();
-
-      if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-        // Format license terms options
-        const options = data.data.map((term: any) => ({
-          value: term.licenseTermsId.toString(),
-          label: term.licenseTermsId.toString(),
-        }));
-
-        setLicenseTermsOptions(options);
+      if (result.options.length > 0) {
+        setLicenseTermsOptions(result.options);
         setIpIdError("");
 
         // Auto-select the first license term if available
-        if (options.length > 0 && !paramValues.licenseTermsId) {
-          onParamChange("licenseTermsId", options[0].value);
+        if (result.options.length > 0 && !paramValues.licenseTermsId) {
+          onParamChange("licenseTermsId", result.options[0].value);
           // Check if the license is already disabled
-          checkLicenseStatus(ipId, options[0].value);
+          checkLicenseStatus(ipId, result.options[0].value);
         }
       } else {
         setLicenseTermsOptions([]);
-        setIpIdError("No license terms found for this IP ID.");
+        setIpIdError(result.error || "No license terms found for this IP ID.");
       }
     } catch (error) {
       console.error("Error fetching license terms:", error);
