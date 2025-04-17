@@ -1,4 +1,8 @@
-import { LicensingConfig } from "@story-protocol/core-sdk";
+import {
+  LicenseTerms,
+  LicensingConfig,
+  StoryClient,
+} from "@story-protocol/core-sdk";
 import { createPublicClient, http, Chain } from "viem";
 import { licenseRegistryAbi } from "../licenseRegistryAbi";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
@@ -21,7 +25,7 @@ export function formatTransactionResponse(data: any): string {
 export function getPublicClient() {
   // Get the current network config from the global state
   const config = getCurrentNetworkConfig();
-  
+
   // Use the chain configuration from the SDK
   return createPublicClient({
     chain: config.chain,
@@ -32,70 +36,54 @@ export function getPublicClient() {
 /**
  * Get licensing configuration directly using viem
  * @param ipId The IP ID
- * @param licenseTemplate The license template address
  * @param licenseTermsId The license terms ID
  * @returns The licensing configuration from the blockchain
  */
 export async function getLicensingConfigSDK(
   ipId: `0x${string}`,
-  licenseTemplate: `0x${string}`,
-  licenseTermsId: number
-) {
+  licenseTermsId: string
+): Promise<LicensingConfig | undefined> {
+  if (!ipId || !licenseTermsId) {
+    return undefined;
+  }
+
   try {
     // Get the network configuration from the global state
     const config = getCurrentNetworkConfig();
-    
-    console.log("Fetching licensing config via viem:", {
-      ipId,
-      licenseTemplate,
-      licenseTermsId,
-      network: config.name,
-    });
 
     // Get a public client configured for the current network
     const publicClient = getPublicClient();
-    
+
     return await publicClient.readContract({
       abi: licenseRegistryAbi,
       address: config.licenseRegistryAddress,
       functionName: "getLicensingConfig",
-      args: [ipId, licenseTemplate, BigInt(licenseTermsId)],
+      args: [ipId, config.licenseTemplateAddress, BigInt(licenseTermsId)],
     });
   } catch (error) {
-    console.error("Error reading contract via viem:", error);
-    throw error;
+    console.error("Error fetching current licensing config:", error);
+    return undefined;
   }
 }
 
 /**
- * Fetches the current licensing configuration for an IP and license terms
- * @param ipId The IP ID
+ * Get licensing configuration directly using viem
  * @param licenseTermsId The license terms ID
- * @returns The current licensing configuration or undefined if not found
+ * @returns The licensing configuration from the blockchain
  */
-export async function getCurrentLicensingConfig(
-  ipId: string,
-  licenseTermsId: string
-): Promise<LicensingConfig | undefined> {
+export async function getLicenseTermsSDK(
+  licenseTermsId: string,
+  client?: StoryClient
+): Promise<LicenseTerms | undefined> {
+  if (!licenseTermsId || !client) {
+    return undefined;
+  }
+
   try {
-    if (!ipId || !licenseTermsId) {
-      return undefined;
-    }
-
-    // Get the network configuration from the global state
-    const networkConfig = getCurrentNetworkConfig();
-    
-    console.log("Fetching license config directly from blockchain via viem");
-    const config = await getLicensingConfigSDK(
-      ipId as `0x${string}`,
-      networkConfig.licenseTemplateAddress,
-      parseInt(licenseTermsId)
-    );
-
-    console.log("Received config from viem:", config);
-    return config;
+    const { terms } = await client.license.getLicenseTerms(licenseTermsId);
+    return terms;
   } catch (error) {
-    console.error("Error fetching current licensing config:", error);
+    console.error("Error fetching license terms:", error);
     return undefined;
   }
 }
@@ -115,14 +103,10 @@ export async function checkLicenseDisabledStatus(
       return { isDisabled: false, error: "Missing IP ID or License Terms ID" };
     }
 
-    // Get the network configuration from the global state
-    const networkConfig = getCurrentNetworkConfig();
-    
     console.log("Checking license disabled status via viem");
     const config = await getLicensingConfigSDK(
       ipId as `0x${string}`,
-      networkConfig.licenseTemplateAddress,
-      parseInt(licenseTermsId)
+      licenseTermsId
     );
 
     if (config) {

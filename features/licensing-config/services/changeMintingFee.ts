@@ -1,6 +1,6 @@
 import { StoryClient, LicensingConfig } from "@story-protocol/core-sdk";
 import { zeroAddress, formatEther, parseEther, zeroHash } from "viem";
-import { getCurrentLicensingConfig } from "../services/utils";
+import { getLicensingConfigSDK } from "../services/utils";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 import { ExecuteReturnType } from "../types";
 /**
@@ -23,8 +23,8 @@ export async function executeChangeMintingFee(
 
     // Fetch the current licensing configuration to preserve existing values
     // Force a refresh to ensure we have the latest data from the blockchain
-    const currentConfig = await getCurrentLicensingConfig(
-      params.ipId,
+    const currentConfig = await getLicensingConfigSDK(
+      params.ipId as `0x${string}`,
       params.licenseTermsId
     );
 
@@ -107,7 +107,10 @@ export async function verifyMintingFee(
 }> {
   try {
     // Get the current licensing configuration directly from the blockchain
-    const currentConfig = await getCurrentLicensingConfig(ipId, licenseTermsId);
+    const currentConfig = await getLicensingConfigSDK(
+      ipId as `0x${string}`,
+      licenseTermsId
+    );
 
     if (currentConfig) {
       try {

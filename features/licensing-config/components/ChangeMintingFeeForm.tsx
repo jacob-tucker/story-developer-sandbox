@@ -9,7 +9,10 @@ import { BaseFormLayout } from "./BaseFormLayout";
 import { Spinner } from "@/components/atoms/Spinner";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 import { fetchLicenseTermsIds } from "../api";
-import { checkLicenseDisabledStatus } from "../services/utils";
+import {
+  checkLicenseDisabledStatus,
+  getLicenseTermsSDK,
+} from "../services/utils";
 
 interface ChangeMintingFeeFormProps {
   paramValues: Record<string, string>;
@@ -45,11 +48,31 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
   >([]);
   const [isLoadingTerms, setIsLoadingTerms] = useState(false);
   const [ipIdError, setIpIdError] = useState("");
+  const [defaultMintingFee, setDefaultMintingFee] = useState<string | null>(
+    null
+  );
 
   // Handle minting fee input change
   const handleMintingFeeChange = (value: string) => {
-    // Just store the user input directly - it will be converted to wei at transaction time
+    // Just store the user input directly
     onParamChange("mintingFee", value);
+  };
+
+  // Fetch license terms details to get default minting fee
+  const fetchLicenseTermsDetails = async (licenseTermsId: string) => {
+    if (!licenseTermsId || !client) return;
+
+    try {
+      const terms = await getLicenseTermsSDK(licenseTermsId, client);
+
+      if (terms && terms.defaultMintingFee !== undefined) {
+        // Use optional chaining and type assertion to safely access mintingFee
+        const defaultFee = formatEther(terms.defaultMintingFee);
+        setDefaultMintingFee(defaultFee);
+      }
+    } catch (error) {
+      console.error("Error fetching license terms details:", error);
+    }
   };
 
   // Fetch license terms for an IP
@@ -119,6 +142,9 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
         );
       }
 
+      // Fetch the license terms to get default minting fee
+      fetchLicenseTermsDetails(licenseTermsId);
+
       // Get the license template address from the network configuration
       const networkConfig = getCurrentNetworkConfig();
       const licenseTemplateAddress = networkConfig.licenseTemplateAddress;
@@ -163,11 +189,33 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
       (field) => paramValues[field] && paramValues[field].trim() !== ""
     );
 
+    // Validate minting fee is a valid number
+    let isValidMintingFee = true;
+    if (paramValues.mintingFee) {
+      const isValidNumber = /^(\d+\.?\d*|\.\d+)$/.test(paramValues.mintingFee);
+      if (!isValidNumber) {
+        setFeeError("Minting fee must be a valid number");
+        isValidMintingFee = false;
+      } else if (
+        defaultMintingFee &&
+        parseFloat(paramValues.mintingFee) < parseFloat(defaultMintingFee)
+      ) {
+        setFeeError(
+          `Minting fee must be greater than or equal to ${defaultMintingFee} IP (default fee)`
+        );
+        isValidMintingFee = false;
+      } else {
+        // Clear fee error if the value is now valid
+        setFeeError("");
+      }
+    }
+
     // Set form validity
     setIsFormValid(
       hasAllRequiredFields &&
         !isLoadingTerms &&
         !ipIdError &&
+        isValidMintingFee &&
         licenseTermsOptions.length > 0
     );
   };
@@ -181,7 +229,7 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
       fetchLicenseTerms(value);
     }
 
-    // For license terms ID, fetch current minting fee
+    // For license terms ID, fetch current minting fee and license terms details
     if (name === "licenseTermsId" && value && paramValues.ipId) {
       fetchCurrentMintingFee(paramValues.ipId, value);
     }

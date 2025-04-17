@@ -1,6 +1,6 @@
 import { StoryClient, LicensingConfig } from "@story-protocol/core-sdk";
 import { zeroAddress, zeroHash } from "viem";
-import { getCurrentLicensingConfig, checkLicenseDisabledStatus } from "./utils";
+import { checkLicenseDisabledStatus, getLicensingConfigSDK } from "./utils";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 import { ExecuteReturnType } from "../types";
 
@@ -75,8 +75,8 @@ export async function executeDisableLicense(
 
     // For disable license, check if    // Fetch the current licensing configuration to preserve existing values
     // Force a refresh to ensure we have the latest data from the blockchain
-    const currentConfig = await getCurrentLicensingConfig(
-      params.ipId,
+    const currentConfig = await getLicensingConfigSDK(
+      params.ipId as `0x${string}`,
       params.licenseTermsId
     );
 
