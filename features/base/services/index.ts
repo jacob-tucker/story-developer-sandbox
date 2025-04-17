@@ -1,12 +1,14 @@
 // Export all service functions
-export * from "./changeMintingFee";
-export * from "./disableLicense";
-export * from "./utils";
+export * from "../../change-license-fee/services/changeMintingFee";
+export * from "../../disable-license/services/disableLicense";
+export * from "../../add-license-terms/services/addLicenseTerms";
+export * from "../../utils";
 
 import { StoryClient } from "@story-protocol/core-sdk";
-import { ActionType, ExecuteReturnType } from "../types";
-import { executeChangeMintingFee } from "./changeMintingFee";
-import { executeDisableLicense } from "./disableLicense";
+import { ActionType, ExecuteReturnType } from "../../types";
+import { executeChangeMintingFee } from "../../change-license-fee/services/changeMintingFee";
+import { executeDisableLicense } from "../../disable-license/services/disableLicense";
+import { executeAddLicenseTerms } from "../../add-license-terms/services/addLicenseTerms";
 
 /**
  * Router function that executes the appropriate action based on the action type
@@ -25,6 +27,8 @@ export async function executeLicensingConfig(
   switch (actionType) {
     case ActionType.DISABLE_LICENSE:
       return executeDisableLicense(params, client);
+    case ActionType.ADD_LICENSE_TERMS:
+      return executeAddLicenseTerms(params, client);
     case ActionType.CHANGE_MINTING_FEE:
     default:
       return executeChangeMintingFee(params, client);

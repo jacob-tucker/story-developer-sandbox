@@ -1,8 +1,8 @@
 import { StoryClient, LicensingConfig } from "@story-protocol/core-sdk";
 import { zeroAddress, formatEther, parseEther, zeroHash } from "viem";
-import { getLicensingConfigSDK } from "../services/utils";
+import { getLicensingConfigSDK } from "../../utils";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
-import { ExecuteReturnType } from "../types";
+import { ExecuteReturnType } from "../../types";
 /**
  * Executes the change minting fee action
  * @param params The parameters for changing the minting fee

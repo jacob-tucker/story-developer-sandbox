@@ -4,6 +4,7 @@
 export enum ActionType {
   CHANGE_MINTING_FEE = "change-minting-fee",
   DISABLE_LICENSE = "disable-license",
+  ADD_LICENSE_TERMS = "add-license-terms",
 }
 
 // Base parameter interface
@@ -32,28 +33,39 @@ export interface LicenseTermsOption {
 
 // Base licensing configuration parameters
 export interface BaseLicensingConfigParams {
-  ipId: string;
-  licenseTermsId: string;
   actionType: ActionType;
 }
 
 // Change minting fee parameters
 export interface ChangeMintingFeeParams extends BaseLicensingConfigParams {
   actionType: ActionType.CHANGE_MINTING_FEE;
+  ipId: string;
+  licenseTermsId: string;
   mintingFee: string;
-  licenseLimit?: string;
 }
 
 // Disable license parameters
 export interface DisableLicenseParams extends BaseLicensingConfigParams {
   actionType: ActionType.DISABLE_LICENSE;
+  ipId: string;
+  licenseTermsId: string;
+}
+
+// Add license terms parameters
+export interface AddLicenseTermsParams extends BaseLicensingConfigParams {
+  actionType: ActionType.ADD_LICENSE_TERMS;
+  ipId: string; // Only IP ID is required
+  mintingFee?: string; // Default: 0
+  commercialRevShare?: string; // Default: 0
+  aiTrainingAllowed?: string; // Default: false
 }
 
 // Union type for all licensing configuration parameters
 export type LicensingConfigParams =
   | ChangeMintingFeeParams
-  | DisableLicenseParams;
+  | DisableLicenseParams
+  | AddLicenseTermsParams;
 
 export type ExecuteReturnType =
-  | { success: true; txHash: string }
+  | { success: true; txHash: string; licenseTermsId?: string }
   | { success: false; error: string };

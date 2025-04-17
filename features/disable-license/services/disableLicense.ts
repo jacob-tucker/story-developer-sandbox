@@ -1,8 +1,8 @@
 import { StoryClient, LicensingConfig } from "@story-protocol/core-sdk";
 import { zeroAddress, zeroHash } from "viem";
-import { checkLicenseDisabledStatus, getLicensingConfigSDK } from "./utils";
+import { checkLicenseDisabledStatus, getLicensingConfigSDK } from "../../utils";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
-import { ExecuteReturnType } from "../types";
+import { ExecuteReturnType } from "../../types";
 
 /**
  * Executes the disable license action

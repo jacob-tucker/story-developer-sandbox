@@ -8,6 +8,7 @@ Additionally, it can be used as a quickstart for developers wanting to learn how
 
 1. Change the minting fee of a license
 2. Disable a license
+3. Add new license terms
 
 ## Use the Sandbox Locally
 

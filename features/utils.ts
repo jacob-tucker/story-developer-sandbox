@@ -3,8 +3,8 @@ import {
   LicensingConfig,
   StoryClient,
 } from "@story-protocol/core-sdk";
-import { createPublicClient, http, Chain } from "viem";
-import { licenseRegistryAbi } from "../licenseRegistryAbi";
+import { createPublicClient, http } from "viem";
+import { licenseRegistryAbi } from "./licenseRegistryAbi";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 
 // No cache needed as we're using SDK directly

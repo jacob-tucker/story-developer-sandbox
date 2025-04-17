@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ActionType } from "../types";
+import { ActionType } from "../../types";
 import { formatEther, parseEther } from "viem";
 import { StoryClient } from "@story-protocol/core-sdk";
 import { verifyMintingFee } from "../services/changeMintingFee";
-import { BaseFormLayout } from "./BaseFormLayout";
+import { BaseFormLayout } from "../../base/components/BaseFormLayout";
 import { Spinner } from "@/components/atoms/Spinner";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
-import { fetchLicenseTermsIds } from "../api";
-import {
-  checkLicenseDisabledStatus,
-  getLicenseTermsSDK,
-} from "../services/utils";
+import { fetchLicenseTermsIds } from "../../api";
+import { checkLicenseDisabledStatus, getLicenseTermsSDK } from "../../utils";
 
 interface ChangeMintingFeeFormProps {
   paramValues: Record<string, string>;

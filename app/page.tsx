@@ -8,17 +8,17 @@ import Footer from "@/components/sections/Footer";
 import { useEffect, useState } from "react";
 import { useWalletClient } from "wagmi";
 import { ViewCode } from "@/components/atoms/ViewCode";
-
-// Import licensing configuration components and services
-import {
-  executeLicensingConfig,
-  ChangeMintingFeeForm,
-  DisableLicenseForm,
-  ActionType,
-} from "@/features/licensing-config";
+import { ActionType } from "@/features/types";
+import { executeLicensingConfig } from "@/features/base/services";
+import { ChangeMintingFeeForm } from "@/features/change-license-fee/components/ChangeMintingFeeForm";
+import { DisableLicenseForm } from "@/features/disable-license/components/DisableLicenseForm";
+import { AddLicenseTermsForm } from "@/features/add-license-terms/components/AddLicenseTermsForm";
 
 // Using the string type to match ViewCode component's expected keys
-type CodeSnippetType = "change-minting-fee" | "disable-license";
+type CodeSnippetType =
+  | "change-minting-fee"
+  | "disable-license"
+  | "add-license-terms";
 
 // Define the card data structure
 interface ActionCard {
@@ -38,6 +38,9 @@ export default function Home() {
     null
   );
   const [paramValues, setParamValues] = useState<Record<string, string>>({});
+  const [lastExecutionResult, setLastExecutionResult] = useState<
+    Record<string, string>
+  >({});
 
   // Define the cards with their actions
   const actionCards: ActionCard[] = [
@@ -54,6 +57,12 @@ export default function Home() {
       description:
         "Disable a license for a specific IP and license terms using the Lock License hook",
       actionType: ActionType.DISABLE_LICENSE,
+    },
+    {
+      id: "add-license-terms",
+      title: "Add License Terms",
+      description: "Add new license terms to an existing license",
+      actionType: ActionType.ADD_LICENSE_TERMS,
     },
   ];
 
@@ -103,6 +112,8 @@ export default function Home() {
   const handleExecuteAction = async () => {
     setIsExecuting(true);
     setExecutionSuccess(null);
+    // Reset last execution result
+    setLastExecutionResult({});
 
     try {
       // Add action type to parameters
@@ -134,6 +145,13 @@ export default function Home() {
             `Transaction submitted with hash: ${result.txHash}`
           );
           addTerminalMessage("Transaction confirmed!", "success");
+
+          // Store licenseTermsId if it exists
+          if (result.licenseTermsId) {
+            setLastExecutionResult({
+              licenseTermsId: result.licenseTermsId,
+            });
+          }
 
           // Set execution success - the form components will handle verification
           setExecutionSuccess(true);
@@ -292,7 +310,7 @@ export default function Home() {
                   </h3>
                   <ViewCode type={selectedCard.id} />
                 </div>
-                {selectedCard?.actionType === ActionType.CHANGE_MINTING_FEE ? (
+                {selectedCard?.actionType === ActionType.CHANGE_MINTING_FEE && (
                   <ChangeMintingFeeForm
                     paramValues={paramValues}
                     onParamChange={handleParamChange}
@@ -303,7 +321,8 @@ export default function Home() {
                     client={client}
                     addTerminalMessage={addTerminalMessage}
                   />
-                ) : selectedCard?.actionType === ActionType.DISABLE_LICENSE ? (
+                )}
+                {selectedCard?.actionType === ActionType.DISABLE_LICENSE && (
                   <DisableLicenseForm
                     paramValues={paramValues}
                     onParamChange={handleParamChange}
@@ -313,7 +332,20 @@ export default function Home() {
                     walletAddress={wallet?.account.address}
                     addTerminalMessage={addTerminalMessage}
                   />
-                ) : null}
+                )}
+                {selectedCard?.actionType === ActionType.ADD_LICENSE_TERMS && (
+                  <AddLicenseTermsForm
+                    paramValues={paramValues}
+                    onParamChange={handleParamChange}
+                    onExecute={handleExecuteAction}
+                    isExecuting={isExecuting}
+                    executionSuccess={executionSuccess}
+                    walletAddress={wallet?.account.address}
+                    client={client}
+                    addTerminalMessage={addTerminalMessage}
+                    lastExecutionResult={lastExecutionResult}
+                  />
+                )}
               </div>
 
               {/* Bottom Section - Transaction Response */}

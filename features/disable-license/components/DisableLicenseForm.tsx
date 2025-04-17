@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/atoms/Spinner";
-import { ActionType } from "../types";
-import { checkLicenseDisabledStatus } from "../services/utils";
+import { ActionType } from "../../types";
+import { checkLicenseDisabledStatus } from "../../utils";
 import { verifyLicenseDisabled } from "../services/disableLicense";
-import { BaseFormLayout } from "./BaseFormLayout";
-import { fetchLicenseTermsIds } from "../api";
+import { BaseFormLayout } from "../../base/components/BaseFormLayout";
+import { fetchLicenseTermsIds } from "../../api";
 
 interface DisableLicenseFormProps {
   paramValues: Record<string, string>;
