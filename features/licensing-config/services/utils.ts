@@ -103,7 +103,6 @@ export async function checkLicenseDisabledStatus(
       return { isDisabled: false, error: "Missing IP ID or License Terms ID" };
     }
 
-    console.log("Checking license disabled status via viem");
     const config = await getLicensingConfigSDK(
       ipId as `0x${string}`,
       licenseTermsId

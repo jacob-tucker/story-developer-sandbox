@@ -82,6 +82,8 @@ export async function executeDisableLicense(
 
     // Determine the minting fee to use
     let mintingFee: bigint;
+    const networkConfig = getCurrentNetworkConfig();
+    const licenseTemplateAddress = networkConfig.licenseTemplateAddress;
 
     // If we already have a minting fee in the current config, use that
     if (currentConfig && currentConfig.mintingFee) {
@@ -92,9 +94,6 @@ export async function executeDisableLicense(
       mintingFee = BigInt(0); // Default to 0
       try {
         console.log("No existing minting fee found, predicting fee...");
-        // Get the license template address from the network configuration
-        const networkConfig = getCurrentNetworkConfig();
-        const licenseTemplateAddress = networkConfig.licenseTemplateAddress;
 
         const feeResponse = await client.license.predictMintingLicenseFee({
           licensorIpId: params.ipId as `0x${string}`,
@@ -128,10 +127,6 @@ export async function executeDisableLicense(
     };
 
     try {
-      // Get the license template address from the network configuration
-      const networkConfig = getCurrentNetworkConfig();
-      const licenseTemplateAddress = networkConfig.licenseTemplateAddress;
-
       const response = await client.license.setLicensingConfig({
         ipId: params.ipId as `0x${string}`,
         licenseTermsId: parseInt(params.licenseTermsId),

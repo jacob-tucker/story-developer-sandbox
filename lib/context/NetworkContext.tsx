@@ -1,14 +1,9 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useEffect, ReactNode } from "react";
 import { aeneid, mainnet } from "@story-protocol/core-sdk";
 import { Chain } from "viem";
+import { useAccount } from "wagmi";
 
 export type NetworkType = "aeneid" | "mainnet";
 
@@ -21,7 +16,7 @@ export interface NetworkConfig {
   licenseRegistryAddress: `0x${string}`;
   licenseTemplateAddress: `0x${string}`;
   explorerUrl: string;
-  chain: Chain; // Using any for the chain type to avoid complex type imports
+  chain: Chain;
 }
 
 // Network configurations using SDK chain definitions
@@ -48,15 +43,13 @@ export const NETWORK_CONFIGS: Record<NetworkType, NetworkConfig> = {
   },
 };
 
-interface NetworkContextType {
-  network: NetworkType;
-  config: NetworkConfig;
-  setNetwork: (network: NetworkType) => void;
-}
+// Map chain IDs to network types
+const CHAIN_ID_TO_NETWORK: Record<number, NetworkType> = {
+  [aeneid.id]: "aeneid",
+  [mainnet.id]: "mainnet",
+};
 
-const NetworkContext = createContext<NetworkContextType | undefined>(undefined);
-
-// Create a global variable to store the network config outside of React components
+// Global variable for access outside React
 let currentNetworkConfig = NETWORK_CONFIGS.aeneid;
 
 // Function to get the current network config (can be used outside of React components)
@@ -64,45 +57,46 @@ export const getCurrentNetworkConfig = (): NetworkConfig => {
   return currentNetworkConfig;
 };
 
+interface NetworkContextType {
+  network: NetworkType;
+  config: NetworkConfig;
+}
+
+const NetworkContext = createContext<NetworkContextType>({
+  network: "aeneid",
+  config: NETWORK_CONFIGS.aeneid,
+});
+
 export const NetworkProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  // Initialize from localStorage if available, otherwise default to testnet
-  const [network, setNetworkState] = useState<NetworkType>(() => {
-    // Only access localStorage in browser environment
-    if (typeof window !== "undefined") {
-      const savedNetwork = localStorage.getItem("network") as NetworkType;
-      return savedNetwork === "mainnet" ? "mainnet" : "aeneid";
-    }
-    return "aeneid";
-  });
+  // Get chain from wagmi
+  const { chain } = useAccount();
 
-  const config = NETWORK_CONFIGS[network];
+  // Get network type from chain ID or default to aeneid
+  const networkType: NetworkType =
+    chain?.id && CHAIN_ID_TO_NETWORK[chain.id]
+      ? CHAIN_ID_TO_NETWORK[chain.id]
+      : "aeneid";
 
-  // Update the global variable when network changes
+  // Set the global config for non-React access
+  const config = NETWORK_CONFIGS[networkType];
+
+  // Update global variable when chain changes
   useEffect(() => {
-    currentNetworkConfig = NETWORK_CONFIGS[network];
-  }, [network]);
-
-  // Save to localStorage when network changes
-  const setNetwork = (newNetwork: NetworkType) => {
-    setNetworkState(newNetwork);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("network", newNetwork);
-    }
-  };
+    currentNetworkConfig = config;
+    console.log(
+      `Network: ${networkType} (Chain: ${chain?.name || "disconnected"})`
+    );
+  }, [networkType, chain, config]);
 
   return (
-    <NetworkContext.Provider value={{ network, config, setNetwork }}>
+    <NetworkContext.Provider value={{ network: networkType, config }}>
       {children}
     </NetworkContext.Provider>
   );
 };
 
 export const useNetwork = (): NetworkContextType => {
-  const context = useContext(NetworkContext);
-  if (context === undefined) {
-    throw new Error("useNetwork must be used within a NetworkProvider");
-  }
-  return context;
+  return useContext(NetworkContext);
 };

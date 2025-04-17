@@ -28,6 +28,8 @@ export async function executeChangeMintingFee(
       params.licenseTermsId
     );
 
+    console.log("currentConfig", currentConfig);
+
     // Create the licensing configuration with updated minting fee but preserving other values
     const licensingConfig: LicensingConfig = {
       mintingFee: parseEther(params.mintingFee),
@@ -45,6 +47,8 @@ export async function executeChangeMintingFee(
       expectGroupRewardPool: (currentConfig?.expectGroupRewardPool ||
         zeroAddress) as `0x${string}`,
     };
+
+    console.log("licensingConfig", licensingConfig);
 
     try {
       // Get the license template address from the network configuration
