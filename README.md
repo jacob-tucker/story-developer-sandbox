@@ -1,24 +1,26 @@
-# Story - Developer Sandbox
+# Story Sandbox
 
-This is a Next.js app built to help you learn the Story TypeScript SDK and see its integration with a wallet like Metamask.
+This is a Next.js app, integrated with the Story SDK, API, and Protocol, intended to extend the features of the [Portal](https://portal.story.foundation) and give non-technical (and technical) users the ability to tap into all features of our protocol.
 
-The sandbox will walk you through building with Story step-by-step. More specifically:
+Additionally, it can be used as a quickstart for developers wanting to learn how to use the Story TypeScript SDK in React.
 
-1. Registering an IP Asset
-2. Attaching License Terms to that IP Asset
-3. Minting a License Token from an IP Asset
-4. Registering a derivative IP Asset from a License Token
-5. Claiming revenue from a child IP Asset
+## Supported Actions
 
-## Get Started
+1. Change the minting fee of a license
+2. Disable a license
 
-### Configure your .env
+## Use the Sandbox Locally
 
-1. Rename the `.env.example` file to `.env`
-2. Go to [Pinata and get a JWT](https://knowledge.pinata.cloud/en/articles/6191471-how-to-create-an-pinata-api-key). Set `PINATA_JWT` equal to your JWT.
-3. Login to to [Dynamic](https://app.dynamic.xyz/). Set `NEXT_PUBLIC_DYNAMIC_ENV_ID` equal to your Environment ID, which you will get when you create a project.
+1. Clone the repo: `git clone https://github.com/jacob-tucker/story-developer-sandbox`
 
-### Run the sandbox
+2. Configure your .env
 
-1. `npm install` in the root directory
-2. `npm run dev` in the root directory
+   a. Rename the `.env.example` file to `.env`
+
+   b. Login to to [Dynamic](https://app.dynamic.xyz/). Set `NEXT_PUBLIC_DYNAMIC_ENV_ID` equal to your Environment ID, which you will get when you create a project.
+
+3. Run the sandbox
+
+   a. `npm install` in the root directory
+
+   b. `npm run dev` in the root directory
