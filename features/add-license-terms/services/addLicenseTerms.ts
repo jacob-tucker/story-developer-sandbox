@@ -32,7 +32,8 @@ export async function executeAddLicenseTerms(
         ? parseEther(params.mintingFee)
         : BigInt(0),
       expiration: BigInt(0),
-      commercialUse: true,
+      commercialUse:
+        params.mintingFee && parseFloat(params.mintingFee) > 0 ? true : false,
       commercialAttribution: true,
       commercializerChecker: zeroAddress,
       commercializerCheckerData: zeroAddress,

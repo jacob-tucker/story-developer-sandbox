@@ -16,7 +16,7 @@ import { setupClient } from "@/lib/code-snippets/setupClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { changeMintingFee } from "@/lib/code-snippets/changeMintingFee";
 import { disableLicense } from "@/lib/code-snippets/disableLicense";
-import { addLicenseTerms } from "@/lib/code-snippets/addLicenseTerms";
+import { attachTerms } from "@/lib/code-snippets/attachTerms";
 
 const data: {
   [type: string]: {
@@ -48,7 +48,7 @@ const data: {
     description:
       "Add new license terms to an existing license with different configurations based on license type.",
     code: [
-      { filename: "AddLicenseTerms.tsx", code: addLicenseTerms },
+      { filename: "AttachTerms.tsx", code: attachTerms },
       { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
