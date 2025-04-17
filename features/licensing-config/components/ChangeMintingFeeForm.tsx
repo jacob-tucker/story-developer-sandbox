@@ -295,6 +295,22 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
     }
   }, []);
 
+  // Effect to refresh data when wallet connects (client becomes available)
+  useEffect(() => {
+    // If client becomes available and we have necessary data already entered
+    if (client && paramValues.ipId && paramValues.licenseTermsId) {
+      // Refresh the license terms and current minting fee
+      fetchCurrentMintingFee(paramValues.ipId, paramValues.licenseTermsId);
+
+      if (addTerminalMessage) {
+        addTerminalMessage(
+          "Wallet connected - refreshing minting fee data",
+          "info"
+        );
+      }
+    }
+  }, [client]);
+
   // Effect to update the minting fee after a successful transaction
   useEffect(() => {
     // If transaction was successful and we have the necessary parameters, check the minting fee
