@@ -205,16 +205,6 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
 
   return (
     <>
-      {/* License Disabled Status Warning - Outside the form layout */}
-      {isLicenseDisabled && (
-        <div className="p-3 mb-4 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800 text-sm">
-          <p className="flex items-center">
-            <span className="mr-2">⚠️</span>
-            <span>This license is already disabled.</span>
-          </p>
-        </div>
-      )}
-
       <BaseFormLayout
         actionType={ActionType.DISABLE_LICENSE}
         isFormValid={isFormValid}
@@ -236,10 +226,7 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
             placeholder="IP ID (0x...)"
             value={paramValues.ipId || ""}
             onChange={(e) => handleParamChange("ipId", e.target.value)}
-            className={`bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] ${
-              isLicenseDisabled ? "opacity-70 bg-gray-50" : ""
-            }`}
-            disabled={isLicenseDisabled}
+            className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF]"
           />
           {ipIdError && <p className="text-xs text-[#09ACFF]">{ipIdError}</p>}
         </div>
@@ -255,14 +242,8 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
             onChange={(e) =>
               handleParamChange("licenseTermsId", e.target.value)
             }
-            className={`w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF] ${
-              isLicenseDisabled ? "opacity-70 bg-gray-50" : ""
-            }`}
-            disabled={
-              isLoadingTerms ||
-              licenseTermsOptions.length === 0 ||
-              isLicenseDisabled
-            }
+            className="w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
+            disabled={isLoadingTerms || licenseTermsOptions.length === 0}
           >
             <option value="">Select License Terms ID</option>
             {licenseTermsOptions.map((option) => (
@@ -276,6 +257,12 @@ export const DisableLicenseForm: React.FC<DisableLicenseFormProps> = ({
               <Spinner size="sm" color="text-gray-500" />
               <span className="ml-2">Loading license terms...</span>
             </div>
+          )}
+          {isLicenseDisabled && (
+            <p className="text-xs text-yellow-600">
+              ⚠️ This license term is already disabled. Select a different one
+              or try another IP.
+            </p>
           )}
         </div>
       </BaseFormLayout>

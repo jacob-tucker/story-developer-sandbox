@@ -52,6 +52,40 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
     null
   );
 
+  // Reset form values function - centralized reset logic
+  const resetFormValues = (
+    options: {
+      resetLicenseTerms?: boolean;
+      resetFeeValues?: boolean;
+    } = {}
+  ) => {
+    const { resetLicenseTerms = false, resetFeeValues = false } = options;
+
+    // Reset license terms if requested
+    if (resetLicenseTerms) {
+      onParamChange("licenseTermsId", "");
+      setLicenseTermsOptions([]);
+    }
+
+    // Reset fee values if requested
+    if (resetFeeValues) {
+      setCurrentMintingFee("");
+      setDefaultMintingFee(null);
+      setFeeError("");
+      onParamChange("mintingFee", "");
+    }
+  };
+
+  // Reset all values when IP changes
+  const resetForNewIp = () => {
+    resetFormValues({ resetLicenseTerms: true, resetFeeValues: true });
+  };
+
+  // Reset fee-related values when license terms change
+  const resetForNewLicenseTerms = () => {
+    resetFormValues({ resetFeeValues: true });
+  };
+
   // Handle minting fee input change
   const handleMintingFeeChange = (value: string) => {
     // Just store the user input directly
@@ -79,12 +113,12 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
   const fetchLicenseTerms = async (ipId: string) => {
     if (!ipId || !ipId.startsWith("0x")) {
       setIpIdError("Invalid IP ID format. Must start with 0x.");
-      setLicenseTermsOptions([]);
+      resetForNewIp();
       return;
     }
 
     setIsLoadingTerms(true);
-    setLicenseTermsOptions([]);
+    resetForNewIp();
 
     try {
       // Use the existing API function instead of duplicating the logic
@@ -94,12 +128,11 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
         setLicenseTermsOptions(result.options);
         setIpIdError("");
 
-        // Auto-select the first license term if available
-        if (result.options.length > 0 && !paramValues.licenseTermsId) {
-          onParamChange("licenseTermsId", result.options[0].value);
-          // Fetch the current minting fee for the selected license term
-          fetchCurrentMintingFee(ipId, result.options[0].value);
-        }
+        // Always auto-select the first license term when options are available
+        onParamChange("licenseTermsId", result.options[0].value);
+
+        // Fetch the current minting fee for the selected license term
+        fetchCurrentMintingFee(ipId, result.options[0].value);
       } else {
         setLicenseTermsOptions([]);
         setIpIdError(result.error || "No license terms found for this IP ID.");
@@ -121,8 +154,7 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
     if (!ipId || !licenseTermsId) return;
 
     setIsLoadingFee(true);
-    setCurrentMintingFee("");
-    setFeeError("");
+    resetForNewLicenseTerms();
 
     try {
       if (!client) {
@@ -224,13 +256,29 @@ export const ChangeMintingFeeForm: React.FC<ChangeMintingFeeFormProps> = ({
   const handleParamChange = (name: string, value: string) => {
     onParamChange(name, value);
 
-    // For IP ID, fetch license terms when it's a valid address
-    if (name === "ipId" && value && value.startsWith("0x")) {
-      fetchLicenseTerms(value);
+    // For IP ID, fetch license terms when it's a valid address and reset other values
+    if (name === "ipId") {
+      resetForNewIp();
+
+      // Now handle the IP ID change
+      if (value && value.startsWith("0x")) {
+        // Set loading state and fetch license terms
+        setIsLoadingTerms(true);
+        fetchLicenseTerms(value);
+      } else {
+        // If IP is invalid, clear license terms options
+        setLicenseTermsOptions([]);
+        if (!value) {
+          setIpIdError("");
+        } else {
+          setIpIdError("Invalid IP ID format. Must start with 0x.");
+        }
+      }
     }
 
     // For license terms ID, fetch current minting fee and license terms details
     if (name === "licenseTermsId" && value && paramValues.ipId) {
+      resetForNewLicenseTerms();
       fetchCurrentMintingFee(paramValues.ipId, value);
     }
   };
