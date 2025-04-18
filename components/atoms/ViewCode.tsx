@@ -30,7 +30,7 @@ const data: {
     description:
       "Set the licensing configuration including minting fee for a specific license terms of an IP.",
     code: [
-      { filename: "ChangeMintingFee.tsx", code: changeMintingFee },
+      { filename: "changeMintingFee.ts", code: changeMintingFee },
       { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
@@ -39,7 +39,7 @@ const data: {
     description:
       "Disable a license for a specific IP and license terms using the Licensing Config.",
     code: [
-      { filename: "DisableLicense.tsx", code: disableLicense },
+      { filename: "disableLicense.ts", code: disableLicense },
       { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
@@ -48,7 +48,7 @@ const data: {
     description:
       "Add new license terms to an existing license with different configurations based on license type.",
     code: [
-      { filename: "AttachTerms.tsx", code: attachTerms },
+      { filename: "attachTerms.ts", code: attachTerms },
       { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
