@@ -43,6 +43,15 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
     validateForm();
   }, [paramValues]);
 
+  // Initialize default values on component mount
+  useEffect(() => {
+    // Set default values for boolean parameters only
+    onParamChange("commercialUse", "true");
+    onParamChange("derivativesAllowed", "true");
+    onParamChange("derivativesAttribution", "true");
+    onParamChange("aiTrainingAllowed", "false");
+  }, []);
+
   // Handle parameter change
   const handleParamChange = (name: string, value: string) => {
     onParamChange(name, value);
@@ -196,41 +205,99 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
         )}
       </div>
 
-      {/* Commercial Rev Share */}
+      {/* Commercial Use */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="commercialRevShare" className="text-black">
-          <span className="text-[#09ACFF]">$</span> commercialRevShare
+        <Label htmlFor="commercialUse" className="text-black mb-1">
+          <span className="text-[#09ACFF]">$</span> Can people use your IP
+          commercially?
         </Label>
-        <div style={{ position: "relative" }}>
-          <Input
-            id="commercialRevShare"
-            type="text"
-            inputMode="decimal"
-            placeholder="0"
-            value={paramValues.commercialRevShare || ""}
-            onChange={(e) =>
-              handleParamChange("commercialRevShare", e.target.value)
-            }
-            style={{ paddingRight: "32px" }}
-            className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF]"
-          />
-          <span
-            style={{
-              position: "absolute",
-              right: "12px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              pointerEvents: "none",
-              color: "rgb(107, 114, 128)",
-            }}
-          >
-            %
-          </span>
-        </div>
-        {commercialRevShareError && (
-          <p className="text-xs text-[#09ACFF]">{commercialRevShareError}</p>
-        )}
+        <select
+          id="commercialUse"
+          value={paramValues.commercialUse}
+          onChange={(e) => handleParamChange("commercialUse", e.target.value)}
+          className="w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
+        >
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
       </div>
+
+      {/* Commercial Rev Share - Only show if commercialUse is true */}
+      {paramValues.commercialUse === "true" && (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="commercialRevShare" className="text-black">
+            <span className="text-[#09ACFF]">$</span> commercialRevShare
+          </Label>
+          <div style={{ position: "relative" }}>
+            <Input
+              id="commercialRevShare"
+              type="text"
+              inputMode="decimal"
+              placeholder="0"
+              value={paramValues.commercialRevShare || ""}
+              onChange={(e) =>
+                handleParamChange("commercialRevShare", e.target.value)
+              }
+              style={{ paddingRight: "32px" }}
+              className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF]"
+            />
+            <span
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                pointerEvents: "none",
+                color: "rgb(107, 114, 128)",
+              }}
+            >
+              %
+            </span>
+          </div>
+          {commercialRevShareError && (
+            <p className="text-xs text-[#09ACFF]">{commercialRevShareError}</p>
+          )}
+        </div>
+      )}
+
+      {/* Derivatives Allowed */}
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="derivativesAllowed" className="text-black mb-1">
+          <span className="text-[#09ACFF]">$</span> Can people remix your work?
+        </Label>
+        <select
+          id="derivativesAllowed"
+          value={paramValues.derivativesAllowed}
+          onChange={(e) =>
+            handleParamChange("derivativesAllowed", e.target.value)
+          }
+          className="w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
+        >
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+      </div>
+
+      {/* Derivatives Attribution - Only show if derivativesAllowed is true */}
+      {paramValues.derivativesAllowed === "true" && (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="derivativesAttribution" className="text-black mb-1">
+            <span className="text-[#09ACFF]">$</span> Do remixes have to give
+            you attribution?
+          </Label>
+          <select
+            id="derivativesAttribution"
+            value={paramValues.derivativesAttribution}
+            onChange={(e) =>
+              handleParamChange("derivativesAttribution", e.target.value)
+            }
+            className="w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
+          >
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+      )}
 
       {/* AI Training Allowed */}
       <div className="flex flex-col gap-2">
@@ -239,7 +306,7 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
         </Label>
         <select
           id="aiTrainingAllowed"
-          value={paramValues.aiTrainingAllowed || "false"}
+          value={paramValues.aiTrainingAllowed}
           onChange={(e) =>
             handleParamChange("aiTrainingAllowed", e.target.value)
           }

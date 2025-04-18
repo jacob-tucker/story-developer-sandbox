@@ -27,29 +27,36 @@ export async function executeAddLicenseTerms(
 
     const licenseTerms: LicenseTerms = {
       transferable: true,
-      royaltyPolicy: networkConfig.royaltyPolicyLRPAddress,
+      royaltyPolicy:
+        params.commercialUse === "true" ||
+        (params.mintingFee && params.mintingFee !== "0")
+          ? networkConfig.royaltyPolicyLRPAddress
+          : zeroAddress,
       defaultMintingFee: params.mintingFee
         ? parseEther(params.mintingFee)
         : BigInt(0),
       expiration: BigInt(0),
-      commercialUse:
-        params.mintingFee && parseFloat(params.mintingFee) > 0 ? true : false,
-      commercialAttribution: true,
+      commercialUse: params.commercialUse === "true",
+      commercialAttribution: params.commercialUse === "true",
       commercializerChecker: zeroAddress,
       commercializerCheckerData: zeroAddress,
-      commercialRevShare: params.commercialRevShare
-        ? parseInt(params.commercialRevShare)
-        : 0,
+      commercialRevShare:
+        params.commercialUse === "true" && params.commercialRevShare
+          ? parseInt(params.commercialRevShare)
+          : 0,
       commercialRevCeiling: BigInt(0),
-      derivativesAllowed: true,
-      derivativesAttribution: true,
+      derivativesAllowed: params.derivativesAllowed === "true",
+      derivativesAttribution:
+        params.derivativesAllowed === "true" &&
+        params.derivativesAttribution === "true",
       derivativesApproval: false,
       derivativesReciprocal: true,
       derivativeRevCeiling: BigInt(0),
       currency: "0x1514000000000000000000000000000000000000", // $WIP address from https://docs.story.foundation/docs/deployed-smart-contracts
-      uri: params.aiTrainingAllowed
-        ? "https://github.com/piplabs/pil-document/blob/998c13e6ee1d04eb817aefd1fe16dfe8be3cd7a2/off-chain-terms/CC-BY.json"
-        : "https://github.com/piplabs/pil-document/blob/ad67bb632a310d2557f8abcccd428e4c9c798db1/off-chain-terms/Default.json",
+      uri:
+        params.aiTrainingAllowed === "true"
+          ? "https://github.com/piplabs/pil-document/blob/998c13e6ee1d04eb817aefd1fe16dfe8be3cd7a2/off-chain-terms/CC-BY.json"
+          : "https://github.com/piplabs/pil-document/blob/ad67bb632a310d2557f8abcccd428e4c9c798db1/off-chain-terms/Default.json",
     };
 
     console.log("licenseTerms", licenseTerms);

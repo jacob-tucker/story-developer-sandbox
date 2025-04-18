@@ -12,7 +12,7 @@ const licenseTerms: LicenseTerms = {
     royaltyPolicy: '0x9156e603C949481883B1d3355c6f1132D191fC41',
     defaultMintingFee: parseEther(MINTING_FEE),
     expiration: BigInt(0),
-    commercialUse: MINTING_FEE && parseFloat(MINTING_FEE) > 0 ? true : false,
+    commercialUse: true,
     commercialAttribution: true,
     commercializerChecker: zeroAddress,
     commercializerCheckerData: zeroAddress,

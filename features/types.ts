@@ -58,6 +58,9 @@ export interface AddLicenseTermsParams extends BaseLicensingConfigParams {
   mintingFee?: string; // Default: 0
   commercialRevShare?: string; // Default: 0
   aiTrainingAllowed?: string; // Default: false
+  derivativesAllowed?: string; // Default: true
+  derivativesAttribution?: string; // Default: true
+  commercialUse?: string; // Default: true
 }
 
 // Union type for all licensing configuration parameters
