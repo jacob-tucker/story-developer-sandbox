@@ -55,8 +55,8 @@ export async function executeAddLicenseTerms(
       currency: "0x1514000000000000000000000000000000000000", // $WIP address from https://docs.story.foundation/docs/deployed-smart-contracts
       uri:
         params.aiTrainingAllowed === "true"
-          ? "https://github.com/piplabs/pil-document/blob/998c13e6ee1d04eb817aefd1fe16dfe8be3cd7a2/off-chain-terms/CC-BY.json"
-          : "https://github.com/piplabs/pil-document/blob/ad67bb632a310d2557f8abcccd428e4c9c798db1/off-chain-terms/Default.json",
+          ? "https://raw.githubusercontent.com/piplabs/pil-document/998c13e6ee1d04eb817aefd1fe16dfe8be3cd7a2/off-chain-terms/CC-BY.json"
+          : "https://raw.githubusercontent.com/piplabs/pil-document/ad67bb632a310d2557f8abcccd428e4c9c798db1/off-chain-terms/Default.json",
     };
 
     console.log("licenseTerms", licenseTerms);
