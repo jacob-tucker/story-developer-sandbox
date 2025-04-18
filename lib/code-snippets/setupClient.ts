@@ -3,7 +3,7 @@ export const setupClient = `
 import { Address, createPublicClient, createWalletClient, custom } from 'viem';
 import { useWalletClient } from 'wagmi';
 import { PropsWithChildren, createContext, useEffect, useContext, useState } from "react";
-import { iliad, StoryClient, StoryConfig } from "@story-protocol/core-sdk";
+import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
 
 export const StoryContext = createContext<{
   client: StoryClient | null;

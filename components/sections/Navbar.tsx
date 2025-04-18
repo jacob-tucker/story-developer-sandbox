@@ -1,5 +1,4 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Icon } from "@iconify/react";
 
 export default function Navbar() {
   return (
@@ -9,48 +8,37 @@ export default function Navbar() {
           <a aria-label="Home" href="/">
             <img
               src="/story-logo.svg"
-              className="hidden h-[1.0rem] text-zinc-950 sm:block dark:text-white forced-colors:text-[CanvasText]"
+              className="h-[1.0rem] text-zinc-950 dark:text-white forced-colors:text-[CanvasText]"
             />
           </a>
-          <a
-            href="https://docs.story.foundation/docs/sdk-overview"
-            target="_blank"
-            className="hidden sm:block"
-          >
-            <div className="flex items-center gap-2 rounded-full border border-dashed border-zinc-300 py-px pr-3 text-xs/6 font-medium text-zinc-900 dark:border-white/20 dark:text-white">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-white/25">
-                v1.3
+          <div className="hidden sm:flex flex-col gap-1">
+            <a
+              href="https://docs.story.foundation/sdk-reference/overview"
+              target="_blank"
+              className="flex items-center"
+            >
+              <div className="relative flex items-center rounded-full border border-dashed border-zinc-300 pr-2 pl-12 py-px text-[10px] font-medium text-zinc-900 dark:border-white/20 dark:text-white">
+                <div className="absolute left-0 flex h-[18px] w-[30px] items-center justify-center rounded-full bg-[#09ACFF] text-white text-[9px] ring-1 ring-[#066DA1]">
+                  v1.3.0
+                </div>
+                <span>SDK</span>
               </div>
-              SDK Version
-            </div>
-          </a>
-          <a
-            href="https://docs.story.foundation/docs/sdk-overview"
-            target="_blank"
-            className="block sm:hidden"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-white/25">
-              v1.3
-            </div>
-          </a>
+            </a>
+            <a
+              href="https://docs.story.foundation/smart-contract-reference/overview"
+              target="_blank"
+              className="flex items-center"
+            >
+              <div className="relative flex items-center rounded-full border border-dashed border-zinc-300 pr-2 pl-12 py-px text-[10px] font-medium text-zinc-900 dark:border-white/20 dark:text-white">
+                <div className="absolute left-0 flex h-[18px] w-[30px] items-center justify-center rounded-full bg-[#A1D1FF] text-black text-[9px] ring-1 ring-[#066DA1]">
+                  v1.3.2
+                </div>
+                <span>Protocol</span>
+              </div>
+            </a>
+          </div>
         </div>
-        <div className="flex items-center gap-8">
-          <a
-            className="text-sm/6 font-medium text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
-            href="https://github.com/jacob-tucker/story-developer-sandbox"
-            target="_blank"
-          >
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-white/25">
-              <Icon icon="tabler:brand-github" />
-            </div>
-          </a>
-          <a
-            className="text-sm/6 font-medium text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
-            href="https://docs.story.foundation"
-            target="_blank"
-          >
-            Docs
-          </a>
+        <div className="flex items-center gap-4">
           <ConnectButton />
         </div>
       </div>
