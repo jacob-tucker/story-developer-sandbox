@@ -20,6 +20,8 @@ Additionally, it can be used as a quickstart for developers wanting to learn how
 
    b. Login to to [Dynamic](https://app.dynamic.xyz/). Set `NEXT_PUBLIC_DYNAMIC_ENV_ID` equal to your Environment ID, which you will get when you create a project.
 
+   c. Get a Pinata JWT from [Pinata](https://app.pinata.cloud/). Set `PINATA_JWT` equal to your Pinata JWT.
+
 3. Run the sandbox
 
    a. `npm install` in the root directory

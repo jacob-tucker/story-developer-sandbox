@@ -4,6 +4,7 @@ import { ExecuteReturnType } from "../../types";
 import { getLicenseTermsSDK } from "@/features/utils";
 import { fetchLicenseTermsIds } from "@/features/api";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
+import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
 
 /**
  * Executes the add license terms action
@@ -25,38 +26,112 @@ export async function executeAddLicenseTerms(
 
     const networkConfig = getCurrentNetworkConfig();
 
+    // 1. Prepare off-chain terms JSON from params (or defaults)
+    const offChainTerms = {
+      // Array fields (empty array means no restrictions)
+      territory: params.territory
+        ? params.territory.split(",").map((item) => item.trim())
+        : [],
+      channelsOfDistribution: params.channelsOfDistribution
+        ? params.channelsOfDistribution.split(",").map((item) => item.trim())
+        : [],
+      contentStandards: params.contentStandards
+        ? params.contentStandards.split(",").map((item) => item.trim())
+        : [],
+
+      // Boolean fields
+      sublicensable: params.sublicensable === "true",
+      aiLearningModels: params.aiLearningModels === "true",
+      attribution: params.attribution === "true",
+
+      // String fields
+      restrictionOnCrossPlatformUse:
+        params.restrictionOnCrossPlatformUse === "true",
+      governingLaw: "California, USA",
+      additionalParameters: params.additionalParameters || {},
+    };
+
+    // 2. Upload off-chain terms to IPFS and get the hash
+    let ipfsHash: string;
+    try {
+      ipfsHash = await uploadJSONToIPFS(offChainTerms);
+    } catch (err) {
+      return {
+        success: false,
+        error: `Could not upload off-chain terms to IPFS: ${String(err)}`,
+      };
+    }
+    const ipfsUri = `https://ipfs.io/ipfs/${ipfsHash}`;
+
+    // 3. PILTerms: Set user-configurable fields from params, all others to defaults
     const licenseTerms: LicenseTerms = {
-      transferable: true,
+      // 1. Transferability
+      transferable: params.transferable === "true",
+
+      // 2. Royalty Policy (user-configurable if exposed, else default)
       royaltyPolicy:
         params.commercialUse === "true" ||
         (params.mintingFee && params.mintingFee !== "0")
-          ? networkConfig.royaltyPolicyLRPAddress
+          ? (params.royaltyPolicy as `0x${string}`)
           : zeroAddress,
+
+      // 3. Default Minting Fee
       defaultMintingFee: params.mintingFee
         ? parseEther(params.mintingFee)
         : BigInt(0),
-      expiration: BigInt(0),
+
+      // 4. Expiration
+      expiration: params.expiration ? BigInt(params.expiration) : BigInt(0),
+
+      // 5. Commercial Use
       commercialUse: params.commercialUse === "true",
-      commercialAttribution: params.commercialUse === "true",
-      commercializerChecker: zeroAddress,
-      commercializerCheckerData: zeroAddress,
+
+      // 6. Commercial Attribution (forced to false if commercialUse is false)
+      commercialAttribution:
+        params.commercialUse === "true" &&
+        params.commercialAttribution === "true",
+
+      // 7. Commercializer Checker (NOT user-configurable, always default)
+      commercializerChecker: zeroAddress, // not exposed in UI
+
+      // 8. Commercializer Checker Data (NOT user-configurable, always default)
+      commercializerCheckerData: "0x", // not exposed in UI
+
+      // 9. Commercial Revenue Share (forced to 0 if commercialUse is false)
       commercialRevShare:
         params.commercialUse === "true" && params.commercialRevShare
           ? parseInt(params.commercialRevShare)
           : 0,
-      commercialRevCeiling: BigInt(0),
+
+      // 10. Commercial Revenue Ceiling (NOT user-configurable, always default)
+      commercialRevCeiling: BigInt(0), // not exposed in UI
+
+      // 11. Derivatives Allowed
       derivativesAllowed: params.derivativesAllowed === "true",
+
+      // 12. Derivatives Attribution
       derivativesAttribution:
         params.derivativesAllowed === "true" &&
         params.derivativesAttribution === "true",
-      derivativesApproval: false,
-      derivativesReciprocal: true,
-      derivativeRevCeiling: BigInt(0),
-      currency: "0x1514000000000000000000000000000000000000", // $WIP address from https://docs.story.foundation/docs/deployed-smart-contracts
-      uri:
-        params.aiTrainingAllowed === "true"
-          ? "https://raw.githubusercontent.com/piplabs/pil-document/998c13e6ee1d04eb817aefd1fe16dfe8be3cd7a2/off-chain-terms/CC-BY.json"
-          : "https://raw.githubusercontent.com/piplabs/pil-document/ad67bb632a310d2557f8abcccd428e4c9c798db1/off-chain-terms/Default.json",
+
+      // 13. Derivatives Approval
+      derivativesApproval:
+        params.derivativesAllowed === "true" &&
+        params.derivativesApproval === "true",
+
+      // 14. Derivatives Reciprocal
+      derivativesReciprocal:
+        params.derivativesAllowed === "true" &&
+        params.derivativesReciprocal === "true",
+
+      // 15. Derivative Revenue Ceiling (NOT user-configurable, always default)
+      derivativeRevCeiling: BigInt(0), // not exposed in UI
+
+      // 16. Currency
+      currency: "0x1514000000000000000000000000000000000000",
+
+      // 17. URI (off-chain terms)
+      uri: ipfsUri, // Set the URI to the uploaded IPFS hash
     };
 
     console.log("licenseTerms", licenseTerms);

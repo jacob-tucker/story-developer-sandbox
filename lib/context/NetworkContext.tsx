@@ -16,6 +16,7 @@ export interface NetworkConfig {
   licenseRegistryAddress: `0x${string}`;
   licenseTemplateAddress: `0x${string}`;
   royaltyPolicyLRPAddress: `0x${string}`;
+  royaltyPolicyLAPAddress: `0x${string}`;
   explorerUrl: string;
   chain: Chain;
 }
@@ -30,6 +31,7 @@ export const NETWORK_CONFIGS: Record<NetworkType, NetworkConfig> = {
     licenseRegistryAddress: "0x529a750E02d8E2f15649c13D69a465286a780e24",
     licenseTemplateAddress: "0x2E896b0b2Fdb7457499B56AAaA4AE55BCB4Cd316",
     royaltyPolicyLRPAddress: "0x9156e603C949481883B1d3355c6f1132D191fC41",
+    royaltyPolicyLAPAddress: "0xBe54FB168b3c982b7AaE60dB6CF75Bd8447b390E",
     explorerUrl: "https://aeneid.storyscan.io",
     chain: aeneid,
   },
@@ -41,6 +43,7 @@ export const NETWORK_CONFIGS: Record<NetworkType, NetworkConfig> = {
     licenseRegistryAddress: "0x529a750E02d8E2f15649c13D69a465286a780e24",
     licenseTemplateAddress: "0x2E896b0b2Fdb7457499B56AAaA4AE55BCB4Cd316",
     royaltyPolicyLRPAddress: "0x9156e603C949481883B1d3355c6f1132D191fC41",
+    royaltyPolicyLAPAddress: "0xBe54FB168b3c982b7AaE60dB6CF75Bd8447b390E",
     explorerUrl: "https://www.storyscan.io",
     chain: mainnet,
   },
