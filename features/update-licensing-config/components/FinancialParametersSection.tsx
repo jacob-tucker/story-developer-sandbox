@@ -212,9 +212,15 @@ export const FinancialParametersSection: React.FC<
     if (paramValues.licensingHook === "limit") {
       onParamChange("mintingFee", defaultMintingFee);
       setDisableMintingFee(true);
-    } else {
+    } else if (licenseConfig?.mintingFee) {
       // if licensing hook is not set, we set to the
-      // actual fee (the predicted one)
+      // config fee because if there's no hook, that takes
+      // biggest priority (we can't predict because it's
+      // still currently set)
+      onParamChange("mintingFee", formatEther(licenseConfig.mintingFee));
+      setDisableMintingFee(false);
+    } else {
+      // otherwise just default lol
       onParamChange("mintingFee", currentMintingFee);
       setDisableMintingFee(false);
     }

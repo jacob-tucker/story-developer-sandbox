@@ -46,29 +46,31 @@ export const UpdateLicensingConfigForm: React.FC<
     isExecuting,
   } = useTerminal();
 
-  useEffect(() => {
-    // Create a separate async function to fetch the licensing config
-    const fetchLicensingConfig = async () => {
-      if (paramValues.ipId && paramValues.licenseTermsId && client) {
-        try {
-          setIsLoading(true);
-          const currentConfig = await getLicensingConfigSDK(
-            paramValues.ipId as `0x${string}`,
-            paramValues.licenseTermsId
-          );
+  // Function to refresh licensing config data
+  const refreshData = async () => {
+    if (paramValues.ipId && paramValues.licenseTermsId && client) {
+      try {
+        setIsLoading(true);
+        const currentConfig = await getLicensingConfigSDK(
+          paramValues.ipId as `0x${string}`,
+          paramValues.licenseTermsId
+        );
 
-          setLicenseConfig(currentConfig || null);
-        } catch (error) {
-          console.error("Error fetching licensing config:", error);
-          setLicenseConfig(null);
-        } finally {
-          setIsLoading(false);
-        }
+        setLicenseConfig(currentConfig || null);
+        addTerminalMessage("Loading licensing configuration data", "info");
+      } catch (error) {
+        console.error("Error fetching licensing config:", error);
+        setLicenseConfig(null);
+        addTerminalMessage("Failed to load licensing configuration", "error");
+      } finally {
+        setIsLoading(false);
       }
-    };
+    }
+  };
 
-    // Call the async function
-    fetchLicensingConfig();
+  // Fetch licensing config when IP ID or license terms ID changes
+  useEffect(() => {
+    refreshData();
   }, [paramValues.ipId, paramValues.licenseTermsId, client]);
 
   // Validate the form
@@ -106,12 +108,10 @@ export const UpdateLicensingConfigForm: React.FC<
   useEffect(() => {
     // If client becomes available and we have necessary data already entered
     if (client && paramValues.ipId && paramValues.licenseTermsId) {
-      if (addTerminalMessage) {
-        addTerminalMessage(
-          "Wallet connected - refreshing licensing configuration data",
-          "info"
-        );
-      }
+      addTerminalMessage(
+        "Wallet connected - refreshing licensing configuration data",
+        "info"
+      );
     }
   }, [client]);
 
@@ -198,6 +198,11 @@ export const UpdateLicensingConfigForm: React.FC<
 
         // Set execution success - the form components will handle verification
         setExecutionSuccess(true);
+
+        // Refresh data after successful transaction
+        setTimeout(() => {
+          refreshData();
+        }, 2000); // Wait 2 seconds for blockchain to update
       } else {
         addTerminalMessage("Transaction failed.", "error");
         addTerminalMessage(`Error: ${result.error}`);
