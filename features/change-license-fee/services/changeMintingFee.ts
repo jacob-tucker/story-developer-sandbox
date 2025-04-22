@@ -69,7 +69,7 @@ export async function executeChangeMintingFee(
         // No need to invalidate cache as we're always fetching fresh data
         return {
           success: true,
-          txHash: response.txHash!,
+          txHashes: [response.txHash!],
         };
       } else {
         return {

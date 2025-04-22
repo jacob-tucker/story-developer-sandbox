@@ -5,37 +5,26 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/atoms/Spinner";
 import { OnChainTermsSection } from "./OnChainTermsSection";
 import { OffChainTermsSection } from "./OffChainTermsSection";
-import { ActionType } from "../../types";
 import { StoryClient } from "@story-protocol/core-sdk";
-import { verifyLicenseTerms } from "../services/addLicenseTerms";
-import { BaseFormLayout } from "../../base/components/BaseFormLayout";
+import {
+  executeAddLicenseTerms,
+  verifyLicenseTerms,
+} from "../services/addLicenseTerms";
 import { useNetwork } from "@/lib/context/NetworkContext";
+import { useTerminal } from "@/lib/context/TerminalContext";
 
 interface AddLicenseTermsFormProps {
   paramValues: Record<string, string>;
   onParamChange: (name: string, value: string) => void;
-  onExecute: () => void;
-  isExecuting: boolean;
-  executionSuccess: boolean | null;
   walletAddress?: string;
   client?: StoryClient;
-  addTerminalMessage?: (
-    message: string,
-    type?: "success" | "error" | "info"
-  ) => void;
-  lastExecutionResult?: Record<string, string>;
 }
 
 export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
   paramValues,
   onParamChange,
-  onExecute,
-  isExecuting,
-  executionSuccess,
   walletAddress,
   client,
-  addTerminalMessage,
-  lastExecutionResult,
 }) => {
   // Form validation state
   const [isFormValid, setIsFormValid] = useState(false);
@@ -44,6 +33,12 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
   const [commercialRevShareError, setCommercialRevShareError] = useState("");
   const [activeTab, setActiveTab] = useState<"onchain" | "offchain">("onchain");
   const { config } = useNetwork(); // Get network config for addresses
+  const {
+    addTerminalMessage,
+    setIsExecuting,
+    setExecutionSuccess,
+    isExecuting,
+  } = useTerminal();
 
   // Validate form whenever params change
   useEffect(() => {
@@ -144,38 +139,81 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
   };
 
   // After successful execution, verify the license terms
-  useEffect(() => {
-    if (executionSuccess && paramValues.ipId) {
-      // Add delay to ensure blockchain state has updated
-      setTimeout(async () => {
-        if (addTerminalMessage) {
-          addTerminalMessage("Verifying license terms addition...", "info");
+  const validateExecution = async (licenseTermsId: string) => {
+    // Add delay to ensure blockchain state has updated
+    setTimeout(async () => {
+      if (addTerminalMessage) {
+        addTerminalMessage("Verifying license terms addition...", "info");
 
-          // Get license terms ID from execution result
-          const licenseTermsId = lastExecutionResult?.licenseTermsId || "0";
+        // Verify if term ID is found in IP's attached terms
+        const verificationResult = await verifyLicenseTerms(
+          paramValues.ipId,
+          licenseTermsId
+        );
 
-          // Verify if term ID is found in IP's attached terms
-          const verificationResult = await verifyLicenseTerms(
-            paramValues.ipId,
-            licenseTermsId
-          );
+        // Show results
+        addTerminalMessage(
+          verificationResult.message,
+          verificationResult.success ? "success" : "info"
+        );
 
-          // Show results
+        if (verificationResult.details) {
           addTerminalMessage(
-            verificationResult.message,
-            verificationResult.success ? "success" : "info"
+            `Verification details: ${verificationResult.details}`,
+            "info"
           );
+        }
+      }
+    }, 2000);
+  };
 
-          if (verificationResult.details) {
+  const handleExecute = async () => {
+    setIsExecuting(true);
+
+    // Display basic transaction start message
+    addTerminalMessage(`Executing update licensing config transaction...`);
+
+    if (!client) {
+      addTerminalMessage("Error: No client available.", "error");
+      addTerminalMessage("Please connect your wallet to execute transactions.");
+      setExecutionSuccess(false);
+      return;
+    }
+
+    try {
+      const result = await executeAddLicenseTerms(paramValues, client);
+
+      if (result.success) {
+        if (result.txHashes.length == 0) {
+          addTerminalMessage(
+            "No changes were made to the licensing configuration.",
+            "info"
+          );
+        } else {
+          for (const txHash of result.txHashes) {
             addTerminalMessage(
-              `Verification details: ${verificationResult.details}`,
-              "info"
+              `Transaction submitted with hash: ${txHash}`,
+              "success"
             );
           }
+          await validateExecution(result.licenseTermsId);
         }
-      }, 2000);
+
+        // Set execution success - the form components will handle verification
+        setExecutionSuccess(true);
+      } else {
+        addTerminalMessage("Transaction failed.", "error");
+        addTerminalMessage(`Error: ${result.error}`);
+        setExecutionSuccess(false);
+      }
+    } catch (error) {
+      addTerminalMessage("Transaction failed.", "error");
+      addTerminalMessage(`Error: ${String(error)}`);
+      setExecutionSuccess(false);
+    } finally {
+      setIsExecuting(false);
     }
-  }, [executionSuccess]);
+  };
 
   return (
     <form
@@ -183,7 +221,7 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
       style={{ gap: "24px" }}
       onSubmit={(e) => {
         e.preventDefault();
-        if (isFormValid && !isExecuting) onExecute();
+        if (isFormValid && !isExecuting) handleExecute();
       }}
     >
       {/* SECTION 1: Top 2 columns (Instructions | IP ID) */}

@@ -9,7 +9,8 @@ import { ActionType, ExecuteReturnType } from "../../types";
 import { executeChangeMintingFee } from "../../change-license-fee/services/changeMintingFee";
 import { executeDisableLicense } from "../../disable-license/services/disableLicense";
 import { executeAddLicenseTerms } from "../../add-license-terms/services/addLicenseTerms";
-
+import { executeUpdateLicensingConfig } from "@/features/update-licensing-config/services/updateLicensingConfig";
+import { WalletClient } from "viem";
 /**
  * Router function that executes the appropriate action based on the action type
  * This maintains backward compatibility with existing code
@@ -19,7 +20,8 @@ import { executeAddLicenseTerms } from "../../add-license-terms/services/addLice
  */
 export async function executeLicensingConfig(
   params: Record<string, string>,
-  client?: StoryClient
+  client?: StoryClient,
+  wallet?: WalletClient
 ): Promise<ExecuteReturnType> {
   const actionType =
     (params.actionType as ActionType) || ActionType.CHANGE_MINTING_FEE;
@@ -29,6 +31,8 @@ export async function executeLicensingConfig(
       return executeDisableLicense(params, client);
     case ActionType.ADD_LICENSE_TERMS:
       return executeAddLicenseTerms(params, client);
+    case ActionType.UPDATE_LICENSING_CONFIG:
+      return executeUpdateLicensingConfig(params, client, wallet);
     case ActionType.CHANGE_MINTING_FEE:
     default:
       return executeChangeMintingFee(params, client);

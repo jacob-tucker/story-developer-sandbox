@@ -10,15 +10,16 @@ import { useWalletClient } from "wagmi";
 import { ViewCode } from "@/components/atoms/ViewCode";
 import { ActionType } from "@/features/types";
 import { executeLicensingConfig } from "@/features/base/services";
-import { ChangeMintingFeeForm } from "@/features/change-license-fee/components/ChangeMintingFeeForm";
-import { DisableLicenseForm } from "@/features/disable-license/components/DisableLicenseForm";
 import { AddLicenseTermsForm } from "@/features/add-license-terms/components/AddLicenseTermsForm";
+import { UpdateLicensingConfigForm } from "@/features/update-licensing-config/components/UpdateLicensingConfigForm";
+import {
+  TerminalProvider,
+  Terminal,
+  useTerminal,
+} from "@/lib/context/TerminalContext";
 
 // Using the string type to match ViewCode component's expected keys
-type CodeSnippetType =
-  | "change-minting-fee"
-  | "disable-license"
-  | "add-license-terms";
+type CodeSnippetType = "add-license-terms" | "update-licensing-config";
 
 // Define the card data structure
 interface ActionCard {
@@ -28,11 +29,11 @@ interface ActionCard {
   actionType: ActionType;
 }
 
-export default function Home() {
+function MainContent() {
   const { txLoading, txHash, txName, client } = useStory();
   const { data: wallet } = useWalletClient();
+  const { addTerminalMessage, clearMessages } = useTerminal();
   const [selectedCard, setSelectedCard] = useState<ActionCard | null>(null);
-  const [transactionResult, setTransactionResult] = useState<string>();
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionSuccess, setExecutionSuccess] = useState<boolean | null>(
     null
@@ -45,18 +46,11 @@ export default function Home() {
   // Define the cards with their actions
   const actionCards: ActionCard[] = [
     {
-      id: "change-minting-fee",
-      title: "Change License Minting Fee",
+      id: "update-licensing-config",
+      title: "Update Licensing Config",
       description:
-        "Set the licensing configuration including minting fee for a specific license terms of an IP",
-      actionType: ActionType.CHANGE_MINTING_FEE,
-    },
-    {
-      id: "disable-license",
-      title: "Disable License",
-      description:
-        "Disable a license for a specific IP and license terms using the Lock License hook",
-      actionType: ActionType.DISABLE_LICENSE,
+        "Update licensing configuration including minting fee, disabled status, and license hook settings",
+      actionType: ActionType.UPDATE_LICENSING_CONFIG,
     },
     {
       id: "add-license-terms",
@@ -70,109 +64,15 @@ export default function Home() {
   useEffect(() => {
     if (actionCards.length > 0 && !selectedCard) {
       setSelectedCard(actionCards[0]);
-      // Set initial message
-      const timestamp = new Date().toLocaleTimeString();
-      setTransactionResult(`[${timestamp}] ℹ️ Waiting for inputs...`);
     }
   }, []);
 
   // Handle card selection
   const handleCardSelect = (card: ActionCard) => {
     setSelectedCard(card);
-    // Set waiting message when changing cards
-    const timestamp = new Date().toLocaleTimeString();
-    setTransactionResult(`[${timestamp}] ℹ️ Waiting for inputs...`);
+    clearMessages(); // Reset terminal messages
     setParamValues({}); // Reset parameter values
     setExecutionSuccess(null); // Reset execution status
-  };
-
-  // Add a message to the terminal with timestamp
-  const addTerminalMessage = (
-    message: string,
-    type?: "success" | "error" | "info"
-  ) => {
-    const timestamp = new Date().toLocaleTimeString();
-    let formattedMessage = message;
-
-    // Apply color formatting based on message type
-    if (type === "success") {
-      formattedMessage = `✅ ${message}`;
-    } else if (type === "error") {
-      formattedMessage = `❌ ${message}`; // Red color will be applied in the terminal display
-    } else if (type === "info") {
-      formattedMessage = `ℹ️ ${message}`;
-    }
-
-    setTransactionResult(
-      (prev) => `${prev}\n[${timestamp}] ${formattedMessage}`
-    );
-  };
-
-  // Handle the licensing configuration action
-  const handleExecuteAction = async () => {
-    setIsExecuting(true);
-    setExecutionSuccess(null);
-    // Reset last execution result
-    setLastExecutionResult({});
-
-    try {
-      // Add action type to parameters
-      const actionParams: Record<string, string> = {
-        ...paramValues,
-        actionType:
-          selectedCard?.actionType?.toString() ||
-          ActionType.CHANGE_MINTING_FEE.toString(),
-      };
-
-      // Display basic transaction start message
-      addTerminalMessage(`Executing ${selectedCard?.title} transaction...`);
-
-      if (!client) {
-        addTerminalMessage("Error: No client available.", "error");
-        addTerminalMessage(
-          "Please connect your wallet to execute transactions."
-        );
-        setExecutionSuccess(false);
-        return;
-      }
-
-      try {
-        // Execute the actual transaction with the client
-        const result = await executeLicensingConfig(actionParams, client);
-
-        if (result.success) {
-          addTerminalMessage(
-            `Transaction submitted with hash: ${result.txHash}`
-          );
-          addTerminalMessage("Transaction confirmed!", "success");
-
-          // Store licenseTermsId if it exists
-          if (result.licenseTermsId) {
-            setLastExecutionResult({
-              licenseTermsId: result.licenseTermsId,
-            });
-          }
-
-          // Set execution success - the form components will handle verification
-          setExecutionSuccess(true);
-        } else {
-          addTerminalMessage("Transaction failed.", "error");
-          addTerminalMessage(`Error: ${result.error}`);
-          setExecutionSuccess(false);
-        }
-      } catch (error) {
-        addTerminalMessage("Transaction failed.", "error");
-        addTerminalMessage(`Error: ${String(error)}`);
-        setExecutionSuccess(false);
-      }
-    } catch (error) {
-      console.error("Error executing transaction:", error);
-      addTerminalMessage("Error executing transaction.", "error");
-      addTerminalMessage(`Error details: ${String(error)}`);
-      setExecutionSuccess(false);
-    } finally {
-      setIsExecuting(false);
-    }
   };
 
   // Handle parameter change
@@ -183,10 +83,10 @@ export default function Home() {
     }));
   };
 
-  return (
-    <main className="flex min-h-screen flex-col">
-      {/* Transaction Alerts */}
-      {txLoading ? (
+  // Transaction Alerts JSX
+  const renderTransactionAlerts = () => {
+    if (txLoading) {
+      return (
         <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px] z-10">
           <Alert>
             <Icon
@@ -198,7 +98,9 @@ export default function Home() {
             <AlertDescription>{txName}</AlertDescription>
           </Alert>
         </div>
-      ) : txHash ? (
+      );
+    } else if (txHash) {
+      return (
         <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px] z-10">
           <Alert>
             <Icon
@@ -220,7 +122,9 @@ export default function Home() {
             </AlertDescription>
           </Alert>
         </div>
-      ) : !wallet?.account.address ? (
+      );
+    } else if (!wallet?.account.address) {
+      return (
         <div className="fixed bottom-5 left-5 md:max-w-[600px] max-w-[300px] z-10">
           <Alert>
             <Icon
@@ -235,12 +139,14 @@ export default function Home() {
             </AlertDescription>
           </Alert>
         </div>
-      ) : null}
+      );
+    }
+    return null;
+  };
 
-      <Navbar />
-      {/* <div className="relative">
-        <ConsoleLog />
-      </div> */}
+  return (
+    <>
+      {renderTransactionAlerts()}
 
       {/* Main Content */}
       <div className="flex flex-col md:flex-row flex-1 p-4 gap-4 bg-white font-mono">
@@ -310,86 +216,43 @@ export default function Home() {
                   </h3>
                   <ViewCode type={selectedCard.id} />
                 </div>
-                {selectedCard?.actionType === ActionType.CHANGE_MINTING_FEE && (
-                  <ChangeMintingFeeForm
+                {selectedCard?.actionType ===
+                  ActionType.UPDATE_LICENSING_CONFIG && (
+                  <UpdateLicensingConfigForm
                     paramValues={paramValues}
                     onParamChange={handleParamChange}
-                    onExecute={handleExecuteAction}
-                    isExecuting={isExecuting}
-                    executionSuccess={executionSuccess}
                     walletAddress={wallet?.account.address}
                     client={client}
-                    addTerminalMessage={addTerminalMessage}
-                  />
-                )}
-                {selectedCard?.actionType === ActionType.DISABLE_LICENSE && (
-                  <DisableLicenseForm
-                    paramValues={paramValues}
-                    onParamChange={handleParamChange}
-                    onExecute={handleExecuteAction}
-                    isExecuting={isExecuting}
-                    executionSuccess={executionSuccess}
-                    walletAddress={wallet?.account.address}
-                    addTerminalMessage={addTerminalMessage}
                   />
                 )}
                 {selectedCard?.actionType === ActionType.ADD_LICENSE_TERMS && (
                   <AddLicenseTermsForm
                     paramValues={paramValues}
                     onParamChange={handleParamChange}
-                    onExecute={handleExecuteAction}
-                    isExecuting={isExecuting}
-                    executionSuccess={executionSuccess}
                     walletAddress={wallet?.account.address}
                     client={client}
-                    addTerminalMessage={addTerminalMessage}
-                    lastExecutionResult={lastExecutionResult}
                   />
                 )}
               </div>
 
-              {/* Bottom Section - Transaction Response */}
-              <div className="flex-1 mt-6">
-                <h3 className="text-xl font-bold text-black border-b border-[#09ACFF] pb-2 mb-4">
-                  Response
-                </h3>
-                <div className="bg-[#1E1E1E] p-4 rounded-md h-[350px] overflow-y-auto shadow-inner border border-[#333] font-mono">
-                  <div className="flex items-center mb-2 text-gray-500 text-sm">
-                    <span className="mr-1">$</span>
-                    <span className="text-green-400">story-sandbox</span>
-                    <span className="mr-1 ml-1">:</span>
-                    <span className="text-blue-400">~</span>
-                    <span className="animate-pulse ml-1">▌</span>
-                  </div>
-                  <pre
-                    className={`font-mono text-sm leading-relaxed ${
-                      executionSuccess === true
-                        ? "text-[#A1D1FF]"
-                        : executionSuccess === false
-                        ? "text-red-400"
-                        : "text-gray-200"
-                    }`}
-                  >
-                    <code>{transactionResult}</code>
-                  </pre>
-                </div>
-                {executionSuccess === false && (
-                  <div className="mt-2 text-sm text-[#09ACFF]">
-                    <a
-                      href="https://discord.gg/storybuilders"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline hover:text-[#09ACFF]/80"
-                    >
-                      Need help? Join the Story Builders Discord
-                    </a>
-                  </div>
-                )}
-              </div>
+              {/* Terminal Component */}
+              <Terminal success={executionSuccess} isExecuting={isExecuting} />
             </>
           )}
         </div>
       </div>
+    </>
+  );
+}
+
+export default function Home() {
+  return (
+    <main className="flex min-h-screen flex-col">
+      <Navbar />
+
+      <TerminalProvider>
+        <MainContent />
+      </TerminalProvider>
 
       <Footer />
     </main>
