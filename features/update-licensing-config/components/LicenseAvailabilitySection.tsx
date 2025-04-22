@@ -29,25 +29,15 @@ export const LicenseAvailabilitySection: React.FC<
 
   // Fetch current licensing config to get disabled status
   const fetchLicenseAvailability = async () => {
+    if (!licenseConfig) {
+      return;
+    }
     setIsDisabledLoading(true);
     setDisabledError("");
 
     try {
-      // Fetch the current licensing configuration
-      const currentConfig = await getLicensingConfigSDK(
-        paramValues.ipId as `0x${string}`,
-        paramValues.licenseTermsId as string
-      );
-
-      console.log("Current licensing config for availability:", currentConfig);
-
-      if (currentConfig) {
-        // Set disabled status from the config
-        onParamChange("disabled", currentConfig.disabled ? "true" : "false");
-      } else {
-        // Set default value if no config found
-        onParamChange("disabled", "false");
-      }
+      // Set disabled status from the config
+      onParamChange("disabled", licenseConfig.disabled ? "true" : "false");
 
       if (onValidationChange) onValidationChange(true);
     } catch (error) {
@@ -72,6 +62,12 @@ export const LicenseAvailabilitySection: React.FC<
       fetchLicenseAvailability();
     }
   }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
+  
+  // Set initial validation state to true when component mounts
+  useEffect(() => {
+    // Initial validation state should be true to avoid disabling the execute button
+    if (onValidationChange) onValidationChange(true);
+  }, []);
 
   return (
     <div
@@ -107,6 +103,9 @@ export const LicenseAvailabilitySection: React.FC<
             <option value="false">False</option>
             <option value="true">True</option>
           </select>
+          {disabledError && (
+            <p className="text-xs text-[#09ACFF] mt-2">{disabledError}</p>
+          )}
           {isDisabledLoading && (
             <div className="flex items-center gap-2 mt-2">
               <Spinner size="sm" />

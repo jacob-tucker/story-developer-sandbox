@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/atoms/Spinner";
 import { LicensingConfig, StoryClient } from "@story-protocol/core-sdk";
 import {
   getLicensingConfigSDK,
@@ -149,6 +150,12 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
       fetchLicensingHooks();
     }
   }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
+  
+  // Set initial validation state to true when component mounts
+  useEffect(() => {
+    // Initial validation state should be true to avoid disabling the execute button
+    if (onValidationChange) onValidationChange(true);
+  }, []);
   return (
     <div
       className="bg-white border rounded-lg shadow-sm mb-6 w-full"
@@ -180,10 +187,17 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
               value={paramValues.licensingHook || "none"}
               onChange={(e) => handleLicensingHookChange(e.target.value)}
               className="w-full h-12 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
+              disabled={isLoadingHooks}
             >
               <option value="none">None</option>
               <option value="limit">Limit License</option>
             </select>
+            {isLoadingHooks && (
+              <div className="flex items-center gap-2 mt-2">
+                <Spinner size="sm" />
+                <span className="text-xs text-gray-500">Loading hook configuration...</span>
+              </div>
+            )}
           </div>
 
           {/* License Limit (only shown when Limit License hook is selected) */}

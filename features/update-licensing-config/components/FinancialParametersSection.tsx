@@ -10,7 +10,7 @@ interface FinancialParametersSectionProps {
   client?: StoryClient;
   paramValues?: Record<string, string>;
   onParamChange: (name: string, value: string) => void;
-  onValidationChange?: (isValid: boolean) => void;
+  onValidationChange: (isValid: boolean) => void;
 }
 
 export const FinancialParametersSection: React.FC<
@@ -39,14 +39,14 @@ export const FinancialParametersSection: React.FC<
   const validateMintingFee = (value: string) => {
     if (!value) {
       setFeeError("Minting fee is required");
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
       return false;
     }
 
     const isValidNumber = /^(\d+\.?\d*|\.\d+)$/.test(value);
     if (!isValidNumber) {
       setFeeError("Minting fee must be a valid number");
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
       return false;
     }
 
@@ -57,12 +57,12 @@ export const FinancialParametersSection: React.FC<
       setFeeError(
         `Minting fee cannot be less than the default fee (${defaultMintingFee})`
       );
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
       return false;
     }
 
     setFeeError("");
-    if (onValidationChange) onValidationChange(true);
+    onValidationChange(true);
     return true;
   };
 
@@ -76,21 +76,21 @@ export const FinancialParametersSection: React.FC<
   const validateCommercialRevShare = (value: string) => {
     if (!value) {
       setRevShareError("Commercial revenue share is required");
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
       return false;
     }
 
     const isValidNumber = /^(\d+\.?\d*|\.\d+)$/.test(value);
     if (!isValidNumber) {
       setRevShareError("Commercial revenue share must be a valid number");
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
       return false;
     }
 
     const numValue = parseFloat(value);
     if (numValue < 0 || numValue > 100) {
       setRevShareError("Commercial revenue share must be between 0 and 100");
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
       return false;
     }
 
@@ -99,12 +99,12 @@ export const FinancialParametersSection: React.FC<
       setRevShareError(
         `Commercial revenue share cannot be less than the default (${defaultRevShare}%)`
       );
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
       return false;
     }
 
     setRevShareError("");
-    if (onValidationChange) onValidationChange(true);
+    onValidationChange(true);
     return true;
   };
 
@@ -217,6 +217,13 @@ export const FinancialParametersSection: React.FC<
       fetchFinancialParameters();
     }
   }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
+
+  // Set initial validation state to true when component mounts
+  useEffect(() => {
+    // Initial validation state should be true to avoid disabling the execute button
+    console.log("Mounted");
+    onValidationChange(true);
+  }, []);
 
   useEffect(() => {
     // if licensing hook is set, we must

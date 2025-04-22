@@ -22,15 +22,9 @@ interface UpdateLicensingConfigFormProps {
 
 export const UpdateLicensingConfigForm: React.FC<
   UpdateLicensingConfigFormProps
-> = ({ paramValues, onParamChange, walletAddress, client }) => {
+> = ({ paramValues, onParamChange, client }) => {
   // Internal form state
   const [isFormValid, setIsFormValid] = useState(false);
-  const [licenseTermsOptions, setLicenseTermsOptions] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [isLoadingTerms, setIsLoadingTerms] = useState(false);
-  const [ipIdError, setIpIdError] = useState("");
-  // We no longer need to track license limit error in the main form
 
   // Track validation state for form sections
   const [isIPSectionValid, setIsIPSectionValid] = useState(false);
@@ -41,6 +35,7 @@ export const UpdateLicensingConfigForm: React.FC<
   const [licenseConfig, setLicenseConfig] = useState<LicensingConfig | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const { data: wallet } = useWalletClient();
   const {
@@ -56,6 +51,7 @@ export const UpdateLicensingConfigForm: React.FC<
     const fetchLicensingConfig = async () => {
       if (paramValues.ipId && paramValues.licenseTermsId && client) {
         try {
+          setIsLoading(true);
           const currentConfig = await getLicensingConfigSDK(
             paramValues.ipId as `0x${string}`,
             paramValues.licenseTermsId
@@ -65,6 +61,8 @@ export const UpdateLicensingConfigForm: React.FC<
         } catch (error) {
           console.error("Error fetching licensing config:", error);
           setLicenseConfig(null);
+        } finally {
+          setIsLoading(false);
         }
       }
     };
@@ -80,8 +78,7 @@ export const UpdateLicensingConfigForm: React.FC<
       isIPSectionValid &&
       isFinancialSectionValid &&
       isHooksSectionValid &&
-      isAvailabilitySectionValid &&
-      !isLoadingTerms;
+      isAvailabilitySectionValid;
 
     setIsFormValid(isValid);
   };
@@ -99,20 +96,11 @@ export const UpdateLicensingConfigForm: React.FC<
     validateForm();
   }, [
     paramValues,
-    ipIdError,
-    licenseTermsOptions,
     isIPSectionValid,
     isFinancialSectionValid,
     isHooksSectionValid,
     isAvailabilitySectionValid,
-    isLoadingTerms,
   ]);
-
-  // Effect to update form validity when dependencies change
-  useEffect(() => {
-    // This is needed to ensure form validity is updated when dependencies change
-    validateForm();
-  }, [paramValues]);
 
   // Effect to refresh data when wallet connects (client becomes available)
   useEffect(() => {

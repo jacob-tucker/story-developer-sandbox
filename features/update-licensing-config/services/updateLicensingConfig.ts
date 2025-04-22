@@ -1,15 +1,11 @@
 import { StoryClient, LicensingConfig } from "@story-protocol/core-sdk";
-import { zeroAddress, formatEther, parseEther, zeroHash, Account } from "viem";
-import {
-  getLicensingConfigSDK,
-  checkLicenseDisabledStatus,
-  getPublicClient,
-  extractLicenseLimitFromHookData,
-} from "../../utils";
+import { parseEther, Account, zeroAddress, zeroHash } from "viem";
+import { getPublicClient, extractLicenseLimitFromHookData } from "../../utils";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 import { ExecuteReturnType } from "../../types";
 import { tokenLimitAbi } from "@/features/tokenLimitAbi";
 import { WalletClient } from "viem";
+
 /**
  * Execute update licensing config to change minting fee, disabled status, and/or licensing hook
  * @param params Parameters for the update
