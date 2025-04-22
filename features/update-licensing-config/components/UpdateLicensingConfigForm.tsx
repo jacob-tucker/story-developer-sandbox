@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Spinner } from "@/components/atoms/Spinner";
-import { StoryClient } from "@story-protocol/core-sdk";
-import {
-  executeUpdateLicensingConfig,
-  verifyLicensingConfig,
-} from "../services/updateLicensingConfig";
+import { LicensingConfig, StoryClient } from "@story-protocol/core-sdk";
+import { executeUpdateLicensingConfig } from "../services/updateLicensingConfig";
 import { useWalletClient } from "wagmi";
 import { useTerminal } from "@/lib/context/TerminalContext";
 // Import the component files
@@ -12,6 +9,9 @@ import { IPIdentificationSection } from "./IPIdentificationSection";
 import { FinancialParametersSection } from "./FinancialParametersSection";
 import { LicenseAvailabilitySection } from "./LicenseAvailabilitySection";
 import { LicenseHooksSection } from "./LicenseHooksSection";
+import { Button } from "@/components/ui/button";
+import { verifyLicensingConfig } from "../services/verifyUpdateLicenseConfig";
+import { getLicensingConfigSDK } from "@/features/utils";
 
 interface UpdateLicensingConfigFormProps {
   paramValues: Record<string, string>;
@@ -38,7 +38,9 @@ export const UpdateLicensingConfigForm: React.FC<
   const [isHooksSectionValid, setIsHooksSectionValid] = useState(false);
   const [isAvailabilitySectionValid, setIsAvailabilitySectionValid] =
     useState(true);
-  const [isDisabledLoading, setIsDisabledLoading] = useState(false);
+  const [licenseConfig, setLicenseConfig] = useState<LicensingConfig | null>(
+    null
+  );
 
   const { data: wallet } = useWalletClient();
   const {
@@ -49,19 +51,27 @@ export const UpdateLicensingConfigForm: React.FC<
     isExecuting,
   } = useTerminal();
 
-  // Reset form values function - centralized reset logic
-  const resetFormValues = () => {
-    // Reset all form values
-    onParamChange("licenseTermsId", "");
-    onParamChange("mintingFee", "");
-    onParamChange("commercialRevShare", "");
-    onParamChange("disabled", "false");
-    onParamChange("licensingHook", "none");
-    onParamChange("licenseLimit", "");
+  useEffect(() => {
+    // Create a separate async function to fetch the licensing config
+    const fetchLicensingConfig = async () => {
+      if (paramValues.ipId && paramValues.licenseTermsId && client) {
+        try {
+          const currentConfig = await getLicensingConfigSDK(
+            paramValues.ipId as `0x${string}`,
+            paramValues.licenseTermsId
+          );
 
-    // Reset internal state
-    setLicenseTermsOptions([]);
-  };
+          setLicenseConfig(currentConfig || null);
+        } catch (error) {
+          console.error("Error fetching licensing config:", error);
+          setLicenseConfig(null);
+        }
+      }
+    };
+
+    // Call the async function
+    fetchLicensingConfig();
+  }, [paramValues.ipId, paramValues.licenseTermsId, client]);
 
   // Validate the form
   const validateForm = () => {
@@ -177,6 +187,7 @@ export const UpdateLicensingConfigForm: React.FC<
     try {
       const result = await executeUpdateLicensingConfig(
         paramValues,
+        licenseConfig,
         client,
         wallet
       );
@@ -252,8 +263,7 @@ export const UpdateLicensingConfigForm: React.FC<
 
         {/* Financial Parameters Section */}
         <FinancialParametersSection
-          ipId={paramValues.ipId || ""}
-          licenseTermsId={paramValues.licenseTermsId || ""}
+          licenseConfig={licenseConfig}
           client={client}
           paramValues={paramValues}
           onParamChange={handleParamChange}
@@ -262,8 +272,7 @@ export const UpdateLicensingConfigForm: React.FC<
 
         {/* License Availability Section */}
         <LicenseAvailabilitySection
-          ipId={paramValues.ipId || ""}
-          licenseTermsId={paramValues.licenseTermsId || ""}
+          licenseConfig={licenseConfig}
           client={client}
           paramValues={paramValues}
           onParamChange={handleParamChange}
@@ -272,8 +281,7 @@ export const UpdateLicensingConfigForm: React.FC<
 
         {/* License Hooks Section */}
         <LicenseHooksSection
-          ipId={paramValues.ipId || ""}
-          licenseTermsId={paramValues.licenseTermsId || ""}
+          licenseConfig={licenseConfig}
           client={client}
           paramValues={paramValues}
           onParamChange={handleParamChange}
@@ -282,15 +290,11 @@ export const UpdateLicensingConfigForm: React.FC<
       </div>
 
       {/* Execute Button */}
-      <div className="w-full max-w-4xl mt-4">
-        <button
+      <div className="w-full max-w-4xl" style={{ marginTop: "-10px" }}>
+        <Button
           type="submit"
           disabled={!isFormValid || isExecuting}
-          className={`w-full h-12 rounded-md font-medium transition-colors ${
-            isFormValid
-              ? "bg-[#09ACFF] hover:bg-[#066DA1] text-white"
-              : "bg-gray-200 text-gray-500 cursor-not-allowed"
-          }`}
+          className="w-full bg-[#09ACFF] hover:bg-[#09ACFF]/80 text-white relative"
         >
           {isExecuting ? (
             <span className="flex items-center justify-center space-x-2">
@@ -298,9 +302,9 @@ export const UpdateLicensingConfigForm: React.FC<
               <span>Executing...</span>
             </span>
           ) : (
-            "$ execute update licensing config"
+            "$ execute update license config"
           )}
-        </button>
+        </Button>
       </div>
     </form>
   );

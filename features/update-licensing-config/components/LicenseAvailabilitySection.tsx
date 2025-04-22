@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Spinner } from "@/components/atoms/Spinner";
-import { StoryClient } from "@story-protocol/core-sdk";
+import { LicensingConfig, StoryClient } from "@story-protocol/core-sdk";
 import { getLicensingConfigSDK } from "@/features/utils";
 
 interface LicenseAvailabilitySectionProps {
-  ipId?: string;
-  licenseTermsId?: string;
+  licenseConfig: LicensingConfig | null;
   client?: StoryClient;
   paramValues?: Record<string, string>;
   onParamChange: (name: string, value: string) => void;
@@ -15,8 +14,7 @@ interface LicenseAvailabilitySectionProps {
 export const LicenseAvailabilitySection: React.FC<
   LicenseAvailabilitySectionProps
 > = ({
-  ipId,
-  licenseTermsId,
+  licenseConfig,
   client,
   paramValues,
   onParamChange,
@@ -31,16 +29,14 @@ export const LicenseAvailabilitySection: React.FC<
 
   // Fetch current licensing config to get disabled status
   const fetchLicenseAvailability = async () => {
-    console.log("Fetching license availability for", ipId, licenseTermsId);
-
     setIsDisabledLoading(true);
     setDisabledError("");
 
     try {
       // Fetch the current licensing configuration
       const currentConfig = await getLicensingConfigSDK(
-        ipId as `0x${string}`,
-        licenseTermsId as string
+        paramValues.ipId as `0x${string}`,
+        paramValues.licenseTermsId as string
       );
 
       console.log("Current licensing config for availability:", currentConfig);
@@ -67,10 +63,15 @@ export const LicenseAvailabilitySection: React.FC<
 
   // Fetch license availability when ipId or licenseTermsId changes
   useEffect(() => {
-    if (ipId && licenseTermsId && client) {
+    if (
+      paramValues.ipId &&
+      paramValues.licenseTermsId &&
+      licenseConfig &&
+      client
+    ) {
       fetchLicenseAvailability();
     }
-  }, [ipId, licenseTermsId, client]);
+  }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
 
   return (
     <div

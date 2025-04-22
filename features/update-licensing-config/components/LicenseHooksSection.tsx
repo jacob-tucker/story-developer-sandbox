@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { StoryClient } from "@story-protocol/core-sdk";
+import { LicensingConfig, StoryClient } from "@story-protocol/core-sdk";
 import {
   getLicensingConfigSDK,
   extractLicenseLimitFromHookData,
@@ -8,8 +8,7 @@ import {
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 
 interface LicenseHooksSectionProps {
-  ipId?: string;
-  licenseTermsId?: string;
+  licenseConfig: LicensingConfig | null;
   client?: StoryClient;
   paramValues?: Record<string, string>;
   onParamChange: (name: string, value: string) => void;
@@ -17,8 +16,7 @@ interface LicenseHooksSectionProps {
 }
 
 export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
-  ipId,
-  licenseTermsId,
+  licenseConfig,
   client,
   paramValues,
   onParamChange,
@@ -61,9 +59,7 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
 
     if (value === "limit") {
       setShowLicenseLimitInput(true);
-      if (paramValues.licenseLimit) {
-        validateLicenseLimit(paramValues.licenseLimit);
-      } else {
+      if (!paramValues.licenseLimit) {
         setLicenseLimitError(
           "License limit is required for Limit License hook"
         );
@@ -85,71 +81,39 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
 
   // Fetch current licensing config for hooks and limits
   const fetchLicensingHooks = async () => {
-    // Only proceed if both values are valid and client is available
-    if (
-      !ipId ||
-      !licenseTermsId ||
-      !client ||
-      !ipId.startsWith("0x") ||
-      licenseTermsId === ""
-    ) {
-      return;
-    }
-
-    console.log("Fetching licensing hooks for", ipId, licenseTermsId);
-
     setIsLoadingHooks(true);
     setLicenseLimitError("");
+    if (!licenseConfig) {
+      return;
+    }
 
     try {
       // Get the network configuration
       const networkConfig = getCurrentNetworkConfig();
       const limitLicenseHookAddress = networkConfig.limitLicenseHookAddress;
 
-      // Fetch the current licensing configuration
-      const currentConfig = await getLicensingConfigSDK(
-        ipId as `0x${string}`,
-        licenseTermsId
-      );
+      // Check licensing hook type
+      if (
+        licenseConfig.licensingHook &&
+        licenseConfig.licensingHook.toLowerCase() ===
+          limitLicenseHookAddress.toLowerCase()
+      ) {
+        // It's a limit license hook
+        onParamChange("licensingHook", "limit");
 
-      console.log("Current licensing config for hooks:", currentConfig);
+        const licenseLimit = await extractLicenseLimitFromHookData(
+          paramValues.ipId as `0x${string}`,
+          paramValues.licenseTermsId
+        );
 
-      if (currentConfig) {
-        // Check licensing hook type
-        if (
-          currentConfig.licensingHook &&
-          currentConfig.licensingHook.toLowerCase() ===
-            limitLicenseHookAddress.toLowerCase()
-        ) {
-          // It's a limit license hook
-          onParamChange("licensingHook", "limit");
-          setShowLicenseLimitInput(true);
-
-          // Extract the license limit from hook data if present
-          if (currentConfig.licensingHook) {
-            const licenseLimit = await extractLicenseLimitFromHookData(
-              ipId as `0x${string}`,
-              licenseTermsId
-            );
-
-            if (licenseLimit) {
-              onParamChange("licenseLimit", licenseLimit);
-            } else {
-              onParamChange("licenseLimit", "");
-            }
-          } else {
-            onParamChange("licenseLimit", "");
-          }
+        if (licenseLimit !== undefined) {
+          onParamChange("licenseLimit", licenseLimit);
         } else {
-          // It's not a limit license hook
-          onParamChange("licensingHook", "none");
-          setShowLicenseLimitInput(false);
           onParamChange("licenseLimit", "");
         }
       } else {
-        // Set default values if no config found
+        // It's not a limit license hook
         onParamChange("licensingHook", "none");
-        setShowLicenseLimitInput(false);
         onParamChange("licenseLimit", "");
       }
 
@@ -163,24 +127,28 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
     }
   };
 
-  // Update internal state when licensing hook changes
+  // Update internal state when licensing hook or license limit changes
   useEffect(() => {
-    if (paramValues.licensingHook === "limit") {
-      setShowLicenseLimitInput(true);
-      if (paramValues.licenseLimit) {
-        validateLicenseLimit(paramValues.licenseLimit);
-      }
-    } else {
-      setShowLicenseLimitInput(false);
+    // Set showLicenseLimitInput based on current hook value
+    setShowLicenseLimitInput(paramValues.licensingHook === "limit");
+
+    // Validate license limit if hook is "limit" and we have a value
+    if (paramValues.licensingHook === "limit" && paramValues.licenseLimit) {
+      validateLicenseLimit(paramValues.licenseLimit);
     }
   }, [paramValues.licensingHook, paramValues.licenseLimit]);
 
   // Fetch licensing hooks when ipId or licenseTermsId changes
   useEffect(() => {
-    if (ipId && licenseTermsId && client) {
+    if (
+      paramValues.ipId &&
+      paramValues.licenseTermsId &&
+      licenseConfig &&
+      client
+    ) {
       fetchLicensingHooks();
     }
-  }, [ipId, licenseTermsId, client]);
+  }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
   return (
     <div
       className="bg-white border rounded-lg shadow-sm mb-6 w-full"

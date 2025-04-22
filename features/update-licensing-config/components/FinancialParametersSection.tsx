@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/atoms/Spinner";
 import { formatEther, parseEther } from "viem";
-import { StoryClient } from "@story-protocol/core-sdk";
+import { LicensingConfig, StoryClient } from "@story-protocol/core-sdk";
 import { getLicenseTermsSDK, getLicensingConfigSDK } from "../../utils";
 
 interface FinancialParametersSectionProps {
-  ipId?: string;
-  licenseTermsId?: string;
+  licenseConfig: LicensingConfig | null;
   client?: StoryClient;
   paramValues?: Record<string, string>;
   onParamChange: (name: string, value: string) => void;
@@ -17,8 +16,7 @@ interface FinancialParametersSectionProps {
 export const FinancialParametersSection: React.FC<
   FinancialParametersSectionProps
 > = ({
-  ipId,
-  licenseTermsId,
+  licenseConfig,
   client,
   paramValues,
   onParamChange,
@@ -30,9 +28,11 @@ export const FinancialParametersSection: React.FC<
   // Internal state for managing fees and errors
   const [isLoadingFee, setIsLoadingFee] = useState(false);
   const [feeError, setFeeError] = useState("");
+  const [revShareError, setRevShareError] = useState("");
   const [currentMintingFee, setCurrentMintingFee] = useState("");
   const [defaultMintingFee, setDefaultMintingFee] = useState("");
   const [currentRevShare, setCurrentRevShare] = useState("");
+  const [defaultRevShare, setDefaultRevShare] = useState("");
   const [disableMintingFee, setDisableMintingFee] = useState(false);
 
   // Validate minting fee
@@ -72,28 +72,62 @@ export const FinancialParametersSection: React.FC<
     validateMintingFee(value);
   };
 
-  // Fetch current licensing config including minting fee and commercial rev share
-  const fetchFinancialParameters = async () => {
-    // Only proceed if both values are valid and client is available
-    if (
-      !ipId ||
-      !licenseTermsId ||
-      !client ||
-      !ipId.startsWith("0x") ||
-      licenseTermsId === ""
-    ) {
-      setIsLoadingFee(false);
-      return;
+  // Validate commercial revenue share
+  const validateCommercialRevShare = (value: string) => {
+    if (!value) {
+      setRevShareError("Commercial revenue share is required");
+      if (onValidationChange) onValidationChange(false);
+      return false;
     }
 
-    console.log("Fetching financial parameters for", ipId, licenseTermsId);
+    const isValidNumber = /^(\d+\.?\d*|\.\d+)$/.test(value);
+    if (!isValidNumber) {
+      setRevShareError("Commercial revenue share must be a valid number");
+      if (onValidationChange) onValidationChange(false);
+      return false;
+    }
 
+    const numValue = parseFloat(value);
+    if (numValue < 0 || numValue > 100) {
+      setRevShareError("Commercial revenue share must be between 0 and 100");
+      if (onValidationChange) onValidationChange(false);
+      return false;
+    }
+
+    // Check if the value is less than the default revenue share
+    if (defaultRevShare && parseFloat(value) < parseFloat(defaultRevShare)) {
+      setRevShareError(
+        `Commercial revenue share cannot be less than the default (${defaultRevShare}%)`
+      );
+      if (onValidationChange) onValidationChange(false);
+      return false;
+    }
+
+    setRevShareError("");
+    if (onValidationChange) onValidationChange(true);
+    return true;
+  };
+
+  // Handle commercial revenue share change
+  const handleCommercialRevShareChange = (value: string) => {
+    onParamChange("commercialRevShare", value);
+    validateCommercialRevShare(value);
+  };
+
+  // Fetch current licensing config including minting fee and commercial rev share
+  const fetchFinancialParameters = async () => {
+    if (!client) {
+      return;
+    }
     setIsLoadingFee(true);
     setFeeError("");
 
     try {
       // 1. Fetch the license terms
-      const terms = await getLicenseTermsSDK(licenseTermsId, client);
+      const terms = await getLicenseTermsSDK(
+        paramValues.licenseTermsId,
+        client
+      );
       if (!terms) {
         setFeeError("Failed to fetch license terms");
         setIsLoadingFee(false);
@@ -103,16 +137,17 @@ export const FinancialParametersSection: React.FC<
       console.log("License terms:", terms);
 
       // 2. Set default minting fee
-      if (terms.defaultMintingFee !== undefined) {
-        // Use optional chaining and type assertion to safely access mintingFee
-        const defaultFee = formatEther(terms.defaultMintingFee);
-        setDefaultMintingFee(defaultFee);
-      }
+      const defaultFee = formatEther(terms.defaultMintingFee);
+      setDefaultMintingFee(defaultFee);
+
+      // 3. Set default commercial revenue share
+      const defaultRevShare = terms.commercialRevShare / 1000000;
+      setDefaultRevShare(defaultRevShare.toString());
 
       // 3. Set current minting fee
       const response = await client.license.predictMintingLicenseFee({
-        licensorIpId: ipId as `0x${string}`,
-        licenseTermsId: parseInt(licenseTermsId),
+        licensorIpId: paramValues.ipId as `0x${string}`,
+        licenseTermsId: parseInt(paramValues.licenseTermsId),
         amount: BigInt(1),
       });
 
@@ -126,8 +161,8 @@ export const FinancialParametersSection: React.FC<
 
       // 3. Fetch the current licensing configuration
       const currentConfig = await getLicensingConfigSDK(
-        ipId as `0x${string}`,
-        licenseTermsId
+        paramValues.ipId as `0x${string}`,
+        paramValues.licenseTermsId
       );
 
       console.log("Current licensing config:", currentConfig);
@@ -164,12 +199,24 @@ export const FinancialParametersSection: React.FC<
     }
   }, [paramValues.mintingFee, defaultMintingFee]);
 
+  // Validate commercial revenue share when it changes
+  useEffect(() => {
+    if (paramValues.commercialRevShare) {
+      validateCommercialRevShare(paramValues.commercialRevShare);
+    }
+  }, [paramValues.commercialRevShare]);
+
   // Fetch financial parameters when ipId or licenseTermsId changes
   useEffect(() => {
-    if (ipId && licenseTermsId && client) {
+    if (
+      paramValues.ipId &&
+      paramValues.licenseTermsId &&
+      licenseConfig &&
+      client
+    ) {
       fetchFinancialParameters();
     }
-  }, [ipId, licenseTermsId, client]);
+  }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
 
   useEffect(() => {
     // if licensing hook is set, we must
@@ -288,9 +335,7 @@ export const FinancialParametersSection: React.FC<
                 inputMode="decimal"
                 placeholder="Commercial revenue share percentage"
                 value={paramValues.commercialRevShare || ""}
-                onChange={(e) =>
-                  onParamChange("commercialRevShare", e.target.value)
-                }
+                onChange={(e) => handleCommercialRevShareChange(e.target.value)}
                 style={{ paddingRight: "32px" }}
                 className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] h-12"
               />
@@ -306,13 +351,22 @@ export const FinancialParametersSection: React.FC<
               >
                 %
               </span>
+              {revShareError && (
+                <p className="text-xs text-[#09ACFF] mt-2">{revShareError}</p>
+              )}
             </div>
-            {paramValues.commercialRevShare && (
+            {currentRevShare && (
               <div className="flex items-center gap-2 mt-2">
                 <p className="text-xs text-gray-500">
                   <span className="font-semibold">Current share:</span>{" "}
                   {currentRevShare}%
                 </p>
+                {defaultRevShare && (
+                  <p className="text-xs text-gray-500 ml-2">
+                    <span className="font-semibold">(Default:</span>{" "}
+                    {defaultRevShare}%<span className="font-semibold">)</span>
+                  </p>
+                )}
               </div>
             )}
           </div>
