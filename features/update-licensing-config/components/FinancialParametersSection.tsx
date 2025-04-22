@@ -66,12 +66,6 @@ export const FinancialParametersSection: React.FC<
     return true;
   };
 
-  // Handle minting fee change
-  const handleMintingFeeChange = (value: string) => {
-    onParamChange("mintingFee", value);
-    validateMintingFee(value);
-  };
-
   // Validate commercial revenue share
   const validateCommercialRevShare = (value: string) => {
     if (!value) {
@@ -106,12 +100,6 @@ export const FinancialParametersSection: React.FC<
     setRevShareError("");
     onValidationChange(true);
     return true;
-  };
-
-  // Handle commercial revenue share change
-  const handleCommercialRevShareChange = (value: string) => {
-    onParamChange("commercialRevShare", value);
-    validateCommercialRevShare(value);
   };
 
   // Fetch current licensing config including minting fee and commercial rev share
@@ -204,7 +192,7 @@ export const FinancialParametersSection: React.FC<
     if (paramValues.commercialRevShare) {
       validateCommercialRevShare(paramValues.commercialRevShare);
     }
-  }, [paramValues.commercialRevShare]);
+  }, [paramValues.commercialRevShare, defaultRevShare]);
 
   // Fetch financial parameters when ipId or licenseTermsId changes
   useEffect(() => {
@@ -217,13 +205,6 @@ export const FinancialParametersSection: React.FC<
       fetchFinancialParameters();
     }
   }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
-
-  // Set initial validation state to true when component mounts
-  useEffect(() => {
-    // Initial validation state should be true to avoid disabling the execute button
-    console.log("Mounted");
-    onValidationChange(true);
-  }, []);
 
   useEffect(() => {
     // if licensing hook is set, we must
@@ -272,7 +253,7 @@ export const FinancialParametersSection: React.FC<
                 inputMode="decimal"
                 placeholder="Minting fee in IP"
                 value={paramValues.mintingFee || ""}
-                onChange={(e) => handleMintingFeeChange(e.target.value)}
+                onChange={(e) => onParamChange("mintingFee", e.target.value)}
                 style={{ paddingRight: "32px" }}
                 className={`border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] h-12 ${
                   disableMintingFee ? "bg-gray-100" : "bg-white"
@@ -342,7 +323,9 @@ export const FinancialParametersSection: React.FC<
                 inputMode="decimal"
                 placeholder="Commercial revenue share percentage"
                 value={paramValues.commercialRevShare || ""}
-                onChange={(e) => handleCommercialRevShareChange(e.target.value)}
+                onChange={(e) =>
+                  onParamChange("commercialRevShare", e.target.value)
+                }
                 style={{ paddingRight: "32px" }}
                 className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] h-12"
               />
