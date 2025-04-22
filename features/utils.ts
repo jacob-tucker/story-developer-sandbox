@@ -80,6 +80,8 @@ export async function getLicenseTermsSDK(
     return undefined;
   }
 
+  console.log("Getting license terms from the SDK");
+
   try {
     const { terms } = await client.license.getLicenseTerms(licenseTermsId);
     return terms;
