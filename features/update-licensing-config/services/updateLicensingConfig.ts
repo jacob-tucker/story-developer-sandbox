@@ -47,12 +47,15 @@ export async function executeUpdateLicensingConfig(
       parseEther(params.mintingFee) !== licenseConfig.mintingFee;
     const disabledChanged =
       (params.disabled === "true") !== licenseConfig.disabled;
+    const revShareChanged =
+      Number(params.commercialRevShare) !== licenseConfig.commercialRevShare;
 
     const paramHook =
       params.licensingHook === "limit" ? limitHookAddress : zeroAddress;
     const hookChanged = paramHook !== licenseConfig.licensingHook;
 
-    const configChanged = mintingFeeChanged || disabledChanged || hookChanged;
+    const configChanged =
+      mintingFeeChanged || disabledChanged || hookChanged || revShareChanged;
 
     // Check if the license limit has changed
     const currentLimit = await extractLicenseLimitFromHookData(
@@ -60,8 +63,6 @@ export async function executeUpdateLicensingConfig(
       params.licenseTermsId
     );
     const limitChanged = currentLimit != params.licenseLimit;
-
-    console.log({ currentLimit, licenseLimit: params.licenseLimit });
 
     let configTxHash: string | undefined;
     let limitTxHash: string | undefined;
