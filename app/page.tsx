@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { useWalletClient } from "wagmi";
 import { ViewCode } from "@/components/atoms/ViewCode";
 import { ActionType } from "@/features/types";
-import { executeLicensingConfig } from "@/features/base/services";
 import { AddLicenseTermsForm } from "@/features/add-license-terms/components/AddLicenseTermsForm";
 import { UpdateLicensingConfigForm } from "@/features/update-licensing-config/components/UpdateLicensingConfigForm";
 import {
