@@ -196,7 +196,7 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
               "success"
             );
           }
-          await validateExecution(result.licenseTermsId);
+          await validateExecution(result.licenseTermsId!);
         }
 
         // Set execution success - the form components will handle verification
@@ -239,11 +239,13 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
         </div>
         {/* IP ID */}
         <div className="flex flex-col gap-2 p-6 bg-white border border-[#A1D1FF] rounded shadow-sm justify-center flex-1 min-w-0 w-full">
-          <Label htmlFor="ipId" className="text-black font-semibold">
-            IP Asset ID
-          </Label>
-          <div className="text-xs text-gray-500 mb-1">
-            <code>ipId</code>
+          <div className="flex items-center gap-1 mb-1">
+            <Label htmlFor="ipId" className="text-black font-semibold">
+              IP Asset ID
+            </Label>
+            <span className="px-1.5 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight">
+              ipId
+            </span>
           </div>
           <div className="text-xs text-gray-600 mb-2">
             The unique identifier for your IP asset (must start with 0x).

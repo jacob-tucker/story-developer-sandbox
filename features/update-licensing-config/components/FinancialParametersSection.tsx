@@ -228,75 +228,71 @@ export const FinancialParametersSection: React.FC<
 
   return (
     <div
-      className="bg-white border rounded-lg shadow-sm mb-6 w-full"
-      style={{ borderLeft: "5px solid #09ACFF" }}
+      className="bg-white border rounded-lg shadow-sm w-full h-full"
+      style={{ borderLeft: "4px solid #09ACFF" }}
     >
-      <div className="flex flex-col w-full p-6">
-        <div className="uppercase tracking-wider text-xs text-[#09ACFF] font-bold mb-4">
+      <div className="flex flex-col w-full p-3">
+        <div className="uppercase tracking-wider text-xs text-[#09ACFF] font-bold mb-2">
           Financial Parameters
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-6">
+        <div className="flex flex-col gap-2">
           {/* Minting Fee */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-base text-black">
-                Minting Fee
-              </span>
-              <span
-                className="ml-2 px-2 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
-                style={{ fontFamily: "Menlo, monospace" }}
-              >
-                mintingFee
-              </span>
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1">
+                <span className="font-semibold text-sm text-black">
+                  Minting Fee
+                </span>
+                <span
+                  className="ml-1 px-1.5 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
+                  style={{ fontFamily: "Menlo, monospace" }}
+                >
+                  mintingFee
+                </span>
+              </div>
             </div>
-            <span className="text-xs text-gray-600 mb-2">
-              The fee users must pay to mint this license (in IP tokens).
+            <span className="text-xs text-gray-600 mb-1">
+              Fee to mint this license (in IP tokens).
             </span>
             <div style={{ position: "relative" }}>
               <Input
                 id="mintingFee"
                 type="text"
                 inputMode="decimal"
-                placeholder="Minting fee in IP"
+                placeholder="Fee in IP"
                 value={paramValues.mintingFee || ""}
                 onChange={(e) => onParamChange("mintingFee", e.target.value)}
-                style={{ paddingRight: "32px" }}
-                className={`border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] h-12 ${
+                style={{ paddingRight: "24px" }}
+                className={`border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] h-8 text-sm ${
                   disableMintingFee ? "bg-gray-100" : "bg-white"
                 }`}
-                disabled={isLoadingFee || disableMintingFee}
+                disabled={disableMintingFee}
               />
               <span
                 style={{
                   position: "absolute",
-                  right: "12px",
+                  right: "8px",
                   top: "50%",
                   transform: "translateY(-50%)",
                   pointerEvents: "none",
                   color: "rgb(107, 114, 128)",
+                  fontSize: "0.75rem"
                 }}
               >
                 IP
               </span>
             </div>
-            {isLoadingFee ? (
-              <div className="flex items-center gap-2 mt-2">
-                <Spinner size="sm" />
-                <p className="text-xs text-gray-500">Loading current fee...</p>
-              </div>
-            ) : (
-              feeError && (
-                <p className="text-xs text-[#09ACFF] mt-2">{feeError}</p>
-              )
+            {feeError && (
+              <p className="text-xs text-[#09ACFF] mt-1">{feeError}</p>
             )}
             {currentMintingFee && (
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex flex-wrap items-center gap-1 mt-1">
                 <p className="text-xs text-gray-500">
-                  <span className="font-semibold">Current fee:</span>{" "}
+                  <span className="font-semibold">Current:</span>{" "}
                   {currentMintingFee} IP
                 </p>
                 {defaultMintingFee && (
-                  <p className="text-xs text-gray-500 ml-2">
+                  <p className="text-xs text-gray-500">
                     <span className="font-semibold">(Default:</span>{" "}
                     {defaultMintingFee} IP
                     <span className="font-semibold">)</span>
@@ -304,61 +300,70 @@ export const FinancialParametersSection: React.FC<
                 )}
               </div>
             )}
+            {isLoadingFee && (
+              <div className="flex items-center gap-1 mt-1">
+                <Spinner size="sm" />
+                <span className="text-xs text-gray-500">Loading...</span>
+              </div>
+            )}
           </div>
 
-          {/* Commercial Rev Share */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-base text-black">
-                Commercial Revenue Share
-              </span>
-              <span
-                className="ml-2 px-2 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
-                style={{ fontFamily: "Menlo, monospace" }}
-              >
-                commercialRevShare
-              </span>
+          {/* Commercial Revenue Share */}
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1">
+                <span className="font-semibold text-sm text-black">
+                  Revenue Share
+                </span>
+                <span
+                  className="ml-1 px-1.5 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
+                  style={{ fontFamily: "Menlo, monospace" }}
+                >
+                  commercialRevShare
+                </span>
+              </div>
             </div>
-            <span className="text-xs text-gray-600 mb-2">
-              Percentage of commercial revenue shared with the IP owner.
+            <span className="text-xs text-gray-600 mb-1">
+              Percentage of revenue commercial licensees share with IP owner.
             </span>
             <div style={{ position: "relative" }}>
               <Input
                 id="commercialRevShare"
                 type="text"
                 inputMode="decimal"
-                placeholder="Commercial revenue share percentage"
+                placeholder="Share %"
                 value={paramValues.commercialRevShare || ""}
                 onChange={(e) =>
                   onParamChange("commercialRevShare", e.target.value)
                 }
-                style={{ paddingRight: "32px" }}
-                className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] h-12"
+                style={{ paddingRight: "24px" }}
+                className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] h-8 text-sm"
               />
               <span
                 style={{
                   position: "absolute",
-                  right: "12px",
+                  right: "8px",
                   top: "50%",
                   transform: "translateY(-50%)",
                   pointerEvents: "none",
                   color: "rgb(107, 114, 128)",
+                  fontSize: "0.75rem"
                 }}
               >
                 %
               </span>
-              {revShareError && (
-                <p className="text-xs text-[#09ACFF] mt-2">{revShareError}</p>
-              )}
             </div>
+            {revShareError && (
+              <p className="text-xs text-[#09ACFF] mt-1">{revShareError}</p>
+            )}
             {currentRevShare && (
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex flex-wrap items-center gap-1 mt-1">
                 <p className="text-xs text-gray-500">
-                  <span className="font-semibold">Current share:</span>{" "}
+                  <span className="font-semibold">Current:</span>{" "}
                   {currentRevShare}%
                 </p>
                 {defaultRevShare && (
-                  <p className="text-xs text-gray-500 ml-2">
+                  <p className="text-xs text-gray-500">
                     <span className="font-semibold">(Default:</span>{" "}
                     {defaultRevShare}%<span className="font-semibold">)</span>
                   </p>

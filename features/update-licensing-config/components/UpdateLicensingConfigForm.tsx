@@ -27,14 +27,31 @@ export const UpdateLicensingConfigForm: React.FC<
   const [isFormValid, setIsFormValid] = useState(false);
 
   // Track validation state for form sections
-  const [isIPSectionValid, setIsIPSectionValid] = useState(false);
-  const [isFinancialSectionValid, setIsFinancialSectionValid] = useState(false);
-  const [isHooksSectionValid, setIsHooksSectionValid] = useState(false);
+  const [isIPSectionValid, setIsIPSectionValid] = useState(true);
+  const [isFinancialSectionValid, setIsFinancialSectionValid] = useState(true);
+  const [isHooksSectionValid, setIsHooksSectionValid] = useState(true);
   const [isAvailabilitySectionValid, setIsAvailabilitySectionValid] =
     useState(true);
+  const [isWideScreen, setIsWideScreen] = useState(false);
   const [licenseConfig, setLicenseConfig] = useState<LicensingConfig | null>(
     null
   );
+
+  // Check if screen is wider than 1150px
+  useEffect(() => {
+    const checkScreenWidth = () => {
+      setIsWideScreen(window.innerWidth >= 1150);
+    };
+
+    // Check on initial render
+    checkScreenWidth();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", checkScreenWidth);
+
+    // Clean up event listener
+    return () => window.removeEventListener("resize", checkScreenWidth);
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
 
   const { data: wallet } = useWalletClient();
@@ -194,15 +211,15 @@ export const UpdateLicensingConfigForm: React.FC<
             );
           }
           await validateExecution();
+
+          // Refresh data after successful transaction
+          setTimeout(() => {
+            refreshData();
+          }, 2000); // Wait 2 seconds for blockchain to update
         }
 
         // Set execution success - the form components will handle verification
         setExecutionSuccess(true);
-
-        // Refresh data after successful transaction
-        setTimeout(() => {
-          refreshData();
-        }, 2000); // Wait 2 seconds for blockchain to update
       } else {
         addTerminalMessage("Transaction failed.", "error");
         addTerminalMessage(`Error: ${result.error}`);
@@ -226,13 +243,30 @@ export const UpdateLicensingConfigForm: React.FC<
         if (isFormValid && !isExecuting) handleExecute();
       }}
     >
-      {/* IP Identification Section - Foundation of the form */}
-      <IPIdentificationSection
-        ipId={paramValues.ipId || ""}
-        licenseTermsId={paramValues.licenseTermsId || ""}
-        onParamChange={handleParamChange}
-        onValidationChange={setIsIPSectionValid}
-      />
+      {/* SECTION 1: Top 2 columns (Instructions | IP Identification) */}
+      <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl">
+        {/* Instructions */}
+        <div className="p-6 bg-[#F6FBFF] border border-[#A1D1FF] rounded shadow-sm flex flex-col justify-center flex-1 min-w-0 w-full">
+          <h2 className="text-xl font-bold text-[#09ACFF] mb-1">
+            Instructions
+          </h2>
+          <p className="text-sm text-gray-700">
+            Update the licensing configuration for your IP asset. You can modify
+            the minting fee, licensing hook settings, and availability status.
+            Each parameter includes its technical code name for full
+            transparency.
+          </p>
+        </div>
+        {/* IP Identification Section - Foundation of the form */}
+        <div className="flex flex-col gap-2 p-6 bg-white border border-[#A1D1FF] rounded shadow-sm justify-center flex-1 min-w-0 w-full">
+          <IPIdentificationSection
+            ipId={paramValues.ipId || ""}
+            licenseTermsId={paramValues.licenseTermsId || ""}
+            onParamChange={handleParamChange}
+            onValidationChange={setIsIPSectionValid}
+          />
+        </div>
+      </div>
 
       {/* Configuration Sections - Only fully visible when IP and Terms are selected */}
       <div
@@ -242,44 +276,62 @@ export const UpdateLicensingConfigForm: React.FC<
             : "opacity-100"
         }`}
       >
-        {/* Configuration Header - Only shown when required fields are filled */}
-        {paramValues.ipId && paramValues.licenseTermsId && (
-          <div className="mb-6 text-center">
-            <h3 className="text-lg font-semibold text-gray-700">
-              License Configuration Parameters
-            </h3>
-            <p className="text-sm text-gray-500">
-              Configure the parameters for the selected license terms
-            </p>
+        <div className="mb-4 text-center">
+          <h3 className="text-lg font-semibold text-gray-700">
+            License Configuration Parameters
+          </h3>
+          <p className="text-sm text-gray-500">
+            Configure the parameters for the selected license terms
+          </p>
+        </div>
+
+        {/* Card Layout for Configuration Sections - 3 columns side by side on desktop, stacked below 1150px */}
+        <div
+          className="flex flex-col space-y-6"
+          style={{
+            flexDirection: isWideScreen ? "row" : "column",
+            columnGap: "1.5rem",
+          }}
+        >
+          {/* Financial Parameters Section */}
+          <div
+            style={{ flex: isWideScreen ? "1" : "auto", padding: "0 0.25rem" }}
+          >
+            <FinancialParametersSection
+              licenseConfig={licenseConfig}
+              client={client}
+              paramValues={paramValues}
+              onParamChange={handleParamChange}
+              onValidationChange={setIsFinancialSectionValid}
+            />
           </div>
-        )}
 
-        {/* Financial Parameters Section */}
-        <FinancialParametersSection
-          licenseConfig={licenseConfig}
-          client={client}
-          paramValues={paramValues}
-          onParamChange={handleParamChange}
-          onValidationChange={setIsFinancialSectionValid}
-        />
+          {/* License Availability Section */}
+          <div
+            style={{ flex: isWideScreen ? "1" : "auto", padding: "0 0.25rem" }}
+          >
+            <LicenseAvailabilitySection
+              licenseConfig={licenseConfig}
+              client={client}
+              paramValues={paramValues}
+              onParamChange={handleParamChange}
+              onValidationChange={setIsAvailabilitySectionValid}
+            />
+          </div>
 
-        {/* License Availability Section */}
-        <LicenseAvailabilitySection
-          licenseConfig={licenseConfig}
-          client={client}
-          paramValues={paramValues}
-          onParamChange={handleParamChange}
-          onValidationChange={setIsAvailabilitySectionValid}
-        />
-
-        {/* License Hooks Section */}
-        <LicenseHooksSection
-          licenseConfig={licenseConfig}
-          client={client}
-          paramValues={paramValues}
-          onParamChange={handleParamChange}
-          onValidationChange={setIsHooksSectionValid}
-        />
+          {/* License Hooks Section */}
+          <div
+            style={{ flex: isWideScreen ? "1" : "auto", padding: "0 0.25rem" }}
+          >
+            <LicenseHooksSection
+              licenseConfig={licenseConfig}
+              client={client}
+              paramValues={paramValues}
+              onParamChange={handleParamChange}
+              onValidationChange={setIsHooksSectionValid}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Execute Button */}

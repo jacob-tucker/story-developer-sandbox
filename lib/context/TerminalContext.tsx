@@ -92,26 +92,58 @@ export const Terminal: React.FC<{
   const { messages } = useTerminal();
 
   return (
-    <div className="flex-1 mt-6">
+    <div className="flex-1 mt-4">
       <h3 className="text-xl font-bold text-black border-b border-[#09ACFF] pb-2 mb-4">
         Response
       </h3>
-      <div className="bg-[#1E1E1E] p-4 rounded-md h-[350px] overflow-y-auto shadow-inner border border-[#333] font-mono">
-        <div className="flex items-center mb-2 text-gray-500 text-sm">
-          <span className="mr-1">$</span>
-          <span className="text-green-400">story-sandbox</span>
-          <span className="mr-1 ml-1">:</span>
-          <span className="text-blue-400">~</span>
-          <span className="animate-pulse ml-1">▌</span>
+      <div
+        style={{
+          backgroundColor: "#1E1E1E",
+          padding: "1rem",
+          borderRadius: "0.375rem",
+          height: "450px",
+          minHeight: "450px",
+          overflowY: "auto",
+          boxShadow: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+          border: "1px solid #333",
+          fontFamily: "monospace",
+        }}
+      >
+        <div className="flex items-center mb-2 text-sm">
+          <span style={{ marginRight: "0.25rem", color: "#6B7280" }}>$</span>
+          <span style={{ color: "#4ADE80" }}>story-sandbox</span>
+          <span
+            style={{
+              marginRight: "0.25rem",
+              marginLeft: "0.25rem",
+              color: "#6B7280",
+            }}
+          >
+            :
+          </span>
+          <span style={{ color: "#60A5fA" }}>~</span>
+          <span
+            style={{
+              animation: "pulse 1.5s infinite",
+              marginLeft: "0.25rem",
+              color: "#E5E7EB",
+            }}
+          >
+            ▌
+          </span>
         </div>
         <pre
-          className={`font-mono text-sm leading-relaxed ${
-            success === true
-              ? "text-[#A1D1FF]"
-              : success === false
-              ? "text-red-400"
-              : "text-gray-200"
-          }`}
+          style={{
+            fontFamily: "monospace",
+            fontSize: "0.875rem",
+            lineHeight: "1.5",
+            color:
+              success === true
+                ? "#A1D1FF"
+                : success === false
+                ? "#f87171"
+                : "#E5E7EB",
+          }}
         >
           <code>{messages}</code>
         </pre>

@@ -71,54 +71,53 @@ export const LicenseAvailabilitySection: React.FC<
 
   return (
     <div
-      className="bg-white border rounded-lg shadow-sm mb-6 w-full"
-      style={{ borderLeft: "5px solid #09ACFF" }}
+      className="bg-white border rounded-lg shadow-sm w-full h-full"
+      style={{ borderLeft: "4px solid #09ACFF" }}
     >
-      <div className="flex flex-col w-full p-6">
-        <div className="uppercase tracking-wider text-xs text-[#09ACFF] font-bold mb-4">
+      <div className="flex flex-col w-full p-3">
+        <div className="uppercase tracking-wider text-xs text-[#09ACFF] font-bold mb-2">
           License Availability
         </div>
-        <div className="max-w-xl">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="font-semibold text-base text-black">
-              Disable License
-            </span>
-            <span
-              className="ml-2 px-2 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
-              style={{ fontFamily: "Menlo, monospace" }}
-            >
-              disabled
-            </span>
-          </div>
-          <span className="text-xs text-gray-600 mb-2 block">
-            Set to true to prevent users from minting new licenses.
-          </span>
-          <select
-            id="disabled"
-            value={paramValues.disabled || "false"}
-            onChange={(e) => onParamChange("disabled", e.target.value)}
-            className="w-full h-12 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
-            disabled={isDisabledLoading}
-          >
-            <option value="false">False</option>
-            <option value="true">True</option>
-          </select>
-          {disabledError && (
-            <p className="text-xs text-[#09ACFF] mt-2">{disabledError}</p>
-          )}
-          {isDisabledLoading && (
-            <div className="flex items-center gap-2 mt-2">
-              <Spinner size="sm" />
-              <p className="text-xs text-gray-500">
-                Loading disabled status...
-              </p>
+        <div className="w-full">
+          <div className="flex flex-col">
+            <div className="mb-1">
+              <div className="flex items-center gap-1">
+                <span className="font-semibold text-sm text-black">
+                  Disable License
+                </span>
+                <span
+                  className="ml-1 px-1.5 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
+                  style={{ fontFamily: "Menlo, monospace" }}
+                >
+                  disabled
+                </span>
+              </div>
             </div>
-          )}
-          <p className="text-xs text-gray-600 mt-3">
-            {paramValues.disabled === "true"
-              ? "True means the license is disabled. Users cannot mint new licenses."
-              : "False means the license is enabled. Users can mint new licenses."}
-          </p>
+            <div className="mb-2">
+              <select
+                id="disabled"
+                value={paramValues.disabled || "false"}
+                onChange={(e) => onParamChange("disabled", e.target.value)}
+                className="w-full h-8 px-2 py-0 bg-white border border-gray-300 rounded-md text-sm text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
+                disabled={isDisabledLoading}
+              >
+                <option value="false">False</option>
+                <option value="true">True</option>
+              </select>
+            </div>
+            <span className="text-xs text-gray-600 block">
+              Set to true to prevent users from minting new licenses.
+            </span>
+            {disabledError && (
+              <p className="text-xs text-[#09ACFF] mt-1">{disabledError}</p>
+            )}
+            {isDisabledLoading && (
+              <div className="flex items-center gap-1 mt-1">
+                <Spinner size="sm" />
+                <span className="text-xs text-gray-500">Loading...</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

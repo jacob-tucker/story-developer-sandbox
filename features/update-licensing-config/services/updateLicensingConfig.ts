@@ -61,6 +61,8 @@ export async function executeUpdateLicensingConfig(
     );
     const limitChanged = currentLimit != params.licenseLimit;
 
+    console.log({ currentLimit, licenseLimit: params.licenseLimit });
+
     let configTxHash: string | undefined;
     let limitTxHash: string | undefined;
 

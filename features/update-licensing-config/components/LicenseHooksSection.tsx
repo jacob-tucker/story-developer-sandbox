@@ -93,6 +93,17 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
       const networkConfig = getCurrentNetworkConfig();
       const limitLicenseHookAddress = networkConfig.limitLicenseHookAddress;
 
+      const licenseLimit = await extractLicenseLimitFromHookData(
+        paramValues.ipId as `0x${string}`,
+        paramValues.licenseTermsId
+      );
+
+      if (licenseLimit !== undefined) {
+        onParamChange("licenseLimit", licenseLimit);
+      } else {
+        onParamChange("licenseLimit", "");
+      }
+
       // Check licensing hook type
       if (
         licenseConfig.licensingHook &&
@@ -101,21 +112,9 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
       ) {
         // It's a limit license hook
         onParamChange("licensingHook", "limit");
-
-        const licenseLimit = await extractLicenseLimitFromHookData(
-          paramValues.ipId as `0x${string}`,
-          paramValues.licenseTermsId
-        );
-
-        if (licenseLimit !== undefined) {
-          onParamChange("licenseLimit", licenseLimit);
-        } else {
-          onParamChange("licenseLimit", "");
-        }
       } else {
         // It's not a limit license hook
         onParamChange("licensingHook", "none");
-        onParamChange("licenseLimit", "");
       }
 
       if (onValidationChange) onValidationChange(true);
@@ -150,7 +149,7 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
       fetchLicensingHooks();
     }
   }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
-  
+
   // Set initial validation state to true when component mounts
   useEffect(() => {
     // Initial validation state should be true to avoid disabling the execute button
@@ -158,74 +157,80 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
   }, []);
   return (
     <div
-      className="bg-white border rounded-lg shadow-sm mb-6 w-full"
-      style={{ borderLeft: "5px solid #09ACFF" }}
+      className="bg-white border rounded-lg shadow-sm w-full h-full"
+      style={{ borderLeft: "4px solid #09ACFF" }}
     >
-      <div className="flex flex-col w-full p-6">
-        <div className="uppercase tracking-wider text-xs text-[#09ACFF] font-bold mb-4">
+      <div className="flex flex-col w-full p-3">
+        <div className="uppercase tracking-wider text-xs text-[#09ACFF] font-bold mb-2">
           License Hooks
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-6">
+        <div className="flex flex-col gap-2">
           {/* Licensing Hook */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-base text-black">
-                Licensing Hook
-              </span>
-              <span
-                className="ml-2 px-2 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
-                style={{ fontFamily: "Menlo, monospace" }}
-              >
-                licensingHook
-              </span>
+          <div className="flex flex-col">
+            <div className="mb-1">
+              <div className="flex items-center gap-1">
+                <span className="font-semibold text-sm text-black">
+                  Licensing Hook
+                </span>
+                <span
+                  className="ml-1 px-1.5 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
+                  style={{ fontFamily: "Menlo, monospace" }}
+                >
+                  licensingHook
+                </span>
+              </div>
             </div>
-            <span className="text-xs text-gray-600 mb-2">
+            <div className="mb-2">
+              <select
+                id="licensingHook"
+                value={paramValues.licensingHook || "none"}
+                onChange={(e) => handleLicensingHookChange(e.target.value)}
+                className="w-full h-8 px-2 py-0 bg-white border border-gray-300 rounded-md text-sm text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
+                disabled={isLoadingHooks}
+              >
+                <option value="none">None</option>
+                <option value="limit">Limit</option>
+              </select>
+            </div>
+            <span className="text-xs text-gray-600 block">
               Select the hook to apply to this license.
             </span>
-            <select
-              id="licensingHook"
-              value={paramValues.licensingHook || "none"}
-              onChange={(e) => handleLicensingHookChange(e.target.value)}
-              className="w-full h-12 px-3 py-2 bg-white border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#09ACFF] focus:ring-[#09ACFF]"
-              disabled={isLoadingHooks}
-            >
-              <option value="none">None</option>
-              <option value="limit">Limit License</option>
-            </select>
             {isLoadingHooks && (
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-1 mt-1">
                 <Spinner size="sm" />
-                <span className="text-xs text-gray-500">Loading hook configuration...</span>
+                <span className="text-xs text-gray-500">Loading...</span>
               </div>
             )}
           </div>
 
           {/* License Limit (only shown when Limit License hook is selected) */}
           {showLicenseLimitInput && (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-semibold text-base text-black">
-                  License Limit
-                </span>
-                <span
-                  className="ml-2 px-2 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
-                  style={{ fontFamily: "Menlo, monospace" }}
-                >
-                  licenseLimit
-                </span>
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-sm text-black">
+                    License Limit
+                  </span>
+                  <span
+                    className="ml-1 px-1.5 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight"
+                    style={{ fontFamily: "Menlo, monospace" }}
+                  >
+                    licenseLimit
+                  </span>
+                </div>
               </div>
-              <span className="text-xs text-gray-600 mb-2">
+              <span className="text-xs text-gray-600 mb-1">
                 Maximum number of licenses that can be minted.
               </span>
               <Input
                 id="licenseLimit"
-                placeholder="Maximum number of licenses"
+                placeholder="Max licenses"
                 value={paramValues.licenseLimit || ""}
                 onChange={(e) => handleLicenseLimitChange(e.target.value)}
-                className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] h-12"
+                className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF] h-8 text-sm"
               />
               {licenseLimitError && (
-                <p className="text-xs text-[#09ACFF] mt-2">
+                <p className="text-xs text-[#09ACFF] mt-1">
                   {licenseLimitError}
                 </p>
               )}
