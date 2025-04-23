@@ -280,15 +280,21 @@ export const UpdateLicensingConfigForm: React.FC<
 
         {/* Card Layout for Configuration Sections - 3 columns side by side on desktop, stacked below 1150px */}
         <div
-          className="flex flex-col space-y-6"
+          className={
+            isWideScreen ? "flex flex-row gap-6" : "flex flex-col space-y-8"
+          }
           style={{
-            flexDirection: isWideScreen ? "row" : "column",
-            columnGap: "1.5rem",
+            columnGap: isWideScreen ? "1.5rem" : "0",
+            marginTop: isWideScreen ? "1rem" : "2rem",
           }}
         >
           {/* Financial Parameters Section */}
           <div
-            style={{ flex: isWideScreen ? "1" : "auto", padding: "0 0.25rem" }}
+            className={isWideScreen ? "flex-1" : ""}
+            style={{
+              padding: "0 0.25rem",
+              marginBottom: isWideScreen ? "0" : "2rem",
+            }}
           >
             <FinancialParametersSection
               licenseConfig={licenseConfig}
@@ -301,7 +307,11 @@ export const UpdateLicensingConfigForm: React.FC<
 
           {/* License Availability Section */}
           <div
-            style={{ flex: isWideScreen ? "1" : "auto", padding: "0 0.25rem" }}
+            className={isWideScreen ? "flex-1" : ""}
+            style={{
+              padding: "0 0.25rem",
+              marginBottom: isWideScreen ? "0" : "2rem",
+            }}
           >
             <LicenseAvailabilitySection
               licenseConfig={licenseConfig}
@@ -314,7 +324,11 @@ export const UpdateLicensingConfigForm: React.FC<
 
           {/* License Hooks Section */}
           <div
-            style={{ flex: isWideScreen ? "1" : "auto", padding: "0 0.25rem" }}
+            className={isWideScreen ? "flex-1" : ""}
+            style={{
+              padding: "0 0.25rem",
+              marginBottom: isWideScreen ? "0" : "2rem",
+            }}
           >
             <LicenseHooksSection
               licenseConfig={licenseConfig}

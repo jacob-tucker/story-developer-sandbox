@@ -276,7 +276,7 @@ export const FinancialParametersSection: React.FC<
                   transform: "translateY(-50%)",
                   pointerEvents: "none",
                   color: "rgb(107, 114, 128)",
-                  fontSize: "0.75rem"
+                  fontSize: "0.75rem",
                 }}
               >
                 IP
@@ -288,14 +288,11 @@ export const FinancialParametersSection: React.FC<
             {currentMintingFee && (
               <div className="flex flex-wrap items-center gap-1 mt-1">
                 <p className="text-xs text-gray-500">
-                  <span className="font-semibold">Current:</span>{" "}
-                  {currentMintingFee} IP
+                  Current: {currentMintingFee} IP
                 </p>
                 {defaultMintingFee && (
                   <p className="text-xs text-gray-500">
-                    <span className="font-semibold">(Default:</span>{" "}
-                    {defaultMintingFee} IP
-                    <span className="font-semibold">)</span>
+                    (Default: {defaultMintingFee} IP)
                   </p>
                 )}
               </div>
@@ -347,7 +344,7 @@ export const FinancialParametersSection: React.FC<
                   transform: "translateY(-50%)",
                   pointerEvents: "none",
                   color: "rgb(107, 114, 128)",
-                  fontSize: "0.75rem"
+                  fontSize: "0.75rem",
                 }}
               >
                 %
@@ -359,13 +356,11 @@ export const FinancialParametersSection: React.FC<
             {currentRevShare && (
               <div className="flex flex-wrap items-center gap-1 mt-1">
                 <p className="text-xs text-gray-500">
-                  <span className="font-semibold">Current:</span>{" "}
-                  {currentRevShare}%
+                  Current: {currentRevShare}%
                 </p>
                 {defaultRevShare && (
                   <p className="text-xs text-gray-500">
-                    <span className="font-semibold">(Default:</span>{" "}
-                    {defaultRevShare}%<span className="font-semibold">)</span>
+                    (Default: {defaultRevShare}%)
                   </p>
                 )}
               </div>

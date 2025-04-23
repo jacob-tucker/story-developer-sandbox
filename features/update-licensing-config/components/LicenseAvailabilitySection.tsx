@@ -65,11 +65,11 @@ export const LicenseAvailabilitySection: React.FC<
 
   return (
     <div
-      className="bg-white border rounded-lg shadow-sm w-full h-full"
-      style={{ borderLeft: "4px solid #09ACFF" }}
+      className="bg-white border rounded-lg shadow-sm w-full h-full flex flex-col"
+      style={{ borderLeft: `4px solid ${licenseConfig?.disabled ? "#FACC15" : "#09ACFF"}` }}
     >
-      <div className="flex flex-col w-full p-3">
-        <div className="uppercase tracking-wider text-xs text-[#09ACFF] font-bold mb-2">
+      <div className="flex flex-col w-full p-3 flex-grow">
+        <div className="uppercase tracking-wider text-xs font-bold mb-2" style={{ color: licenseConfig?.disabled ? "#FACC15" : "#09ACFF" }}>
           License Availability
         </div>
         <div className="w-full">
@@ -114,6 +114,16 @@ export const LicenseAvailabilitySection: React.FC<
           </div>
         </div>
       </div>
+      
+      {/* Simple warning message at the bottom of the card */}
+      {licenseConfig?.disabled && (
+        <div className="py-2 flex items-center justify-center mt-auto border-t border-gray-100">
+          <span className="text-yellow-500 mr-1">⚠️</span>
+          <span className="text-xs text-yellow-600 font-medium">
+            This license is currently disabled.
+          </span>
+        </div>
+      )}
     </div>
   );
 };
