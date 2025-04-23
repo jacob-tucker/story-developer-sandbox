@@ -98,7 +98,9 @@ export const UpdateLicensingConfigForm: React.FC<
       isFinancialSectionValid &&
       isHooksSectionValid &&
       isAvailabilitySectionValid &&
-      !isLoading;
+      !isLoading &&
+      !!paramValues.ipId &&
+      !!paramValues.licenseTermsId;
 
     setIsFormValid(isValid);
   };
