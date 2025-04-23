@@ -12,10 +12,12 @@ interface IPIdentificationSectionProps {
   licenseTermsOptions?: { value: string; label: string }[];
   onParamChange: (name: string, value: string) => void;
   onLicenseTermsLoaded?: (licenseTermsId: string) => void;
-  onValidationChange?: (isValid: boolean) => void;
+  onValidationChange: (isValid: boolean) => void;
 }
 
-export const IPIdentificationSection: React.FC<IPIdentificationSectionProps> = ({
+export const IPIdentificationSection: React.FC<
+  IPIdentificationSectionProps
+> = ({
   ipId,
   licenseTermsId,
   ipIdError: externalIpIdError,
@@ -28,20 +30,26 @@ export const IPIdentificationSection: React.FC<IPIdentificationSectionProps> = (
   // Internal state for when not provided externally
   const [internalIpIdError, setInternalIpIdError] = useState("");
   const [internalIsLoadingTerms, setInternalIsLoadingTerms] = useState(false);
-  const [internalLicenseTermsOptions, setInternalLicenseTermsOptions] = useState<
-    { value: string; label: string }[]
-  >([]);
-  
+  const [internalLicenseTermsOptions, setInternalLicenseTermsOptions] =
+    useState<{ value: string; label: string }[]>([]);
+
   // Use external values if provided, otherwise use internal state
-  const ipIdError = externalIpIdError !== undefined ? externalIpIdError : internalIpIdError;
-  const isLoadingTerms = externalIsLoadingTerms !== undefined ? externalIsLoadingTerms : internalIsLoadingTerms;
-  const licenseTermsOptions = externalLicenseTermsOptions !== undefined ? externalLicenseTermsOptions : internalLicenseTermsOptions;
-  
+  const ipIdError =
+    externalIpIdError !== undefined ? externalIpIdError : internalIpIdError;
+  const isLoadingTerms =
+    externalIsLoadingTerms !== undefined
+      ? externalIsLoadingTerms
+      : internalIsLoadingTerms;
+  const licenseTermsOptions =
+    externalLicenseTermsOptions !== undefined
+      ? externalLicenseTermsOptions
+      : internalLicenseTermsOptions;
+
   // Fetch license terms for an IP
   const fetchLicenseTerms = async (ipIdValue: string) => {
     if (!ipIdValue || !ipIdValue.startsWith("0x")) {
       setInternalIpIdError("Invalid IP ID format. Must start with 0x.");
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
       return;
     }
 
@@ -54,35 +62,37 @@ export const IPIdentificationSection: React.FC<IPIdentificationSectionProps> = (
       if (result.options.length > 0) {
         setInternalLicenseTermsOptions(result.options);
         setInternalIpIdError("");
-        if (onValidationChange) onValidationChange(true);
+        onValidationChange(true);
 
         // Auto-select the first license term when options are available
         const firstTermId = result.options[0].value;
         onParamChange("licenseTermsId", firstTermId);
-        
+
         // Notify parent component that license terms are loaded
         if (onLicenseTermsLoaded) {
           onLicenseTermsLoaded(firstTermId);
         }
       } else {
         setInternalLicenseTermsOptions([]);
-        setInternalIpIdError(result.error || "No license terms found for this IP ID.");
-        if (onValidationChange) onValidationChange(false);
+        setInternalIpIdError(
+          result.error || "No license terms found for this IP ID."
+        );
+        onValidationChange(false);
       }
     } catch (error) {
       console.error("Error fetching license terms:", error);
       setInternalIpIdError("Error fetching license terms. Please try again.");
       setInternalLicenseTermsOptions([]);
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
     } finally {
       setInternalIsLoadingTerms(false);
     }
   };
-  
+
   // Handle IP ID change
   const handleIpIdChange = (value: string) => {
     onParamChange("ipId", value);
-    
+
     // For IP ID, fetch license terms when it's a valid address
     if (value && value.startsWith("0x")) {
       fetchLicenseTerms(value);
@@ -111,13 +121,18 @@ export const IPIdentificationSection: React.FC<IPIdentificationSectionProps> = (
             onChange={(e) => handleIpIdChange(e.target.value)}
             className="bg-white border-gray-300 text-black focus:border-[#09ACFF] focus:ring-[#09ACFF]"
           />
-          {ipIdError && <p className="text-xs text-[#09ACFF] mt-1">{ipIdError}</p>}
+          {ipIdError && (
+            <p className="text-xs text-[#09ACFF] mt-1">{ipIdError}</p>
+          )}
         </div>
-        
+
         {/* License Terms ID */}
         <div>
           <div className="flex items-center gap-1 mb-1 mt-4">
-            <Label htmlFor="licenseTermsId" className="text-black font-semibold">
+            <Label
+              htmlFor="licenseTermsId"
+              className="text-black font-semibold"
+            >
               License Terms
             </Label>
             <span className="px-1.5 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight">

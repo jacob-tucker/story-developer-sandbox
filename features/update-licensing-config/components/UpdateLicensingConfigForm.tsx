@@ -264,7 +264,7 @@ export const UpdateLicensingConfigForm: React.FC<
       {/* Configuration Sections - Only fully visible when IP and Terms are selected */}
       <div
         className={`w-full transition-opacity duration-300 ${
-          !paramValues.ipId || !paramValues.licenseTermsId
+          !paramValues.ipId || !paramValues.licenseTermsId || !isIPSectionValid
             ? "opacity-50 pointer-events-none"
             : "opacity-100"
         }`}

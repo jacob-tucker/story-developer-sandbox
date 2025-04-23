@@ -59,8 +59,7 @@ export async function verifyLicensingConfig(
         if (feeMatches && disabledMatches && hookMatches) {
           return {
             success: true,
-            message: `Licensing configuration successfully updated.`,
-            details: `Minting fee: ${currentFeeHuman} IP, Disabled: ${currentConfig.disabled}, Hook: ${currentConfig.licensingHook}`,
+            message: `The licensing configuration was successfully updated.`,
           };
         } else {
           return {
