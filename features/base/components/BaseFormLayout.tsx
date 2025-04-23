@@ -1,12 +1,12 @@
-import React, { ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/atoms/Spinner';
+import React, { ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/atoms/Spinner";
+import { useTerminal } from "@/lib/context/TerminalContext";
 
 interface BaseFormLayoutProps {
   children: ReactNode;
   actionType: string;
   isFormValid: boolean;
-  isExecuting: boolean;
   onExecute: () => void;
   walletAddress?: string;
   isDisabled?: boolean;
@@ -19,7 +19,6 @@ export const BaseFormLayout: React.FC<BaseFormLayoutProps> = ({
   children,
   actionType,
   isFormValid,
-  isExecuting,
   onExecute,
   walletAddress,
   isDisabled = false,
@@ -27,17 +26,18 @@ export const BaseFormLayout: React.FC<BaseFormLayoutProps> = ({
   isCheckingStatus = false,
   buttonText,
 }) => {
+  const { isExecuting } = useTerminal();
+
   return (
     <div className="space-y-4">
       {/* Hidden action type field */}
-      <input 
-        type="hidden" 
-        name="actionType" 
-        value={actionType} 
-      />
+      <input type="hidden" name="actionType" value={actionType} />
 
       {/* Parameters Grid */}
-      <div className="grid grid-cols-2 gap-4 mb-4 w-full" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
+      <div
+        className="grid grid-cols-2 gap-4 mb-4 w-full"
+        style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)" }}
+      >
         {children}
       </div>
 
@@ -47,9 +47,7 @@ export const BaseFormLayout: React.FC<BaseFormLayoutProps> = ({
           onClick={onExecute}
           disabled={!walletAddress || isExecuting || isDisabled}
           className={`w-full ${
-            !isDisabled
-              ? "bg-[#09ACFF] hover:bg-[#09ACFF]/80"
-              : "bg-gray-300"
+            !isDisabled ? "bg-[#09ACFF] hover:bg-[#09ACFF]/80" : "bg-gray-300"
           } text-white relative`}
         >
           {isExecuting ? (

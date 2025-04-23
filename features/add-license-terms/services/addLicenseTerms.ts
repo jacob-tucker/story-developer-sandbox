@@ -1,7 +1,6 @@
 import { StoryClient, LicenseTerms } from "@story-protocol/core-sdk";
 import { zeroAddress, parseEther } from "viem";
 import { ExecuteReturnType } from "../../types";
-import { getLicenseTermsSDK } from "@/features/utils";
 import { fetchLicenseTermsIds } from "@/features/api";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 import { uploadJSONToIPFS } from "@/lib/functions/uploadJSONToIpfs";
@@ -152,7 +151,7 @@ export async function executeAddLicenseTerms(
     // Return the created license terms ID along with the success response
     return {
       success: true,
-      txHash: response.txHash!,
+      txHashes: [response.txHash!],
       licenseTermsId: attachedLicenseTermsId.toString(),
     };
   } catch (error) {

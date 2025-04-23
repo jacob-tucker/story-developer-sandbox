@@ -5,37 +5,26 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/atoms/Spinner";
 import { OnChainTermsSection } from "./OnChainTermsSection";
 import { OffChainTermsSection } from "./OffChainTermsSection";
-import { ActionType } from "../../types";
 import { StoryClient } from "@story-protocol/core-sdk";
-import { verifyLicenseTerms } from "../services/addLicenseTerms";
-import { BaseFormLayout } from "../../base/components/BaseFormLayout";
+import {
+  executeAddLicenseTerms,
+  verifyLicenseTerms,
+} from "../services/addLicenseTerms";
 import { useNetwork } from "@/lib/context/NetworkContext";
+import { useTerminal } from "@/lib/context/TerminalContext";
 
 interface AddLicenseTermsFormProps {
   paramValues: Record<string, string>;
   onParamChange: (name: string, value: string) => void;
-  onExecute: () => void;
-  isExecuting: boolean;
-  executionSuccess: boolean | null;
   walletAddress?: string;
   client?: StoryClient;
-  addTerminalMessage?: (
-    message: string,
-    type?: "success" | "error" | "info"
-  ) => void;
-  lastExecutionResult?: Record<string, string>;
 }
 
 export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
   paramValues,
   onParamChange,
-  onExecute,
-  isExecuting,
-  executionSuccess,
   walletAddress,
   client,
-  addTerminalMessage,
-  lastExecutionResult,
 }) => {
   // Form validation state
   const [isFormValid, setIsFormValid] = useState(false);
@@ -44,6 +33,12 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
   const [commercialRevShareError, setCommercialRevShareError] = useState("");
   const [activeTab, setActiveTab] = useState<"onchain" | "offchain">("onchain");
   const { config } = useNetwork(); // Get network config for addresses
+  const {
+    addTerminalMessage,
+    setIsExecuting,
+    setExecutionSuccess,
+    isExecuting,
+  } = useTerminal();
 
   // Validate form whenever params change
   useEffect(() => {
@@ -144,38 +139,81 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
   };
 
   // After successful execution, verify the license terms
-  useEffect(() => {
-    if (executionSuccess && paramValues.ipId) {
-      // Add delay to ensure blockchain state has updated
-      setTimeout(async () => {
-        if (addTerminalMessage) {
-          addTerminalMessage("Verifying license terms addition...", "info");
+  const validateExecution = async (licenseTermsId: string) => {
+    // Add delay to ensure blockchain state has updated
+    setTimeout(async () => {
+      if (addTerminalMessage) {
+        addTerminalMessage("Verifying license terms addition...", "info");
 
-          // Get license terms ID from execution result
-          const licenseTermsId = lastExecutionResult?.licenseTermsId || "0";
+        // Verify if term ID is found in IP's attached terms
+        const verificationResult = await verifyLicenseTerms(
+          paramValues.ipId,
+          licenseTermsId
+        );
 
-          // Verify if term ID is found in IP's attached terms
-          const verificationResult = await verifyLicenseTerms(
-            paramValues.ipId,
-            licenseTermsId
-          );
+        // Show results
+        addTerminalMessage(
+          verificationResult.message,
+          verificationResult.success ? "success" : "info"
+        );
 
-          // Show results
+        if (verificationResult.details) {
           addTerminalMessage(
-            verificationResult.message,
-            verificationResult.success ? "success" : "info"
+            `Verification details: ${verificationResult.details}`,
+            "info"
           );
+        }
+      }
+    }, 2000);
+  };
 
-          if (verificationResult.details) {
+  const handleExecute = async () => {
+    setIsExecuting(true);
+
+    // Display basic transaction start message
+    addTerminalMessage(`Executing update licensing config transaction...`);
+
+    if (!client) {
+      addTerminalMessage("Error: No client available.", "error");
+      addTerminalMessage("Please connect your wallet to execute transactions.");
+      setExecutionSuccess(false);
+      return;
+    }
+
+    try {
+      const result = await executeAddLicenseTerms(paramValues, client);
+
+      if (result.success) {
+        if (result.txHashes.length == 0) {
+          addTerminalMessage(
+            "No changes were made to the licensing configuration.",
+            "info"
+          );
+        } else {
+          for (const txHash of result.txHashes) {
             addTerminalMessage(
-              `Verification details: ${verificationResult.details}`,
-              "info"
+              `Transaction submitted with hash: ${txHash}`,
+              "success"
             );
           }
+          await validateExecution(result.licenseTermsId!);
         }
-      }, 2000);
+
+        // Set execution success - the form components will handle verification
+        setExecutionSuccess(true);
+      } else {
+        addTerminalMessage("Transaction failed.", "error");
+        addTerminalMessage(`Error: ${result.error}`);
+        setExecutionSuccess(false);
+      }
+    } catch (error) {
+      addTerminalMessage("Transaction failed.", "error");
+      addTerminalMessage(`Error: ${String(error)}`);
+      setExecutionSuccess(false);
+    } finally {
+      setIsExecuting(false);
     }
-  }, [executionSuccess]);
+  };
 
   return (
     <form
@@ -183,7 +221,7 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
       style={{ gap: "24px" }}
       onSubmit={(e) => {
         e.preventDefault();
-        if (isFormValid && !isExecuting) onExecute();
+        if (isFormValid && !isExecuting) handleExecute();
       }}
     >
       {/* SECTION 1: Top 2 columns (Instructions | IP ID) */}
@@ -201,11 +239,13 @@ export const AddLicenseTermsForm: React.FC<AddLicenseTermsFormProps> = ({
         </div>
         {/* IP ID */}
         <div className="flex flex-col gap-2 p-6 bg-white border border-[#A1D1FF] rounded shadow-sm justify-center flex-1 min-w-0 w-full">
-          <Label htmlFor="ipId" className="text-black font-semibold">
-            IP Asset ID
-          </Label>
-          <div className="text-xs text-gray-500 mb-1">
-            <code>ipId</code>
+          <div className="flex items-center gap-1 mb-1">
+            <Label htmlFor="ipId" className="text-black font-semibold">
+              IP Asset ID
+            </Label>
+            <span className="px-1.5 py-0.5 rounded bg-[#EFF3FB] text-[#066DA1] text-xs font-mono border border-[#A1D1FF] tracking-tight">
+              ipId
+            </span>
           </div>
           <div className="text-xs text-gray-600 mb-2">
             The unique identifier for your IP asset (must start with 0x).

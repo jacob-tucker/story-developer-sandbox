@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { changeMintingFee } from "@/lib/code-snippets/changeMintingFee";
 import { disableLicense } from "@/lib/code-snippets/disableLicense";
 import { attachTerms } from "@/lib/code-snippets/attachTerms";
+import { updateLicensingConfig } from "@/lib/code-snippets/updateLicensingConfig";
 
 const data: {
   [type: string]: {
@@ -40,6 +41,15 @@ const data: {
       "Disable a license for a specific IP and license terms using the Licensing Config.",
     code: [
       { filename: "disableLicense.ts", code: disableLicense },
+      { filename: "StoryContext.tsx", code: setupClient },
+    ],
+  },
+  "update-licensing-config": {
+    title: "Update Licensing Config",
+    description:
+      "Update licensing configuration including minting fee, disabled status, and license hook settings.",
+    code: [
+      { filename: "updateLicensingConfig.ts", code: updateLicensingConfig },
       { filename: "StoryContext.tsx", code: setupClient },
     ],
   },
