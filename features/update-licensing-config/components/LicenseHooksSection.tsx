@@ -13,7 +13,7 @@ interface LicenseHooksSectionProps {
   client?: StoryClient;
   paramValues?: Record<string, string>;
   onParamChange: (name: string, value: string) => void;
-  onValidationChange?: (isValid: boolean) => void;
+  onValidationChange: (isValid: boolean) => void;
 }
 
 export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
@@ -35,7 +35,7 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
   const validateLicenseLimit = (value: string) => {
     if (!value && paramValues.licensingHook === "limit") {
       setLicenseLimitError("License limit is required for Limit License hook");
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
       return false;
     }
 
@@ -44,13 +44,13 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
       const isPositiveInteger = /^[1-9]\d*$/.test(value);
       if (!isPositiveInteger) {
         setLicenseLimitError("License limit must be a positive integer");
-        if (onValidationChange) onValidationChange(false);
+        onValidationChange(false);
         return false;
       }
     }
 
     setLicenseLimitError("");
-    if (onValidationChange) onValidationChange(true);
+    onValidationChange(true);
     return true;
   };
 
@@ -64,13 +64,13 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
         setLicenseLimitError(
           "License limit is required for Limit License hook"
         );
-        if (onValidationChange) onValidationChange(false);
+        onValidationChange(false);
       }
     } else {
       setShowLicenseLimitInput(false);
       setLicenseLimitError("");
       onParamChange("licenseLimit", "");
-      if (onValidationChange) onValidationChange(true);
+      onValidationChange(true);
     }
   };
 
@@ -117,11 +117,11 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
         onParamChange("licensingHook", "none");
       }
 
-      if (onValidationChange) onValidationChange(true);
+      onValidationChange(true);
     } catch (error) {
       console.error("Error fetching licensing hooks:", error);
       setLicenseLimitError("Error fetching licensing hooks. Please try again.");
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
     } finally {
       setIsLoadingHooks(false);
     }
@@ -149,12 +149,6 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
       fetchLicensingHooks();
     }
   }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
-
-  // Set initial validation state to true when component mounts
-  useEffect(() => {
-    // Initial validation state should be true to avoid disabling the execute button
-    if (onValidationChange) onValidationChange(true);
-  }, []);
   return (
     <div
       className="bg-white border rounded-lg shadow-sm w-full h-full"
@@ -162,7 +156,7 @@ export const LicenseHooksSection: React.FC<LicenseHooksSectionProps> = ({
     >
       <div className="flex flex-col w-full p-3">
         <div className="uppercase tracking-wider text-xs text-[#09ACFF] font-bold mb-2">
-          License Hooks
+          Additional Features
         </div>
         <div className="flex flex-col gap-2">
           {/* Licensing Hook */}

@@ -8,7 +8,7 @@ interface LicenseAvailabilitySectionProps {
   client?: StoryClient;
   paramValues?: Record<string, string>;
   onParamChange: (name: string, value: string) => void;
-  onValidationChange?: (isValid: boolean) => void;
+  onValidationChange: (isValid: boolean) => void;
 }
 
 export const LicenseAvailabilitySection: React.FC<
@@ -39,13 +39,13 @@ export const LicenseAvailabilitySection: React.FC<
       // Set disabled status from the config
       onParamChange("disabled", licenseConfig.disabled ? "true" : "false");
 
-      if (onValidationChange) onValidationChange(true);
+      onValidationChange(true);
     } catch (error) {
       console.error("Error fetching license availability:", error);
       setDisabledError(
         "Error fetching license availability. Please try again."
       );
-      if (onValidationChange) onValidationChange(false);
+      onValidationChange(false);
     } finally {
       setIsDisabledLoading(false);
     }
@@ -62,12 +62,6 @@ export const LicenseAvailabilitySection: React.FC<
       fetchLicenseAvailability();
     }
   }, [paramValues.ipId, paramValues.licenseTermsId, licenseConfig, client]);
-  
-  // Set initial validation state to true when component mounts
-  useEffect(() => {
-    // Initial validation state should be true to avoid disabling the execute button
-    if (onValidationChange) onValidationChange(true);
-  }, []);
 
   return (
     <div

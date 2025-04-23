@@ -36,6 +36,16 @@ export const UpdateLicensingConfigForm: React.FC<
   const [licenseConfig, setLicenseConfig] = useState<LicensingConfig | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { data: wallet } = useWalletClient();
+  const {
+    setIsExecuting,
+    addTerminalMessage,
+    executionSuccess,
+    setExecutionSuccess,
+    isExecuting,
+  } = useTerminal();
 
   // Check if screen is wider than 1150px
   useEffect(() => {
@@ -52,16 +62,6 @@ export const UpdateLicensingConfigForm: React.FC<
     // Clean up event listener
     return () => window.removeEventListener("resize", checkScreenWidth);
   }, []);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { data: wallet } = useWalletClient();
-  const {
-    setIsExecuting,
-    addTerminalMessage,
-    executionSuccess,
-    setExecutionSuccess,
-    isExecuting,
-  } = useTerminal();
 
   // Function to refresh licensing config data
   const refreshData = async () => {
@@ -97,17 +97,10 @@ export const UpdateLicensingConfigForm: React.FC<
       isIPSectionValid &&
       isFinancialSectionValid &&
       isHooksSectionValid &&
-      isAvailabilitySectionValid;
+      isAvailabilitySectionValid &&
+      !isLoading;
 
     setIsFormValid(isValid);
-  };
-
-  // Handle parameter change
-  const handleParamChange = (name: string, value: string) => {
-    onParamChange(name, value);
-
-    // Validate form after any parameter change
-    setTimeout(validateForm, 0);
   };
 
   // Effect to validate form when parameters change
@@ -262,7 +255,7 @@ export const UpdateLicensingConfigForm: React.FC<
           <IPIdentificationSection
             ipId={paramValues.ipId || ""}
             licenseTermsId={paramValues.licenseTermsId || ""}
-            onParamChange={handleParamChange}
+            onParamChange={onParamChange}
             onValidationChange={setIsIPSectionValid}
           />
         </div>
@@ -301,7 +294,7 @@ export const UpdateLicensingConfigForm: React.FC<
               licenseConfig={licenseConfig}
               client={client}
               paramValues={paramValues}
-              onParamChange={handleParamChange}
+              onParamChange={onParamChange}
               onValidationChange={setIsFinancialSectionValid}
             />
           </div>
@@ -314,7 +307,7 @@ export const UpdateLicensingConfigForm: React.FC<
               licenseConfig={licenseConfig}
               client={client}
               paramValues={paramValues}
-              onParamChange={handleParamChange}
+              onParamChange={onParamChange}
               onValidationChange={setIsAvailabilitySectionValid}
             />
           </div>
@@ -327,7 +320,7 @@ export const UpdateLicensingConfigForm: React.FC<
               licenseConfig={licenseConfig}
               client={client}
               paramValues={paramValues}
-              onParamChange={handleParamChange}
+              onParamChange={onParamChange}
               onValidationChange={setIsHooksSectionValid}
             />
           </div>
