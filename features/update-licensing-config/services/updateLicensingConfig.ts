@@ -1,5 +1,5 @@
 import { StoryClient, LicensingConfig } from "@story-protocol/core-sdk";
-import { parseEther, Account, zeroAddress, zeroHash } from "viem";
+import { parseEther, Account, zeroAddress, zeroHash, Address } from "viem";
 import { getPublicClient, extractLicenseLimitFromHookData } from "../../utils";
 import { getCurrentNetworkConfig } from "@/lib/context/NetworkContext";
 import { ExecuteReturnType } from "../../types";
@@ -47,8 +47,10 @@ export async function executeUpdateLicensingConfig(
       parseEther(params.mintingFee) !== licenseConfig.mintingFee;
     const disabledChanged =
       (params.disabled === "true") !== licenseConfig.disabled;
+
     const revShareChanged =
-      Number(params.commercialRevShare) !== licenseConfig.commercialRevShare;
+      Number(params.commercialRevShare) !==
+      licenseConfig.commercialRevShare / 1000000;
 
     const paramHook =
       params.licensingHook === "limit" ? limitHookAddress : zeroAddress;
@@ -119,6 +121,7 @@ export async function executeUpdateLicensingConfig(
         params.ipId,
         params.licenseTermsId,
         licenseTemplateAddress,
+        limitHookAddress,
         params.licenseLimit,
         wallet
       );
@@ -158,6 +161,7 @@ export async function updateLicenseLimit(
   ipId: string,
   licenseTermsId: string,
   licenseTemplateAddress: string,
+  limitLicenseHookAddress: Address,
   licenseLimit: string,
   wallet: WalletClient
 ): Promise<{ txHash?: string; success: boolean; error?: string }> {
@@ -167,7 +171,7 @@ export async function updateLicenseLimit(
     const { request } = await publicClient.simulateContract({
       // address of TotalLicenseTokenLimitHook
       // from https://docs.story.foundation/developers/deployed-smart-contracts
-      address: "0xaBAD364Bfa41230272b08f171E0Ca939bD600478",
+      address: limitLicenseHookAddress,
       abi: tokenLimitAbi,
       functionName: "setTotalLicenseTokenLimit",
       args: [
